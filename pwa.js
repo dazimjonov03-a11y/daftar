@@ -7,7 +7,7 @@
   const cfg = window.FIREBASE_CONFIG;
   const TYPES = { sales: ["d", "p", "r"], prod: ["m"], stock: ["b", "u"], exp: ["x"], wages: ["w", "v"] };
   const REFS = { shops: "sales", materials: "stock", workers: "wages" };
-  const PWA = window.DAFTAR_PWA = { email: "", name: "", owner: false, perms: [], users: [],
+  const PWA = window.DAFTAR_PWA = { email: "", name: "", uid: "", owner: false, full: false, perms: [], users: [],
     logout() { firebase.auth().signOut().then(() => { try { history.replaceState(null, "", location.pathname); } catch (e) {} location.reload(); }); } };
   const block = text => { gate.hidden = false; gate.classList.add("nofields"); msg.textContent = text; };
   const kick = text => { try { sessionStorage.setItem("gateMsg", text); } catch (e) {} PWA.logout(); };
@@ -27,10 +27,10 @@
     ready = new Promise(res => firebase.auth().onAuthStateChanged(async u => {
       if (!u) { gate.hidden = false; msg.textContent = note || "Login va PIN-kodni kiriting."; return; }
       if (started) return; started = true;
-      PWA.email = u.email || "";
+      PWA.email = u.email || ""; PWA.uid = u.uid;
       PWA.owner = !PWA.email.endsWith("@" + cfg.authDomain);
       if (PWA.owner) {
-        PWA.perms = null; PWA.name = PWA.email;
+        PWA.perms = null; PWA.name = "Rahbar";
         fs.collection("users").onSnapshot(s => { PWA.users = s.docs.map(d => Object.assign({ uid: d.id }, d.data())); rerender(); }, () => {});
       } else {
         let first = true, sig = "";
@@ -42,6 +42,7 @@
         }, () => { if (first) { first = false; done(false); } }));
         if (!ok) return denied();
       }
+      PWA.full = PWA.owner || (PWA.perms || []).includes("all");
       gate.hidden = true; res(fs);
     }));
 
@@ -73,6 +74,9 @@
       await fs.collection("users").doc(uid).set(data, { merge: true });
     };
     PWA.removeUser = uid => fs.collection("users").doc(uid).delete();
+    /* Kim nima qilgani: har bir amal alohida yozuv, uni faqat rahbar o'qiydi. */
+    PWA.log = ev => { fs.collection("log").add(Object.assign({ ts: Date.now(), uid: PWA.uid, by: PWA.name }, ev)).catch(() => {}); };
+    PWA.loadLog = n => fs.collection("log").orderBy("ts", "desc").limit(n).get().then(s => s.docs.map(d => d.data()));
   }
 
   const code = e => e && e.code === "permission-denied" ? "invalid_argument" : e && e.code === "resource-exhausted" ? "quota_exceeded" : "unavailable";
@@ -98,7 +102,7 @@
       update: d => { r.set(stamp(p, d), { merge: true }).catch(late); return Promise.resolve(); },
       delete: () => { r.delete().catch(late); return Promise.resolve(); } }; },
     collection: c => ({ onSnapshot: (next, err) => {
-      if (PWA.owner) return fs.collection(c).onSnapshot({ includeMetadataChanges: true }, s => {
+      if (PWA.full) return fs.collection(c).onSnapshot({ includeMetadataChanges: true }, s => {
         if (c === "j") for (const d of s.docs) if (!d.data().t && !fixed.has(d.id)) { fixed.add(d.id); fs.doc("j/" + d.id).set({ t: d.id.split("_")[1] }, { merge: true }).catch(() => {}); }
         next(s);
       }, e => { if (e && e.code === "permission-denied") denied(); else if (err) err({ code: code(e), message: String(e && e.message) }); });
@@ -110,5 +114,5 @@
   const downloads = { save: async ({ filename, data }) => {
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv;charset=utf-8" })); a.download = filename;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); return { status: "saved" }; } };
-  window.claude = { use: async name => { if (name === "db") { await ready; return wrap(); } return name === "user" ? { can: async () => true } : name === "downloads" ? (PWA.owner || !fs ? downloads : (await ready, PWA.owner ? downloads : null)) : null; } };
+  window.claude = { use: async name => { if (name === "db") { await ready; return wrap(); } return name === "user" ? { can: async () => true } : name === "downloads" ? (!fs ? downloads : (await ready, PWA.full ? downloads : null)) : null; } };
 })();

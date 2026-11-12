@@ -246,19 +246,22 @@ const REFS = {
   workers: { one: "Ishchi", add: "Ishchi qo'shish" }
 };
 const PW = () => window.DAFTAR_PWA || null;
-const can = p => !PW() || !PW().perms || PW().perms.includes(p);
-const isOwner = () => !PW() || !PW().perms || !!PW().owner;
+const can = p => !PW() || !PW().perms || PW().perms.includes("all") || PW().perms.includes(p);
+const isOwner = () => !PW() || !PW().perms || !!PW().owner || PW().perms.includes("all");
+const isBoss = () => !!PW() && !!PW().owner;
+const logEv = (act, kind, text, was) => { const P = PW(); if (P && P.log) P.log({ act, kind, text: String(text || ""), was: String(was || "") }); };
 const TPERM = { d: "sales", p: "sales", r: "sales", m: "prod", b: "stock", u: "stock", x: "exp", w: "wages", v: "wages" };
 const canT = t => can(TPERM[t]);
-const PERMS = [["sales", "Do'konlar: yuk, to'lov, vozvrat, qarzlar"], ["prod", "Ishlab chiqarish"], ["stock", "Xomashyo: xarid va sarf"], ["exp", "Xarajatlar"], ["wages", "Ishchilar va ish haqi"]];
-const VIEWOK = { bugun: () => true, dokonlar: () => can("sales"), sklad: () => can("prod") || can("stock"), ishchilar: () => can("wages"), xarajatlar: () => can("exp"), hisobot: isOwner, sozlama: () => isOwner() || !!PW() };
+const PERMS = [["all", "To'liq huquq: hamma bo'limlar, hisobot, narxlar, o'chirish"], ["sales", "Do'konlar: yuk, to'lov, vozvrat, qarzlar"], ["prod", "Ishlab chiqarish"], ["stock", "Xomashyo: xarid va sarf"], ["exp", "Xarajatlar"], ["wages", "Ishchilar va ish haqi"]];
+const VIEWOK = { bugun: () => true, dokonlar: () => can("sales"), sklad: () => can("prod") || can("stock"), ishchilar: () => can("wages"), xarajatlar: () => can("exp"), hisobot: isOwner, tarix: isBoss, sozlama: () => isOwner() || !!PW() };
 const QUICK = [["d", "+", "Yuk berdim"], ["p", "$", "Pul oldim"], ["r", "↩", "Vozvrat"], ["m", "✓", "Mahsulot chiqdi"], ["b", "▣", "Xomashyo oldim"], ["u", "−", "Xomashyo sarfi"], ["x", "−", "Xarajat"], ["v", "→", "Ishchiga pul"]];
-const VIEWS = [["bugun", "Bugun"], ["dokonlar", "Do'konlar"], ["sklad", "Sklad"], ["ishchilar", "Ishchilar"], ["xarajatlar", "Xarajatlar"], ["hisobot", "Hisobot"], ["sozlama", "Sozlamalar"]];
+const VIEWS = [["bugun", "Bugun"], ["dokonlar", "Do'konlar"], ["sklad", "Sklad"], ["ishchilar", "Ishchilar"], ["xarajatlar", "Xarajatlar"], ["hisobot", "Hisobot"], ["tarix", "Tarix"], ["sozlama", "Sozlamalar"]];
 
 const S = {
   db: null, dl: null, noDb: false, ready: false, slow: false, stale: false, canWrite: true, dead: false,
   loaded: {}, known: new Set(), jSize: {},
   ref: { shops: {}, products: {}, materials: {}, workers: {} }, entries: [],
+  log: null, logBusy: false, logErr: false, logWho: "",
   view: "bugun", day: today(), month: today().slice(0, 7), shopId: null, workerId: null, q: ""
 };
 let D = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {} };
@@ -315,6 +318,11 @@ function mapLinks(s) {
   return `<span class="hint">Lokatsiya kiritilmagan. «Ma'lumotni tuzatish» orqali qo'shing.</span>`;
 }
 const callBtn = ph => window.DAFTAR_PWA ? `<a class="btn small" href="tel:${esc(String(ph).replace(/[^\d+]/g, ""))}">Qo'ng'iroq qilish</a>` : "";
+function sumText(e) {
+  const a = amt(e), who = e.s ? rname("shops", e.s) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
+  return [dm(e.d), who, e.i ? itemsText(e, "drb".includes(e.t)) : "", a ? fmt(a) + " so'm" : "", e.m, e.n].filter(Boolean).join(" · ");
+}
+const refText = x => [x.name, x.price ? fmt(x.price) + " so'm" : "", x.open ? "boshlang'ich qarz " + fmt(x.open) : "", x.phone, x.addr].filter(Boolean).join(" · ");
 const sumOf = (list, t) => list.filter(e => e.t === t).reduce((a, e) => a + amt(e), 0);
 
 /* ---------- rows ---------- */
@@ -333,6 +341,7 @@ function rowHTML(e, showDate) {
     case "v": title = rname("workers", e.w); detail = "pul berildi"; val = "−" + fmt(a); cls = "paid"; break;
   }
   if (e.n) detail += (detail ? " · " : "") + e.n;
+  if (PW() && isOwner() && e.by) detail += (detail ? " · " : "") + "kiritdi: " + e.by + (e.eb && e.eb !== e.by ? ", tuzatdi: " + e.eb : "");
   if (showDate) detail = dm(e.d) + (detail ? " · " + detail : "");
   const inner = `<span class="pill t-${e.t}">${TYPES[e.t].label}</span><span class="row-main"><b>${esc(title)}</b>${detail ? `<small>${esc(detail)}</small>` : ""}</span><span class="row-val ${cls}">${esc(val)}</span>`;
   return S.canWrite ? `<button type="button" class="row" data-edit="${e.id}">${inner}</button>` : `<div class="row">${inner}</div>`;
@@ -521,7 +530,24 @@ function viewSozlama() {
   ${window.DAFTAR_PWA ? `<div class="sec"><h2>Hisob</h2><div class="card"><div>${esc(window.DAFTAR_PWA.name || window.DAFTAR_PWA.email || "")}</div><div><button type="button" class="btn small" data-logout>Hisobdan chiqish</button></div></div></div>` : ""}
   <p class="hint" ${isOwner() ? "" : "hidden"}>Do'konlar va ishchilar o'z bo'limida qo'shiladi. Biror do'konga boshqa narxda bersangiz, yuk yozishda narxni o'zgartiring: dastur shu do'konning oxirgi narxini eslab qoladi.</p>`;
 }
-const VIEWFN = { bugun: viewBugun, dokonlar: viewDokonlar, sklad: viewSklad, ishchilar: viewIshchilar, xarajatlar: viewXarajatlar, hisobot: viewHisobot, sozlama: viewSozlama };
+const ACTS = { add: ["Kiritdi", "t-p"], edit: ["Tuzatdi", "t-b"], del: ["O'chirdi", "t-r"] };
+function loadLog() {
+  if (S.logBusy) return; S.logBusy = true; S.logErr = false;
+  PW().loadLog(200).then(l => { S.log = l; }, () => { S.log = S.log || []; S.logErr = true; }).then(() => { S.logBusy = false; if (S.view === "tarix") render(); });
+}
+function viewTarix() {
+  if (!S.log && !S.logBusy) loadLog();
+  const all = S.log || [], who = [...new Set(all.map(x => x.by).filter(Boolean))].sort();
+  const list = all.filter(x => !S.logWho || x.by === S.logWho);
+  const tm = ts => { const d = new Date(ts), z = n => String(n).padStart(2, "0"); return `${z(d.getDate())}.${z(d.getMonth() + 1)} ${z(d.getHours())}:${z(d.getMinutes())}`; };
+  return `<div class="head"><h1>Tarix</h1><button type="button" class="btn small" data-reload-log ${S.logBusy ? "disabled" : ""}>${S.logBusy ? "Yuklanmoqda…" : "Yangilash"}</button></div>
+  <div class="field"><label for="logWho">Kim</label><select id="logWho" class="search"><option value="">Hamma</option>${who.map(w => `<option ${w === S.logWho ? "selected" : ""}>${esc(w)}</option>`).join("")}</select></div>
+  ${S.logErr ? `<p class="err">Tarixni yuklab bo'lmadi. Internetni tekshirib, «Yangilash» ni bosing.</p>` : ""}
+  <div class="list">${list.length ? list.map(x => { const a = ACTS[x.act] || ACTS.edit; return `<div class="row"><span class="pill ${a[1]}">${a[0]}</span><span class="row-main"><b>${esc(x.by || "?")} · ${esc(x.kind || "")}</b><small>${esc(x.text || "")}</small>${x.was && x.was !== x.text ? `<small>avval: ${esc(x.was)}</small>` : ""}</span><span class="row-val muted"><small>${tm(x.ts)}</small></span></div>`; }).join("")
+    : `<div class="empty">${S.log ? "Hali yozuv yo'q. Kim nimani kiritgani, tuzatgani va o'chirgani shu yerda chiqadi." : "Yuklanmoqda…"}</div>`}</div>
+  <p class="hint">Oxirgi 200 ta amal ko'rsatiladi. Tarix shu bo'lim qo'shilgan kundan boshlab yoziladi.</p>`;
+}
+const VIEWFN = { bugun: viewBugun, dokonlar: viewDokonlar, sklad: viewSklad, ishchilar: viewIshchilar, xarajatlar: viewXarajatlar, hisobot: viewHisobot, tarix: viewTarix, sozlama: viewSozlama };
 
 function render() {
   const tabs = $("#tabs");
@@ -680,7 +706,7 @@ function entryForm(t, init = {}, ex = null) {
   openForm({
     t, hasPrice, title: (ex ? "Tuzatish: " : "") + TYPES[t].title, body: b,
     after: () => { refreshPrices(); updateTotal(); },
-    onDelete: ex ? () => put("j", ex._doc, ex.id, null) : null,
+    onDelete: ex && isOwner() ? async () => { await put("j", ex._doc, ex.id, null); logEv("del", TYPES[t].label, sumText(ex)); } : null,
     submit: async () => {
       const o = { d: $("#f-d").value, ts: ex?.ts || Date.now() };
       if (!/^\d{4}-\d{2}-\d{2}$/.test(o.d)) throw "Sanani kiriting.";
@@ -693,7 +719,9 @@ function entryForm(t, init = {}, ex = null) {
       if (t === "p") o.m = $("#f-m").value;
       if (t === "b") o.sup = $("#f-sup").value.trim();
       o.n = $("#f-n").value.trim();
+      if (PW()) { if (!ex) o.by = PW().name; else { if (ex.by) o.by = ex.by; o.eb = PW().name; } }
       await saveEntry(t, o, ex);
+      logEv(ex ? "edit" : "add", TYPES[t].label, sumText(Object.assign({ t }, o)), ex ? sumText(ex) : "");
     }
   });
 }
@@ -710,7 +738,7 @@ function refForm(cat, id) {
   openForm({
     title: (id ? "Tuzatish: " : "Yangi: ") + REFS[cat].one.toLowerCase(), body: b,
     delText: "Ro'yxatdan olib tashlash",
-    onDelete: id ? async () => { await put("ref", cat, id, { ...x, del: true }); if (S.shopId === id) S.shopId = null; if (S.workerId === id) S.workerId = null; } : null,
+    onDelete: id && isOwner() ? async () => { await put("ref", cat, id, { ...x, del: true }); logEv("del", REFS[cat].one, refText(x)); if (S.shopId === id) S.shopId = null; if (S.workerId === id) S.workerId = null; } : null,
     submit: async () => {
       const o = { name: $("#r-name").value.trim() }; if (!o.name) throw "Nomini kiriting.";
       for (const k of ["owner", "phone", "addr", "note", "unit"]) if ($("#r-" + k)) o[k] = $("#r-" + k).value.trim();
@@ -718,6 +746,7 @@ function refForm(cat, id) {
       if ($("#r-open")) o.open = num($("#r-open").value);
       if ($("#r-price")) o.price = num($("#r-price").value);
       await put("ref", cat, id || newId(), o);
+      logEv(id ? "edit" : "add", REFS[cat].one, refText(o), id ? refText(x) : "");
     }
   });
 }
@@ -727,12 +756,13 @@ function userForm(uid) {
   b += uid ? `<p class="hint">Login: <b>${esc(u.login)}</b>. Login va PIN o'zgarmaydi. PIN unutilsa, ruxsatni olib qo'yib, xodimni boshqa login bilan qayta qo'shing.</p>`
     : `<div class="two">${inp("u-login", "Login (lotin harflarida)", "", 'autocapitalize="none" autocomplete="off" placeholder="sardor"')}${inp("u-pin", "PIN-kod (6 ta raqam)", "", 'inputmode="numeric" autocomplete="off" maxlength="12" placeholder="482913"')}</div>`;
   b += `<div class="field"><span class="flabel">Qaysi bo'limlar ochiq</span>${PERMS.map(([k, t]) => `<label class="check"><input type="checkbox" class="u-perm" id="u-perm-${k}" value="${k}" ${(u.perms || []).includes(k) ? "checked" : ""}> ${t}</label>`).join("")}</div>
-    <p class="hint">Belgilanmagan bo'limlar xodimga ko'rinmaydi. Hisobot, mahsulot narxlari va xodimlar ro'yxati faqat sizda.</p>`;
+    <p class="hint">Belgilanmagan bo'limlar xodimga ko'rinmaydi. «To'liq huquq» berilsa, u hamma bo'limni, hisobotni va narxlarni ko'radi, yozuvni o'chira oladi. Xodimlar ro'yxati va Tarix faqat sizda.</p>`;
   openForm({
     title: uid ? "Xodim ruxsatlari" : "Yangi xodim", body: b, delText: "Ruxsatni olib qo'yish",
     onDelete: uid ? () => P.removeUser(uid) : null,
     submit: async () => {
       const o = { uid, name: $("#u-name").value.trim(), perms: $$(".u-perm").filter(c => c.checked).map(c => c.value) };
+      if (o.perms.includes("all")) o.perms = ["all"];
       if (!o.name) throw "Ismni kiriting.";
       if (!uid) {
         o.login = $("#u-login").value.trim().toLowerCase(); o.pin = $("#u-pin").value.trim();
@@ -771,7 +801,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log]");
   if (!el) return;
   const ds = el.dataset;
   if ("nav" in ds) go(ds.nav);
@@ -788,6 +818,7 @@ document.addEventListener("click", async ev => {
   else if ("export" in ds) exportCsv();
   else if ("logout" in ds) window.DAFTAR_PWA.logout();
   else if ("user" in ds) userForm(ds.user || null);
+  else if ("reloadLog" in ds) { loadLog(); render(); }
   else if ("geo" in ds) {
     const er = $("#frmErr"), label = el.textContent, fail = () => { el.disabled = false; el.textContent = label; er.textContent = "Joylashuvni aniqlab bo'lmadi. Telefonda joylashuvga ruxsat bering yoki xarita havolasini qo'ying."; er.hidden = false; };
     if (!navigator.geolocation) return fail();
@@ -807,7 +838,7 @@ document.addEventListener("click", async ev => {
     el.disabled = false;
   }
 });
-document.addEventListener("change", ev => { if (ev.target.id === "dayPick" && ev.target.value) { S.day = ev.target.value; render(); } });
+document.addEventListener("change", ev => { if (ev.target.id === "dayPick" && ev.target.value) { S.day = ev.target.value; render(); } if (ev.target.id === "logWho") { S.logWho = ev.target.value; render(); } });
 document.addEventListener("input", ev => { if (ev.target.id === "shopSearch") { S.q = ev.target.value; $("#shopList").innerHTML = shopRows(); } });
 window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && VIEWOK[hv]() && hv !== S.view) { S.view = hv; S.shopId = S.workerId = null; render(); } });
 start();
