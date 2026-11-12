@@ -57,8 +57,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .status.bad{color:var(--debt)}
 .tabs{overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs-in{display:flex;gap:2px;width:max-content;min-width:100%}
-.tab{background:none;border:0;border-bottom:2px solid transparent;padding:9px 12px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs-in{display:flex;gap:2px}
+.tab{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:9px 12px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
 .tab[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
 
 main{padding-block:18px 48px;display:flex;flex-direction:column;gap:18px}
@@ -176,8 +176,8 @@ dialog::backdrop{background:rgba(10,14,26,.5)}
   <form id="gateForm" class="gate-card" novalidate>
     <div class="brand">Chuchvara daftari</div>
     <p id="gateMsg" class="hint" role="status"></p>
-    <div class="field"><label for="g-email">Email</label><input id="g-email" type="email" autocomplete="username" inputmode="email"></div>
-    <div class="field"><label for="g-pass">Parol</label><input id="g-pass" type="password" autocomplete="current-password"></div>
+    <div class="field"><label for="g-email">Login yoki email</label><input id="g-email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+    <div class="field"><label for="g-pass">PIN-kod yoki parol</label><input id="g-pass" type="password" autocomplete="current-password"></div>
     <button type="submit" class="btn primary" id="g-btn">Kirish</button>
   </form>
 </div>
@@ -245,6 +245,14 @@ const REFS = {
   materials: { one: "Xomashyo", add: "Xomashyo turini qo'shish" },
   workers: { one: "Ishchi", add: "Ishchi qo'shish" }
 };
+const PW = () => window.DAFTAR_PWA || null;
+const can = p => !PW() || !PW().perms || PW().perms.includes(p);
+const isOwner = () => !PW() || !PW().perms || !!PW().owner;
+const TPERM = { d: "sales", p: "sales", r: "sales", m: "prod", b: "stock", u: "stock", x: "exp", w: "wages", v: "wages" };
+const canT = t => can(TPERM[t]);
+const PERMS = [["sales", "Do'konlar: yuk, to'lov, vozvrat, qarzlar"], ["prod", "Ishlab chiqarish"], ["stock", "Xomashyo: xarid va sarf"], ["exp", "Xarajatlar"], ["wages", "Ishchilar va ish haqi"]];
+const VIEWOK = { bugun: () => true, dokonlar: () => can("sales"), sklad: () => can("prod") || can("stock"), ishchilar: () => can("wages"), xarajatlar: () => can("exp"), hisobot: isOwner, sozlama: () => isOwner() || !!PW() };
+const QUICK = [["d", "+", "Yuk berdim"], ["p", "$", "Pul oldim"], ["r", "↩", "Vozvrat"], ["m", "✓", "Mahsulot chiqdi"], ["b", "▣", "Xomashyo oldim"], ["u", "−", "Xomashyo sarfi"], ["x", "−", "Xarajat"], ["v", "→", "Ishchiga pul"]];
 const VIEWS = [["bugun", "Bugun"], ["dokonlar", "Do'konlar"], ["sklad", "Sklad"], ["ishchilar", "Ishchilar"], ["xarajatlar", "Xarajatlar"], ["hisobot", "Hisobot"], ["sozlama", "Sozlamalar"]];
 
 const S = {
@@ -331,6 +339,7 @@ function rowHTML(e, showDate) {
 }
 const listHTML = (list, showDate, emptyMsg) => `<div class="list">${list.length ? list.map(e => rowHTML(e, showDate)).join("") : `<div class="empty">${emptyMsg}</div>`}</div>`;
 const W = html => S.canWrite ? html : "";
+const quick = types => { const q = QUICK.filter(x => types.includes(x[0]) && canT(x[0])); return q.length ? W(`<div class="quick">${q.map(x => `<button type="button" class="btn" data-add="${x[0]}"><i>${x[1]}</i>${x[2]}</button>`).join("")}</div>`) : ""; };
 const addBtn = (t, text, extra = "", cls = "") => W(`<button type="button" class="btn ${cls}" data-add="${t}" ${extra}>${text}</button>`);
 
 /* ---------- views ---------- */
@@ -341,7 +350,7 @@ function viewBugun() {
   const debtors = debts.filter(([, s]) => s.bal > 0.5).length;
   const out = sumOf(day, "x") + sumOf(day, "b") + sumOf(day, "v");
   const isToday = S.day === today();
-  const fresh = !active("shops").length && !active("products").length && !S.entries.length;
+  const fresh = isOwner() && !active("shops").length && !active("products").length && !S.entries.length;
   return `
   <div class="head">
     <h1>${isToday ? "Bugun" : dm(S.day)}</h1>
@@ -354,22 +363,15 @@ function viewBugun() {
       <li>Do'konlar bo'limida do'konlarni qo'shing. Daftardagi eski qarzini «boshlang'ich qarz» qatoriga yozing.</li>
       <li>Shundan keyin har kuni shu yerdan yuk, to'lov va vozvratni yozib borasiz.</li></ol>
       ${W(`<div class="quick"><button type="button" class="btn primary" data-ref="products">Mahsulot qo'shish</button><button type="button" class="btn" data-ref="shops">Do'kon qo'shish</button></div>`)}</div>` : ""}
-  <div class="banner"><div><small>Do'konlarning jami qarzi</small><div class="big num">${fmt(total)} so'm</div></div>
-    <div class="side">${debtors} ta do'konda qarz bor</div></div>
-  ${W(`<div class="quick">
-    <button type="button" class="btn" data-add="d"><i>+</i>Yuk berdim</button>
-    <button type="button" class="btn" data-add="p"><i>$</i>Pul oldim</button>
-    <button type="button" class="btn" data-add="r"><i>↩</i>Vozvrat</button>
-    <button type="button" class="btn" data-add="m"><i>✓</i>Mahsulot chiqdi</button>
-    <button type="button" class="btn" data-add="b"><i>▣</i>Xomashyo oldim</button>
-    <button type="button" class="btn" data-add="x"><i>−</i>Xarajat</button>
-    <button type="button" class="btn" data-add="v"><i>→</i>Ishchiga pul</button></div>`)}
+  ${can("sales") ? `<div class="banner"><div><small>Do'konlarning jami qarzi</small><div class="big num">${fmt(total)} so'm</div></div>
+    <div class="side">${debtors} ta do'konda qarz bor</div></div>` : ""}
+  ${quick("dprmbxv")}
   <div class="tiles">
-    <div class="tile"><small>Ishlab chiqarildi</small><b>${esc(qtyByUnit(day.filter(e => e.t === "m")))}</b></div>
-    <div class="tile"><small>Yuk berildi</small><b>${fmt(sumOf(day, "d"))}</b> <em>so'm</em></div>
+    ${can("prod") ? `<div class="tile"><small>Ishlab chiqarildi</small><b>${esc(qtyByUnit(day.filter(e => e.t === "m")))}</b></div>` : ""}
+    ${can("sales") ? `<div class="tile"><small>Yuk berildi</small><b>${fmt(sumOf(day, "d"))}</b> <em>so'm</em></div>
     <div class="tile"><small>Pul tushdi</small><b class="paid">${fmt(sumOf(day, "p"))}</b> <em>so'm</em></div>
-    <div class="tile"><small>Vozvrat</small><b>${fmt(sumOf(day, "r"))}</b> <em>so'm</em></div>
-    <div class="tile"><small>Pul chiqdi</small><b class="debt">${fmt(out)}</b> <em>so'm</em></div>
+    <div class="tile"><small>Vozvrat</small><b>${fmt(sumOf(day, "r"))}</b> <em>so'm</em></div>` : ""}
+    ${can("exp") && can("stock") && can("wages") ? `<div class="tile"><small>Pul chiqdi</small><b class="debt">${fmt(out)}</b> <em>so'm</em></div>` : ""}
   </div>
   <div class="sec"><h2>${dm(S.day)} kungi yozuvlar</h2>
     ${listHTML(day.slice().reverse(), false, "Bu kunga hali yozuv yo'q. Yuqoridagi tugmalardan birini bosib birinchi yozuvni kiriting.")}</div>`;
@@ -425,14 +427,14 @@ function viewSklad() {
   const recent = S.entries.filter(e => "mbu".includes(e.t)).slice(-40).reverse();
   const stockCell = (q, u) => `<td class="n ${q < -0.001 ? "debt" : ""}">${fq(q)} ${esc(u || "")}</td>`;
   return `<div class="head"><h1>Sklad</h1></div>
-  ${W(`<div class="quick"><button type="button" class="btn" data-add="m"><i>✓</i>Mahsulot chiqdi</button><button type="button" class="btn" data-add="b"><i>▣</i>Xomashyo oldim</button><button type="button" class="btn" data-add="u"><i>−</i>Xomashyo sarfi</button></div>`)}
-  <div class="sec"><h2>Tayyor mahsulot qoldig'i</h2>
+  ${quick("mbu")}
+  ${can("sales") && can("prod") ? `<div class="sec"><h2>Tayyor mahsulot qoldig'i</h2>
     ${prods.length ? `<div class="tblwrap"><table><thead><tr><th>Mahsulot</th><th class="n">Qoldiq</th></tr></thead><tbody>${prods.map(([id, p]) => `<tr><td>${esc(p.name)}</td>${stockCell(D.prod[id] || 0, p.unit)}</tr>`).join("")}</tbody></table></div>
     <p class="hint">Qoldiq = ishlab chiqarilgan − do'konlarga berilgan + skladga qaytgan vozvrat. Minus chiqsa, ishlab chiqarish yozuvi kiritilmay qolgan.</p>`
-      : `<div class="list"><div class="empty">Mahsulot turlari hali kiritilmagan. Sozlamalar bo'limida qo'shing.</div></div>`}</div>
-  <div class="sec"><div class="head"><h2>Xomashyo qoldig'i</h2>${W(`<button type="button" class="btn small" data-ref="materials">Xomashyo turini qo'shish</button>`)}</div>
+      : `<div class="list"><div class="empty">Mahsulot turlari hali kiritilmagan. Sozlamalar bo'limida qo'shing.</div></div>`}</div>` : ""}
+  ${can("stock") ? `<div class="sec"><div class="head"><h2>Xomashyo qoldig'i</h2>${W(`<button type="button" class="btn small" data-ref="materials">Xomashyo turini qo'shish</button>`)}</div>
     ${mats.length ? `<div class="tblwrap"><table><thead><tr><th>Nomi</th><th class="n">Qoldiq</th><th class="n">Oxirgi narx</th></tr></thead><tbody>${mats.map(([id, m]) => { const x = D.mat[id] || { q: 0, pr: null }; return `<tr><td>${esc(m.name)}</td>${stockCell(x.q, m.unit)}<td class="n">${x.pr != null ? fmt(x.pr) : "—"}</td></tr>`; }).join("")}</tbody></table></div>`
-      : `<div class="list"><div class="empty">Xomashyo turlari (un, go'sht, piyoz, qadoq va boshqalar) qo'shilsa, nima qancha olingani va qancha qolgani shu yerda ko'rinadi.</div></div>`}</div>
+      : `<div class="list"><div class="empty">Xomashyo turlari (un, go'sht, piyoz, qadoq va boshqalar) qo'shilsa, nima qancha olingani va qancha qolgani shu yerda ko'rinadi.</div></div>`}</div>` : ""}
   <div class="sec"><h2>Oxirgi sklad yozuvlari</h2>${listHTML(recent, true, "Hali sklad yozuvi yo'q.")}</div>`;
 }
 
@@ -509,17 +511,23 @@ function viewHisobot() {
 function viewSozlama() {
   const block = (cat, title, cols, empty) => { const list = active(cat); return `<div class="sec"><div class="head"><h2>${title}</h2>${W(`<button type="button" class="btn small" data-ref="${cat}">${REFS[cat].add}</button>`)}</div>
     <div class="list">${list.length ? list.map(([id, x]) => `<${S.canWrite ? "button type=\"button\"" : "div"} class="row" data-ref="${cat}" data-id="${id}"><span class="row-main"><b>${esc(x.name)}</b><small>${esc(x.unit || "")}</small></span><span class="row-val">${cols(x)}</span></${S.canWrite ? "button" : "div"}>`).join("") : `<div class="empty">${empty}</div>`}</div></div>`; };
+  const P = PW(), us = P && P.owner ? P.users || [] : null;
   return `<div class="head"><h1>Sozlamalar</h1></div>
-  ${block("products", "Mahsulotlar va narxi", x => x.price ? fmt(x.price) + " so'm" : "narx yo'q", "Ishlab chiqaradigan mahsulotlaringizni qo'shing: masalan, chuchvara turlari va har birining sotuv narxi.")}
-  ${block("materials", "Xomashyo turlari", () => "", "Sotib oladigan narsalaringiz: un, go'sht, piyoz, qadoq va boshqalar.")}
-  ${window.DAFTAR_PWA ? `<div class="sec"><h2>Hisob</h2><div class="card"><div>${esc(window.DAFTAR_PWA.email || "")}</div><div><button type="button" class="btn small" data-logout>Hisobdan chiqish</button></div></div></div>` : ""}
-  <p class="hint">Do'konlar va ishchilar o'z bo'limida qo'shiladi. Biror do'konga boshqa narxda bersangiz, yuk yozishda narxni o'zgartiring: dastur shu do'konning oxirgi narxini eslab qoladi.</p>`;
+  ${isOwner() ? block("products", "Mahsulotlar va narxi", x => x.price ? fmt(x.price) + " so'm" : "narx yo'q", "Ishlab chiqaradigan mahsulotlaringizni qo'shing: masalan, chuchvara turlari va har birining sotuv narxi.") : ""}
+  ${isOwner() ? block("materials", "Xomashyo turlari", () => "", "Sotib oladigan narsalaringiz: un, go'sht, piyoz, qadoq va boshqalar.") : ""}
+  ${us ? `<div class="sec"><div class="head"><h2>Xodimlar va ruxsatlar</h2><button type="button" class="btn small" data-user="">Xodim qo'shish</button></div>
+    <div class="list">${us.length ? us.map(u => `<button type="button" class="row" data-user="${esc(u.uid)}"><span class="row-main"><b>${esc(u.name)}</b><small>login: ${esc(u.login)} · ${esc(PERMS.filter(x => (u.perms || []).includes(x[0])).map(x => x[1].split(":")[0]).join(", ") || "ruxsat yo'q")}</small></span><span class="row-val muted">o'zgartirish</span></button>`).join("")
+      : `<div class="empty">Hali xodim qo'shilmagan. Xodim qo'shsangiz, u o'z logini va PIN-kodi bilan kirib, faqat siz ruxsat bergan bo'limlarni ko'radi.</div>`}</div></div>` : ""}
+  ${window.DAFTAR_PWA ? `<div class="sec"><h2>Hisob</h2><div class="card"><div>${esc(window.DAFTAR_PWA.name || window.DAFTAR_PWA.email || "")}</div><div><button type="button" class="btn small" data-logout>Hisobdan chiqish</button></div></div></div>` : ""}
+  <p class="hint" ${isOwner() ? "" : "hidden"}>Do'konlar va ishchilar o'z bo'limida qo'shiladi. Biror do'konga boshqa narxda bersangiz, yuk yozishda narxni o'zgartiring: dastur shu do'konning oxirgi narxini eslab qoladi.</p>`;
 }
 const VIEWFN = { bugun: viewBugun, dokonlar: viewDokonlar, sklad: viewSklad, ishchilar: viewIshchilar, xarajatlar: viewXarajatlar, hisobot: viewHisobot, sozlama: viewSozlama };
 
 function render() {
   const tabs = $("#tabs");
-  if (!tabs.children.length) tabs.innerHTML = VIEWS.map(([k, t]) => `<button type="button" class="tab" data-nav="${k}">${t}</button>`).join("");
+  const okViews = VIEWS.filter(([k]) => VIEWOK[k]()), key = okViews.map(v => v[0]).join();
+  if (tabs.dataset.key !== key) { tabs.dataset.key = key; tabs.innerHTML = okViews.map(([k, t]) => `<button type="button" class="tab" data-nav="${k}">${t}</button>`).join(""); }
+  if (!VIEWOK[S.view]()) S.view = "bugun";
   for (const b of tabs.children) { if (b.dataset.nav === S.view) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }
   const st = $("#status"); st.className = "status";
   const v = $("#view");
@@ -650,7 +658,7 @@ function entryForm(t, init = {}, ex = null) {
   if ("bu".includes(t) && !active("materials").length) need.push("materials");
   if ("wv".includes(t) && !active("workers").length) need.push("workers");
   if (need.length && !ex) {
-    openForm({ title: TYPES[t].title, noSave: true, body: need.map(r => `<p class="hint">Bu yozuv uchun avval ${REFS[r].one.toLowerCase()} kiritilgan bo'lishi kerak.</p><button type="button" class="btn primary" data-ref="${r}">${REFS[r].add}</button>`).join("") });
+    openForm({ title: TYPES[t].title, noSave: true, body: need.map(r => `<p class="hint">Bu yozuv uchun avval ${REFS[r].one.toLowerCase()} kiritilgan bo'lishi kerak.${r === "products" && !isOwner() ? " Mahsulotlarni rahbar kiritadi." : ""}</p>${r === "products" && !isOwner() ? "" : `<button type="button" class="btn primary" data-ref="${r}">${REFS[r].add}</button>`}`).join("") });
     return;
   }
   const e = ex || init, cat = catOf(t), rowsT = "drmbu".includes(t), hasPrice = "drb".includes(t);
@@ -713,6 +721,29 @@ function refForm(cat, id) {
     }
   });
 }
+function userForm(uid) {
+  const P = PW(), u = uid ? (P.users || []).find(x => x.uid === uid) || {} : {};
+  let b = inp("u-name", "Ism", u.name || "");
+  b += uid ? `<p class="hint">Login: <b>${esc(u.login)}</b>. Login va PIN o'zgarmaydi. PIN unutilsa, ruxsatni olib qo'yib, xodimni boshqa login bilan qayta qo'shing.</p>`
+    : `<div class="two">${inp("u-login", "Login (lotin harflarida)", "", 'autocapitalize="none" autocomplete="off" placeholder="sardor"')}${inp("u-pin", "PIN-kod (6 ta raqam)", "", 'inputmode="numeric" autocomplete="off" maxlength="12" placeholder="482913"')}</div>`;
+  b += `<div class="field"><span class="flabel">Qaysi bo'limlar ochiq</span>${PERMS.map(([k, t]) => `<label class="check"><input type="checkbox" class="u-perm" id="u-perm-${k}" value="${k}" ${(u.perms || []).includes(k) ? "checked" : ""}> ${t}</label>`).join("")}</div>
+    <p class="hint">Belgilanmagan bo'limlar xodimga ko'rinmaydi. Hisobot, mahsulot narxlari va xodimlar ro'yxati faqat sizda.</p>`;
+  openForm({
+    title: uid ? "Xodim ruxsatlari" : "Yangi xodim", body: b, delText: "Ruxsatni olib qo'yish",
+    onDelete: uid ? () => P.removeUser(uid) : null,
+    submit: async () => {
+      const o = { uid, name: $("#u-name").value.trim(), perms: $$(".u-perm").filter(c => c.checked).map(c => c.value) };
+      if (!o.name) throw "Ismni kiriting.";
+      if (!uid) {
+        o.login = $("#u-login").value.trim().toLowerCase(); o.pin = $("#u-pin").value.trim();
+        if (!/^[a-z0-9._-]{3,20}$/.test(o.login)) throw "Login 3 tadan 20 tagacha lotin harfi yoki raqamdan iborat bo'lsin.";
+        if (!/^\d{6,12}$/.test(o.pin)) throw "PIN kamida 6 ta raqam bo'lsin.";
+      }
+      if (!o.perms.length) throw "Kamida bitta bo'limni belgilang.";
+      await P.saveUser(o);
+    }
+  });
+}
 $("#frm").addEventListener("submit", async ev => {
   ev.preventDefault(); if (!F || !F.submit) return;
   const sv = $("#frmSave"), er = $("#frmErr"); sv.disabled = true; er.hidden = true;
@@ -740,7 +771,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user]");
   if (!el) return;
   const ds = el.dataset;
   if ("nav" in ds) go(ds.nav);
@@ -756,6 +787,7 @@ document.addEventListener("click", async ev => {
   else if ("rmRow" in ds) { if ($$("#frmBody .irow").length > 1) el.closest(".irow").remove(); updateTotal(); }
   else if ("export" in ds) exportCsv();
   else if ("logout" in ds) window.DAFTAR_PWA.logout();
+  else if ("user" in ds) userForm(ds.user || null);
   else if ("geo" in ds) {
     const er = $("#frmErr"), label = el.textContent, fail = () => { el.disabled = false; el.textContent = label; er.textContent = "Joylashuvni aniqlab bo'lmadi. Telefonda joylashuvga ruxsat bering yoki xarita havolasini qo'ying."; er.hidden = false; };
     if (!navigator.geolocation) return fail();
@@ -777,7 +809,7 @@ document.addEventListener("click", async ev => {
 });
 document.addEventListener("change", ev => { if (ev.target.id === "dayPick" && ev.target.value) { S.day = ev.target.value; render(); } });
 document.addEventListener("input", ev => { if (ev.target.id === "shopSearch") { S.q = ev.target.value; $("#shopList").innerHTML = shopRows(); } });
-window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && hv !== S.view) { S.view = hv; S.shopId = S.workerId = null; render(); } });
+window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && VIEWOK[hv]() && hv !== S.view) { S.view = hv; S.shopId = S.workerId = null; render(); } });
 start();
 </script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
