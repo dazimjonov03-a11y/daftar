@@ -130,6 +130,8 @@ tr.total td{font-weight:700;background:var(--accent-soft)}
 .kv > div:nth-last-child(-n+2){border-bottom:0}
 .kv .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .kv .strong{background:var(--accent-soft)}
+.kv .v{white-space:normal}
+.kv .qty{display:inline-block;margin-right:10px;font-weight:600;color:var(--muted);white-space:nowrap}
 .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:4px}
 .bar span{display:block;height:100%;background:var(--accent)}
 .info{display:flex;flex-direction:column;gap:4px}
@@ -494,13 +496,17 @@ function viewHisobot() {
   const debtEnd = shopRowsH.reduce((a, [, x]) => a + Math.max(0, x.bal), 0);
   const pa = {};
   for (const e of m) if ("mdr".includes(e.t)) for (const r of e.i || []) { const x = pa[r.p] || (pa[r.p] = { m: 0, d: 0, r: 0 }); x[e.t] += +r.q || 0; }
+  const units = t => { const u = {}; for (const e of m) if (e.t === t) for (const r of e.i || []) { const k = runit("products", r.p) || "dona"; u[k] = (u[k] || 0) + (+r.q || 0); } return u; };
+  const uD = units("d"), uR = units("r"), uN = {};
+  for (const k of new Set([...Object.keys(uD), ...Object.keys(uR)])) uN[k] = (uD[k] || 0) - (uR[k] || 0);
+  const qt = u => { const p = Object.entries(u).filter(([, v]) => v).map(([k, v]) => `${fq(v)} ${esc(k)}`); return p.length ? `<span class="qty">${p.join(" + ")}</span>` : ""; };
   const kv = (k, v, cls = "", strong = false) => `<div class="${strong ? "strong" : ""}">${k}</div><div class="v ${cls} ${strong ? "strong" : ""}">${v}</div>`;
   return `<div class="head"><h1>Hisobot</h1>${monthStepper()}</div>
   <div class="sec"><h2>${monthName(S.month)} yakuni</h2><div class="list"><div class="kv">
     ${kv("Ishlab chiqarildi", esc(qtyByUnit(m.filter(e => e.t === "m"))))}
-    ${kv("Do'konlarga yuk berildi", fmt(sold))}
-    ${kv("Vozvrat", neg(ret), "debt")}
-    ${kv("Sof sotuv", fmt(net), "", true)}
+    ${kv("Do'konlarga yuk berildi", qt(uD) + fmt(sold))}
+    ${kv("Vozvrat", qt(uR) + neg(ret), "debt")}
+    ${kv("Sof sotuv (sotilgani)", qt(uN) + fmt(net), "", true)}
     ${kv("Do'konlardan pul tushdi", fmt(paid), "paid")}
     ${kv("Xomashyo xaridi", neg(buy))}
     ${kv("Ish haqi (hisoblangan)", neg(wage))}
