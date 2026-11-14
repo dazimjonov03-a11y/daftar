@@ -248,6 +248,10 @@ const BASE = { f: "d", g: "p", h: "r" };
 const bt = t => BASE[t] || t;
 const isF = t => !!BASE[t];
 const shopCat = t => isF(t) ? "fshops" : "shops";
+/* Firma do'konining filiallari: firma yozuvi ichida br: { id: { name, phone, addr, loc, open, note } }, yozuvda b: filial id. */
+const brOf = (sid, bid) => { const f = S.ref.fshops[sid]; return f && f.br && bid && f.br[bid] ? f.br[bid] : null; };
+const brList = (sid, keep) => { const f = S.ref.fshops[sid]; return f && f.br ? Object.entries(f.br).filter(([id, x]) => x && (!x.del || id === keep || Math.abs((D.br[sid + "|" + id] || {}).bal || 0) > 0.5)).sort((a, b) => String(a[1].name).localeCompare(String(b[1].name))) : []; };
+const shopName = e => rname(shopCat(e.t), e.s) + (isF(e.t) && brOf(e.s, e.b) ? " — " + brOf(e.s, e.b).name : "");
 const CATS = ["Ijara", "Kommunal (gaz, svet, suv)", "Transport, benzin", "Qadoq, paket", "Soliq", "Ta'mirlash", "Boshqa"];
 const METHODS = ["Naqd", "Karta", "O'tkazma"];
 const REFS = {
@@ -274,9 +278,9 @@ const S = {
   loaded: {}, known: new Set(), jSize: {},
   ref: { shops: {}, fshops: {}, products: {}, materials: {}, workers: {} }, entries: [],
   ctl: { norms: {}, inv: {} }, invId: null, log: null, logBusy: false, logErr: false, logWho: "",
-  view: "bugun", day: today(), month: today().slice(0, 7), shopId: null, fshopId: null, workerId: null, q: ""
+  view: "bugun", day: today(), month: today().slice(0, 7), shopId: null, fshopId: null, fbrId: null, workerId: null, q: ""
 };
-let D = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {}, sup: {} };
+let D = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {}, sup: {}, br: {} };
 let F = null;
 
 /* ---------- derived numbers ---------- */
@@ -289,12 +293,16 @@ const supKey = n => String(n || "").trim().toLowerCase();
 const paidOut = list => list.filter(e => e.t === "b").reduce((a, e) => a + paidB(e), 0);
 const payNote = e => e.t !== "b" || isPay(e) || e.pd == null ? "" : +e.pd > 0 ? "to'landi " + fmt(e.pd) + ", qarz " + fmt(sumItems(e) - e.pd) : "qarzga olindi";
 function compute() {
-  const d = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {}, sup: {} };
+  const d = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {}, sup: {}, br: {} };
   const sh = id => d.shop[id] || (d.shop[id] = { bal: 0, lastD: "", lastP: "" });
   const mt = id => d.mat[id] || (d.mat[id] = { q: 0, pr: null, in: 0, out: 0 });
   for (const cat of ["shops", "fshops"]) for (const [id, s] of Object.entries(S.ref[cat])) sh(id).bal = +s.open || 0;
+  const bk = (sid, bid) => d.br[sid + "|" + bid] || (d.br[sid + "|" + bid] = { bal: 0, lastD: "", lastP: "" });
+  for (const [id, s] of Object.entries(S.ref.fshops)) for (const [bid, x] of Object.entries(s.br || {})) if (x) { bk(id, bid).bal = +x.open || 0; sh(id).bal += +x.open || 0; }
   for (const e0 of S.entries) {
     const a = amt(e0), e = isF(e0.t) ? { ...e0, t: bt(e0.t) } : e0;
+    const hb = isF(e0.t) && brOf(e0.s, e0.b) ? bk(e0.s, e0.b) : null;
+    if (hb) { if (e.t === "d") { hb.bal += a; hb.lastD = e.d; } else if (e.t === "p") { hb.bal -= a; hb.lastP = e.d; } else hb.bal -= a; }
     if (e.t === "d") { const s = sh(e.s); s.bal += a; s.lastD = e.d; for (const r of e.i || []) { d.prod[r.p] = (d.prod[r.p] || 0) - (+r.q || 0); d.lastPr[e.s + "|" + r.p] = r.pr; } }
     else if (e.t === "p") { const s = sh(e.s); s.bal -= a; s.lastP = e.d; }
     else if (e.t === "r") { sh(e.s).bal -= a; if (e.st) for (const r of e.i || []) d.prod[r.p] = (d.prod[r.p] || 0) + (+r.q || 0); }
@@ -340,7 +348,7 @@ function mapLinks(s) {
 }
 const callBtn = ph => window.DAFTAR_PWA ? `<a class="btn small" href="tel:${esc(String(ph).replace(/[^\d+]/g, ""))}">Qo'ng'iroq qilish</a>` : "";
 function sumText(e) {
-  const a = isPay(e) ? paidB(e) : amt(e), who = e.s ? rname(shopCat(e.t), e.s) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
+  const a = isPay(e) ? paidB(e) : amt(e), who = e.s ? shopName(e) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
   return [dm(e.d), who, e.i ? itemsText(e, "drbfh".includes(e.t)) : "", a ? fmt(a) + " so'm" : "", isPay(e) ? "ta'minotchiga pul berildi" : payNote(e), e.m, e.n].filter(Boolean).join(" · ");
 }
 const refText = x => [x.name, x.price ? fmt(x.price) + " so'm" : "", x.open ? "boshlang'ich qarz " + fmt(x.open) : "", x.phone, x.addr].filter(Boolean).join(" · ");
@@ -351,9 +359,9 @@ function rowHTML(e, showDate) {
   let title = "", detail = "", val = "", cls = "";
   const a = amt(e);
   switch (bt(e.t)) {
-    case "d": title = rname(shopCat(e.t), e.s); detail = itemsText(e, true); val = "+" + fmt(a); break;
-    case "p": title = rname(shopCat(e.t), e.s); detail = e.m || ""; val = "−" + fmt(a); cls = "paid"; break;
-    case "r": title = rname(shopCat(e.t), e.s); detail = itemsText(e, true) + (e.st ? " · skladga qaytdi" : " · yaroqsiz"); val = "−" + fmt(a); cls = "debt"; break;
+    case "d": title = shopName(e); detail = itemsText(e, true); val = "+" + fmt(a); break;
+    case "p": title = shopName(e); detail = e.m || ""; val = "−" + fmt(a); cls = "paid"; break;
+    case "r": title = shopName(e); detail = itemsText(e, true) + (e.st ? " · skladga qaytdi" : " · yaroqsiz"); val = "−" + fmt(a); cls = "debt"; break;
     case "m": title = "Ishlab chiqarildi"; detail = itemsText(e, false); val = qtyByUnit([e]); cls = "paid"; break;
     case "b": if (isPay(e)) { title = e.sup || "Ta'minotchi"; detail = ["ta'minotchiga pul berildi", e.m].filter(Boolean).join(" · "); val = "−" + fmt(paidB(e)); }
       else { title = e.sup || "Xomashyo xaridi"; detail = [itemsText(e, true), payNote(e)].filter(Boolean).join(" · "); val = fmt(a); if (e.pd != null) cls = "debt"; } break;
@@ -410,11 +418,11 @@ function viewBugun() {
 
 function shopRows(cat = "shops") {
   const q = S.q.trim().toLowerCase();
-  const list = active(cat).filter(([, s]) => !q || [s.name, s.owner, s.phone, s.addr].join(" ").toLowerCase().includes(q))
+  const list = active(cat).filter(([, s]) => !q || [s.name, s.owner, s.phone, s.addr, ...Object.values(s.br || {}).map(x => x && !x.del ? x.name : "")].join(" ").toLowerCase().includes(q))
     .map(([id, s]) => ({ id, s, d: D.shop[id] || { bal: 0, lastD: "", lastP: "" } })).sort((a, b) => b.d.bal - a.d.bal);
   if (!list.length) return `<div class="empty">${q ? "Bunday do'kon topilmadi." : "Hali do'kon yo'q. Do'kon qo'shsangiz, shu yerda nomi, telefoni va qarzi ko'rinadi."}</div>`;
   return list.map(({ id, s, d }) => `<button type="button" class="row" data-open="${cat}:${id}">
-    <span class="row-main"><b>${esc(s.name)}</b><small>${esc([s.owner, s.phone].filter(Boolean).join(" · ") || "telefon kiritilmagan")}</small></span>
+    <span class="row-main"><b>${esc(s.name)}</b><small>${esc([cat === "fshops" && brList(id).length ? brList(id).length + " ta filial" : "", s.owner, s.phone].filter(Boolean).join(" · ") || "telefon kiritilmagan")}</small></span>
     <span class="row-val ${d.bal > 0.5 ? "debt" : d.bal < -0.5 ? "paid" : "muted"}">${d.bal > 0.5 ? fmt(d.bal) : d.bal < -0.5 ? "+" + fmt(-d.bal) : "qarzi yo'q"}
       <small>yuk ${dshort(d.lastD)} · pul ${dshort(d.lastP)}</small></span></button>`).join("");
 }
@@ -438,23 +446,48 @@ function ledger(openBal, list, plusT, label) {
   if (!rows.length) return `<div class="list"><div class="empty">Hali yozuv yo'q.</div></div>`;
   return `<div class="tblwrap"><table><thead><tr><th>Sana</th><th>Amal</th><th class="n">${label[0]}</th><th class="n">${label[1]}</th><th class="n">Qoldiq</th><th></th></tr></thead><tbody>${rows.reverse().join("")}</tbody></table></div>`;
 }
-function viewShop(cat, id) {
+function viewShop(cat, id, bid) {
   const fm = cat === "fshops", T = fm ? "fgh" : "dpr";
-  const s = S.ref[cat][id], d = D.shop[id] || { bal: 0 };
-  const list = S.entries.filter(e => e.s === id && T.includes(e.t));
-  return `<div><button type="button" class="btn small" data-back>‹ ${fm ? "Firma" : "Do'konlar"}</button></div>
-  <div class="head"><h1>${esc(s.name)}</h1>${W(`<button type="button" class="btn small" data-ref="${cat}" data-id="${id}">Ma'lumotni tuzatish</button>`)}</div>
-  <div class="card"><div class="info">
-    ${s.owner ? `<div><span>Egasi:</span> ${esc(s.owner)}</div>` : ""}
+  const f = S.ref[cat][id], br = bid && bid !== "-" ? f.br[bid] : null, none = bid === "-";
+  const s = bid ? (br || {}) : f;
+  const brSum = fm ? Object.keys(f.br || {}).reduce((a, k) => a + ((D.br[id + "|" + k] || {}).bal || 0), 0) : 0;
+  const d = br ? (D.br[id + "|" + bid] || { bal: 0 }) : none ? { bal: (D.shop[id] || { bal: 0 }).bal - brSum } : (D.shop[id] || { bal: 0 });
+  const list = S.entries.filter(e => e.s === id && T.includes(e.t) && (!bid || (none ? !brOf(id, e.b) : e.b === bid)));
+  const bAttr = br ? ` data-b="${bid}"` : "";
+  return `<div><button type="button" class="btn small" data-back>‹ ${bid ? esc(f.name) : fm ? "Firma" : "Do'konlar"}</button></div>
+  <div class="head"><h1>${none ? "Filial ko'rsatilmagan" : esc(s.name)}</h1>${none ? "" : W(br ? `<button type="button" class="btn small" data-br="${bid}" data-firm="${id}">Ma'lumotni tuzatish</button>` : `<span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">${fm ? `<button type="button" class="btn small" data-br="" data-firm="${id}">Filial qo'shish</button>` : ""}<button type="button" class="btn small" data-ref="${cat}" data-id="${id}">Ma'lumotni tuzatish</button></span>`)}</div>
+  ${none ? `<p class="hint">${esc(f.name)}: filiali belgilanmagan yozuvlar. Yozuvni ochib filialni tanlasangiz, u o'sha filialga o'tadi.</p>` : `<div class="card"><div class="info">
+    ${br ? `<div><span>Firma:</span> ${esc(f.name)}</div>` : ""}${s.owner ? `<div><span>Egasi:</span> ${esc(s.owner)}</div>` : ""}
     <div class="phone"><span class="muted">Telefon:</span> ${s.phone ? `<code id="ph">${esc(s.phone)}</code><button type="button" class="btn small" data-copy="${esc(s.phone)}">Nusxa olish</button>${callBtn(s.phone)}` : "kiritilmagan"}</div>
-    ${s.addr ? `<div><span>Manzil:</span> ${esc(s.addr)}</div>` : ""}<div class="maprow">${mapLinks(s)}</div>${s.note ? `<div><span>Izoh:</span> ${esc(s.note)}</div>` : ""}</div></div>
+    ${s.addr ? `<div><span>Manzil:</span> ${esc(s.addr)}</div>` : ""}<div class="maprow">${mapLinks(s)}</div>${s.note ? `<div><span>Izoh:</span> ${esc(s.note)}</div>` : ""}</div></div>`}
   <div class="banner"><div><small>${d.bal < -0.5 ? "Ortiqcha to'lagan" : "Hozirgi qarzi"}</small><div class="big num">${fmt(Math.abs(d.bal))} so'm</div></div>
-    <div class="side">oxirgi yuk ${dshort(d.lastD)} · oxirgi pul ${dshort(d.lastP)}</div></div>
-  ${W(`<div class="quick"><button type="button" class="btn" data-add="${T[0]}" data-s="${id}"><i>+</i>Yuk berdim</button><button type="button" class="btn" data-add="${T[1]}" data-s="${id}"><i>$</i>Pul oldim</button><button type="button" class="btn" data-add="${T[2]}" data-s="${id}"><i>↩</i>Vozvrat</button></div>`)}
+    ${none ? "" : `<div class="side">oxirgi yuk ${dshort(d.lastD)} · oxirgi pul ${dshort(d.lastP)}</div>`}</div>
+  ${none ? "" : W(`<div class="quick"><button type="button" class="btn" data-add="${T[0]}" data-s="${id}"${bAttr}><i>+</i>Yuk berdim</button><button type="button" class="btn" data-add="${T[1]}" data-s="${id}"${bAttr}><i>$</i>Pul oldim</button><button type="button" class="btn" data-add="${T[2]}" data-s="${id}"${bAttr}><i>↩</i>Vozvrat</button></div>`)}
   <div class="sec"><h2>Hisob-kitob tarixi</h2>${ledger(+s.open || 0, list, T[0], ["Yuk", "To'lov / vozvrat"])}</div>`;
 }
+/* Filiallari bor firma: filiallar ro'yxati, har birining qarzi bilan. */
+function viewFirmBranches(id) {
+  const f = S.ref.fshops[id], d = D.shop[id] || { bal: 0, lastD: "", lastP: "" }, brs = brList(id);
+  const brSum = Object.keys(f.br || {}).reduce((a, k) => a + ((D.br[id + "|" + k] || {}).bal || 0), 0), rest = d.bal - brSum;
+  const loose = S.entries.some(e => e.s === id && "fgh".includes(e.t) && !brOf(id, e.b));
+  const val = b => `<span class="row-val ${b > 0.5 ? "debt" : b < -0.5 ? "paid" : "muted"}">${b > 0.5 ? fmt(b) : b < -0.5 ? "+" + fmt(-b) : "qarzi yo'q"}`;
+  return `<div><button type="button" class="btn small" data-back>‹ Firma</button></div>
+  <div class="head"><h1>${esc(f.name)}</h1>${W(`<span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button type="button" class="btn small primary" data-br="" data-firm="${id}">Filial qo'shish</button><button type="button" class="btn small" data-ref="fshops" data-id="${id}">Ma'lumotni tuzatish</button></span>`)}</div>
+  <div class="banner"><div><small>${d.bal < -0.5 ? "Ortiqcha to'lagan" : "Firmaning umumiy qarzi"}</small><div class="big num">${fmt(Math.abs(d.bal))} so'm</div></div>
+    <div class="side">${brs.length} ta filial · oxirgi yuk ${dshort(d.lastD)} · oxirgi pul ${dshort(d.lastP)}</div></div>
+  ${W(`<div class="quick"><button type="button" class="btn" data-add="f" data-s="${id}"><i>+</i>Yuk berdim</button><button type="button" class="btn" data-add="g" data-s="${id}"><i>$</i>Pul oldim</button><button type="button" class="btn" data-add="h" data-s="${id}"><i>↩</i>Vozvrat</button></div>`)}
+  <div class="sec"><h2>Filiallar</h2><div class="list">
+    ${brs.map(([bid, x]) => { const b = D.br[id + "|" + bid] || { bal: 0, lastD: "", lastP: "" }; return `<button type="button" class="row" data-openbr="${bid}"><span class="row-main"><b>${esc(x.name)}</b><small>${esc([x.addr, x.phone].filter(Boolean).join(" · ") || "manzil kiritilmagan")}</small></span>
+      ${val(b.bal)}<small>yuk ${dshort(b.lastD)} · pul ${dshort(b.lastP)}</small></span></button>`; }).join("")}
+    ${loose || Math.abs(rest) > 0.5 ? `<button type="button" class="row" data-openbr="-"><span class="row-main"><b>Filial ko'rsatilmagan</b><small>filiali belgilanmagan yozuvlar</small></span>${val(rest)}</span></button>` : ""}
+  </div><p class="hint">Filialni bossangiz, uning manzili, qarzi va hisob-kitob tarixi ochiladi. Firmaning umumiy qarzi — hamma filiallar yig'indisi.</p></div>`;
+}
 function viewFirma() {
-  if (S.fshopId && S.ref.fshops[S.fshopId]) return viewShop("fshops", S.fshopId);
+  if (S.fshopId && S.ref.fshops[S.fshopId]) {
+    const id = S.fshopId, hasBr = brList(id).length > 0;
+    if (S.fbrId && (S.fbrId === "-" || brOf(id, S.fbrId)) && hasBr) return viewShop("fshops", id, S.fbrId);
+    return hasBr ? viewFirmBranches(id) : viewShop("fshops", id);
+  }
   const m = S.entries.filter(e => "fgh".includes(e.t) && e.d.startsWith(S.month));
   const debt = Object.entries(D.shop).filter(([id]) => S.ref.fshops[id] && !S.ref.fshops[id].del).reduce((a, [, x]) => a + Math.max(0, x.bal), 0);
   const tile = (label, t, cls = "") => `<div class="tile"><small>${label}</small><b class="${cls}">${fmt(sumOf(m, t))}</b> <em>so'm</em>${t === "g" ? "" : `<div class="hint">${esc(qtyByUnit(m.filter(e => e.t === t)))}</div>`}</div>`;
@@ -756,7 +789,7 @@ function render() {
   compute();
   v.innerHTML = VIEWFN[S.view]();
 }
-function go(view) { S.view = view; S.shopId = S.fshopId = S.workerId = null; S.q = ""; try { if (location.hash !== "#" + view) location.hash = view; } catch (e) {} render(); window.scrollTo(0, 0); }
+function go(view) { S.view = view; S.shopId = S.fshopId = S.fbrId = S.workerId = null; S.q = ""; try { if (location.hash !== "#" + view) location.hash = view; } catch (e) {} render(); window.scrollTo(0, 0); }
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
 
 /* ---------- store ---------- */
@@ -863,6 +896,12 @@ function refreshPrices() {
     pr.value = def ?? "";
   }
 }
+function fillBranches() {
+  const w = $("#f-bw"); if (!w) return;
+  const el = $("#f-b"), sid = $("#f-s").value, cur = el.dataset.cur || "", list = sid ? brList(sid, cur) : [];
+  w.hidden = !list.length;
+  el.innerHTML = [["", "Filialni tanlang"], ...list.map(([id, x]) => [id, x.name]), ["-", "Filialsiz (umumiy)"]].map(([v, t]) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(t)}</option>`).join("");
+}
 function updateTotal() {
   if (!F) return;
   const tl = $("#f-total");
@@ -870,7 +909,7 @@ function updateTotal() {
   const sd = $("#f-sdebt");
   if (sd) { const x = D.sup[supKey($("#f-sup").value)]; sd.textContent = x && x.bal > 0.5 ? `Bu ta'minotchiga qarzingiz: ${fmt(x.bal)} so'm` : x ? "Bu ta'minotchiga qarzingiz yo'q" : ""; }
   const dh = $("#f-debt");
-  if (dh) { const s = $("#f-s").value, b = D.shop[s]?.bal || 0; dh.textContent = s ? (b > 0.5 ? `Bu do'konning qarzi: ${fmt(b)} so'm` : "Bu do'konning qarzi yo'q") : ""; }
+  if (dh) { const s = $("#f-s").value, bv = $("#f-b") && !$("#f-bw").hidden ? $("#f-b").value : "", isB = bv && bv !== "-", b = isB ? (D.br[s + "|" + bv] || {}).bal || 0 : D.shop[s]?.bal || 0, nm = isB ? "filial" : "do'kon"; dh.textContent = s ? (b > 0.5 ? `Bu ${nm}ning qarzi: ${fmt(b)} so'm` : `Bu ${nm}ning qarzi yo'q`) : ""; }
 }
 const readRows = hasPrice => $$("#frmBody .irow").map(row => { const r = { p: $(".i-p", row).value, q: num($(".i-q", row).value) }; if (hasPrice) r.pr = num($(".i-pr", row).value); return r; }).filter(r => r.p && r.q > 0);
 
@@ -889,7 +928,8 @@ function entryForm(t, init = {}, ex = null) {
   const supList = `<datalist id="supList">${supNames.map(n => `<option value="${esc(n)}">`).join("")}</datalist>`;
   const pm = e.pd == null ? "f" : +e.pd > 0 ? "p" : "c";
   let b = inp("f-d", "Sana", e.d || (S.view === "bugun" ? S.day : today()), 'type="date" required');
-  if ("dprfgh".includes(t)) b += sel("f-s", isF(t) ? "Firma do'koni" : "Do'kon", [["", "Do'konni tanlang"], ...active(shopCat(t), e.s).map(([id, s]) => [id, s.name])], e.s || "");
+  if ("dprfgh".includes(t)) b += sel("f-s", isF(t) ? "Firma do'koni" : "Do'kon", [["", "Do'konni tanlang"], ...active(shopCat(t), e.s).map(([id, s]) => [id, s.name])], e.s || "")
+    + (isF(t) ? `<div id="f-bw" hidden><div class="field"><label for="f-b">Filial</label><select id="f-b" data-cur="${esc(ex ? (brOf(ex.s, ex.b) ? ex.b : "-") : e.b || "")}"></select></div></div>` : "");
   if ("wv".includes(t)) b += sel("f-w", "Ishchi", [["", "Ishchini tanlang"], ...active("workers", e.w).map(([id, w]) => [id, w.name])], e.w || "");
   if (t === "b") b += inp("f-sup", isP ? "Kimga pul berildi" : "Kimdan olindi (qarzga olinsa, albatta yozing)", e.sup || "", 'list="supList" autocomplete="off" placeholder="Bozor, yetkazib beruvchi"') + supList + (isP ? `<p class="hint" id="f-sdebt"></p>` : "");
   if (rowsT) {
@@ -909,12 +949,13 @@ function entryForm(t, init = {}, ex = null) {
   b += inp("f-n", "Izoh (ixtiyoriy)", e.n || "");
   openForm({
     t, hasPrice, title: (ex ? "Tuzatish: " : "") + (isP ? "Ta'minotchiga pul berish" : TYPES[t].title), body: b,
-    after: () => { refreshPrices(); updateTotal(); },
+    after: () => { fillBranches(); refreshPrices(); updateTotal(); },
     onDelete: ex && isOwner() ? async () => { await put("j", ex._doc, ex.id, null); logEv("del", isP ? "Ta'minotchiga to'lov" : TYPES[t].label, sumText(ex)); } : null,
     submit: async () => {
       const o = { d: $("#f-d").value, ts: ex?.ts || Date.now() };
       if (!/^\d{4}-\d{2}-\d{2}$/.test(o.d)) throw "Sanani kiriting.";
       if ($("#f-s")) { o.s = $("#f-s").value; if (!o.s) throw "Do'konni tanlang."; }
+      if ($("#f-b")) { const bv = $("#f-bw").hidden ? "-" : $("#f-b").value; if (!bv) throw "Filialni tanlang."; o.b = bv === "-" ? null : bv; }
       if ($("#f-w")) { o.w = $("#f-w").value; if (!o.w) throw "Ishchini tanlang."; }
       if (rowsT) { o.i = readRows(hasPrice); if (!o.i.length) throw "Kamida bitta qatorda miqdorni kiriting."; if (hasPrice && t !== "b" && o.i.some(r => !(r.pr > 0))) throw "Narxni kiriting."; }
       if ($("#f-a")) { o.a = num($("#f-a").value); if (!(o.a > 0)) throw "Summani kiriting."; }
@@ -963,8 +1004,30 @@ function refForm(cat, id) {
       if ($("#r-loc")) { const raw = $("#r-loc").value.trim(), L = parseLoc(raw); if (raw && !L) throw "Lokatsiyani tushunmadim. Koordinata (41.311081, 69.240562) yoki xarita havolasini kiriting."; o.loc = L ? (L.url || L.lat.toFixed(6) + ", " + L.lng.toFixed(6)) : ""; }
       if ($("#r-open")) o.open = num($("#r-open").value);
       if ($("#r-price")) o.price = num($("#r-price").value);
+      if (x.br) o.br = x.br;
       await put("ref", cat, id || newId(), o);
       logEv(id ? "edit" : "add", REFS[cat].one, refText(o), id ? refText(x) : "");
+    }
+  });
+}
+function brForm(fid, bid) {
+  const f = S.ref.fshops[fid]; if (!f) return;
+  const x = bid && f.br && f.br[bid] ? f.br[bid] : {};
+  const b = inp("r-name", "Filial nomi", x.name || "", 'required placeholder="Masalan: Chilonzor filiali"') + inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"') + inp("r-addr", "Manzil", x.addr || "")
+    + `<div class="field"><label for="r-loc">Lokatsiya (koordinata yoki xarita havolasi)</label><input id="r-loc" value="${esc(x.loc || "")}" placeholder="41.311081, 69.240562">
+      ${window.DAFTAR_PWA ? `<div><button type="button" class="btn small" data-geo>Hozir turgan joyimni saqlash</button></div>` : ""}</div>`
+    + inp("r-open", "Boshlang'ich qarz, so'm (shu filialning eski qarzi)", x.open ?? "", 'inputmode="decimal" placeholder="0"') + inp("r-note", "Izoh", x.note || "");
+  const save = (id, val) => put("ref", "fshops", fid, { ...f, br: { ...(f.br || {}), [id]: val } });
+  openForm({
+    title: (bid ? "Tuzatish: " : "Yangi filial: ") + f.name, body: b, delText: "Ro'yxatdan olib tashlash",
+    onDelete: bid && isOwner() ? async () => { await save(bid, { ...x, del: true }); logEv("del", "Filial", f.name + " — " + refText(x)); if (S.fbrId === bid) S.fbrId = null; } : null,
+    submit: async () => {
+      const o = { name: $("#r-name").value.trim() }; if (!o.name) throw "Filial nomini kiriting.";
+      for (const k of ["phone", "addr", "note"]) o[k] = $("#r-" + k).value.trim();
+      const raw = $("#r-loc").value.trim(), L = parseLoc(raw); if (raw && !L) throw "Lokatsiyani tushunmadim. Koordinata (41.311081, 69.240562) yoki xarita havolasini kiriting.";
+      o.loc = L ? (L.url || L.lat.toFixed(6) + ", " + L.lng.toFixed(6)) : ""; o.open = num($("#r-open").value); o.del = false;
+      await save(bid || newId(), o);
+      logEv(bid ? "edit" : "add", "Filial", f.name + " — " + refText(o), bid ? f.name + " — " + refText(x) : "");
     }
   });
 }
@@ -1000,7 +1063,7 @@ $("#frm").addEventListener("submit", async ev => {
   sv.disabled = false;
 });
 $("#frm").addEventListener("input", ev => { if (ev.target.classList.contains("i-pr")) delete ev.target.dataset.auto; updateTotal(); });
-$("#frm").addEventListener("change", ev => { if (ev.target.classList.contains("i-p") || ev.target.id === "f-s") refreshPrices(); if (ev.target.id === "f-pm") $("#f-pdw").hidden = ev.target.value !== "p"; updateTotal(); });
+$("#frm").addEventListener("change", ev => { if (ev.target.id === "f-s") { const fb = $("#f-b"); if (fb) fb.dataset.cur = ""; fillBranches(); } if (ev.target.classList.contains("i-p") || ev.target.id === "f-s") refreshPrices(); if (ev.target.id === "f-pm") $("#f-pdw").hidden = ev.target.value !== "p"; updateTotal(); });
 dlg.addEventListener("close", () => { F = null; });
 
 /* ---------- export ---------- */
@@ -1008,7 +1071,7 @@ async function exportCsv() {
   const q = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
   const lines = [["Sana", "Turi", "Kim / nima", "Nomi", "Miqdor", "Birlik", "Narx", "Summa", "Izoh"].map(q).join(";")];
   for (const e of S.entries) {
-    const who = e.s ? rname(shopCat(e.t), e.s) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
+    const who = e.s ? shopName(e) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
     const note = [payNote(e), e.m, bt(e.t) === "r" ? (e.st ? "skladga qaytdi" : "yaroqsiz") : "", e.n].filter(Boolean).join(", ");
     if (e.i) for (const r of e.i) lines.push([dm(e.d), TYPES[e.t].label, who, rname(catOf(e.t), r.p), String(r.q).replace(".", ","), runit(catOf(e.t), r.p), r.pr ?? "", r.pr != null ? Math.round(r.q * r.pr) : "", note].map(q).join(";"));
     else lines.push([dm(e.d), isPay(e) ? "Ta'minotchiga to'lov" : TYPES[e.t].label, who, "", "", "", "", Math.round(e.a || 0), note].map(q).join(";"));
@@ -1019,14 +1082,16 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br]");
   if (!el) return;
   const ds = el.dataset;
   if ("nav" in ds) go(ds.nav);
-  else if ("add" in ds) { if (ds.add === "B") { const x = D.sup[supKey(ds.sup)]; entryForm("b", { k: "pay", sup: ds.sup || "", a: x && x.bal > 0.5 ? Math.round(x.bal) : undefined }); } else entryForm(ds.add, { s: ds.s, w: ds.w }); }
+  else if ("add" in ds) { if (ds.add === "B") { const x = D.sup[supKey(ds.sup)]; entryForm("b", { k: "pay", sup: ds.sup || "", a: x && x.bal > 0.5 ? Math.round(x.bal) : undefined }); } else entryForm(ds.add, { s: ds.s, w: ds.w, b: ds.b }); }
   else if ("edit" in ds) { const e = S.entries.find(x => x.id === ds.edit); if (e) entryForm(e.t, {}, e); }
-  else if ("open" in ds) { const [cat, id] = ds.open.split(":"); if (cat === "shops") S.shopId = id; else if (cat === "fshops") S.fshopId = id; else S.workerId = id; render(); window.scrollTo(0, 0); }
-  else if ("back" in ds) { S.shopId = S.fshopId = S.workerId = null; render(); }
+  else if ("open" in ds) { const [cat, id] = ds.open.split(":"); if (cat === "shops") S.shopId = id; else if (cat === "fshops") { S.fshopId = id; S.fbrId = null; } else S.workerId = id; render(); window.scrollTo(0, 0); }
+  else if ("back" in ds) { if (S.fbrId) S.fbrId = null; else S.shopId = S.fshopId = S.workerId = null; render(); window.scrollTo(0, 0); }
+  else if ("openbr" in ds) { S.fbrId = ds.openbr; render(); window.scrollTo(0, 0); }
+  else if ("br" in ds) brForm(ds.firm, ds.br || null);
   else if ("ref" in ds) refForm(ds.ref, ds.id);
   else if ("day" in ds) { S.day = shiftDay(S.day, +ds.day); render(); }
   else if ("month" in ds) { S.month = shiftMonth(S.month, +ds.month); render(); }
@@ -1061,7 +1126,7 @@ document.addEventListener("click", async ev => {
 });
 document.addEventListener("change", ev => { if (ev.target.id === "dayPick" && ev.target.value) { S.day = ev.target.value; render(); } if (ev.target.id === "logWho") { S.logWho = ev.target.value; render(); } });
 document.addEventListener("input", ev => { if (ev.target.id === "shopSearch") { S.q = ev.target.value; $("#shopList").innerHTML = shopRows(S.view === "firma" ? "fshops" : "shops"); } });
-window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && VIEWOK[hv]() && hv !== S.view) { S.view = hv; S.shopId = S.fshopId = S.workerId = null; render(); } });
+window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && VIEWOK[hv]() && hv !== S.view) { S.view = hv; S.shopId = S.fshopId = S.fbrId = S.workerId = null; render(); } });
 start();
 </script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
