@@ -5,8 +5,8 @@
   const gate = $("gate"), msg = $("gateMsg"), form = $("gateForm"), btn = $("g-btn");
   const never = new Promise(() => {});
   const cfg = window.FIREBASE_CONFIG;
-  const TYPES = { sales: ["d", "p", "r"], prod: ["m"], stock: ["b", "u"], exp: ["x"], wages: ["w", "v"] };
-  const REFS = { shops: "sales", materials: "stock", workers: "wages" };
+  const TYPES = { sales: ["d", "p", "r"], firma: ["f", "g", "h"], prod: ["m"], stock: ["b", "u"], exp: ["x"], wages: ["w", "v"] };
+  const REFS = { shops: "sales", fshops: "firma", materials: "stock", workers: "wages" };
   const PWA = window.DAFTAR_PWA = { email: "", name: "", uid: "", owner: false, full: false, perms: [], users: [],
     logout() { firebase.auth().signOut().then(() => { try { history.replaceState(null, "", location.pathname); } catch (e) {} location.reload(); }); } };
   const block = text => { gate.hidden = false; gate.classList.add("nofields"); msg.textContent = text; };
@@ -105,7 +105,7 @@
       if (PWA.full) return fs.collection(c).onSnapshot({ includeMetadataChanges: true }, s => {
         if (c === "j") for (const d of s.docs) if (!d.data().t && !fixed.has(d.id)) { fixed.add(d.id); fs.doc("j/" + d.id).set({ t: d.id.split("_")[1] }, { merge: true }).catch(() => {}); }
         next(s);
-      }, e => { if (e && e.code === "permission-denied") denied(); else if (err) err({ code: code(e), message: String(e && e.message) }); });
+      }, e => { if (e && e.code === "permission-denied") { if (c !== "ctl") denied(); } else if (err) err({ code: code(e), message: String(e && e.message) }); });
       if (c === "ref") return partial([fs.doc("ref/products")].concat(Object.keys(REFS).filter(k => has(REFS[k])).map(k => fs.doc("ref/" + k))), next);
       const types = [].concat(...Object.keys(TYPES).filter(has).map(k => TYPES[k]));
       return partial(types.map(t => fs.collection("j").where("t", "==", t)), next);

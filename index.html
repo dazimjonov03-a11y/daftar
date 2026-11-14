@@ -111,8 +111,8 @@ button.row:hover{background:var(--accent-soft)}
 .row-val small{display:block;font-weight:500;color:var(--muted);font-size:12px}
 .debt{color:var(--debt)} .paid{color:var(--paid)} .muted{color:var(--muted)}
 .pill{flex:none;font-size:11px;font-weight:700;letter-spacing:.03em;padding:3px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent);min-width:62px;text-align:center}
-.pill.t-p,.pill.t-m{background:var(--paid-soft);color:var(--paid)}
-.pill.t-r,.pill.t-x,.pill.t-v{background:var(--debt-soft);color:var(--debt)}
+.pill.t-p,.pill.t-m,.pill.t-g{background:var(--paid-soft);color:var(--paid)}
+.pill.t-r,.pill.t-x,.pill.t-v,.pill.t-h{background:var(--debt-soft);color:var(--debt)}
 .pill.t-b,.pill.t-u,.pill.t-w{background:var(--warn-soft);color:var(--warn)}
 .empty{padding:22px 16px;text-align:center;color:var(--muted)}
 .steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
@@ -238,12 +238,21 @@ const TYPES = {
   u: { label: "Sarf", title: "Xomashyo sarfi" },
   x: { label: "Xarajat", title: "Xarajat" },
   w: { label: "Ish haqi", title: "Ish haqi yozish" },
-  v: { label: "Berildi", title: "Ishchiga pul berish" }
+  v: { label: "Berildi", title: "Ishchiga pul berish" },
+  f: { label: "F. yuk", title: "Firma do'koniga yuk berish" },
+  g: { label: "F. to'lov", title: "Firma do'konidan pul olish" },
+  h: { label: "F. vozvrat", title: "Firma vozvrati (qaytgan mahsulot)" }
 };
+/* Firma yozuvlari (f, g, h) naqd yozuvlar (d, p, r) bilan bir xil ishlaydi, lekin summalari alohida hisoblanadi. */
+const BASE = { f: "d", g: "p", h: "r" };
+const bt = t => BASE[t] || t;
+const isF = t => !!BASE[t];
+const shopCat = t => isF(t) ? "fshops" : "shops";
 const CATS = ["Ijara", "Kommunal (gaz, svet, suv)", "Transport, benzin", "Qadoq, paket", "Soliq", "Ta'mirlash", "Boshqa"];
 const METHODS = ["Naqd", "Karta", "O'tkazma"];
 const REFS = {
   shops: { one: "Do'kon", add: "Do'kon qo'shish" },
+  fshops: { one: "Firma do'koni", add: "Firma do'konini qo'shish" },
   products: { one: "Mahsulot", add: "Mahsulot qo'shish" },
   materials: { one: "Xomashyo", add: "Xomashyo turini qo'shish" },
   workers: { one: "Ishchi", add: "Ishchi qo'shish" }
@@ -253,26 +262,26 @@ const can = p => !PW() || !PW().perms || PW().perms.includes("all") || PW().perm
 const isOwner = () => !PW() || !PW().perms || !!PW().owner || PW().perms.includes("all");
 const isBoss = () => !!PW() && !!PW().owner;
 const logEv = (act, kind, text, was) => { const P = PW(); if (P && P.log) P.log({ act, kind, text: String(text || ""), was: String(was || "") }); };
-const TPERM = { d: "sales", p: "sales", r: "sales", m: "prod", b: "stock", B: "stock", u: "stock", x: "exp", w: "wages", v: "wages" };
+const TPERM = { d: "sales", p: "sales", r: "sales", m: "prod", b: "stock", B: "stock", u: "stock", x: "exp", w: "wages", v: "wages", f: "firma", g: "firma", h: "firma" };
 const canT = t => can(TPERM[t]);
-const PERMS = [["all", "To'liq huquq: hamma bo'limlar, hisobot, narxlar, o'chirish"], ["sales", "Do'konlar: yuk, to'lov, vozvrat, qarzlar"], ["prod", "Ishlab chiqarish"], ["stock", "Xomashyo: xarid va sarf"], ["exp", "Xarajatlar"], ["wages", "Ishchilar va ish haqi"]];
-const VIEWOK = { bugun: () => true, dokonlar: () => can("sales"), sklad: () => can("prod") || can("stock"), xomashyo: () => can("stock"), ishchilar: () => can("wages"), xarajatlar: () => can("exp"), hisobot: isOwner, tarix: isBoss, sozlama: () => isOwner() || !!PW() };
-const QUICK = [["d", "+", "Yuk berdim"], ["p", "$", "Pul oldim"], ["r", "↩", "Vozvrat"], ["m", "✓", "Mahsulot chiqdi"], ["b", "▣", "Xomashyo oldim"], ["B", "$", "Ta'minotchiga pul"], ["u", "−", "Xomashyo sarfi"], ["x", "−", "Xarajat"], ["v", "→", "Ishchiga pul"]];
-const VIEWS = [["bugun", "Bugun"], ["dokonlar", "Do'konlar"], ["sklad", "Sklad"], ["xomashyo", "Xomashyo"], ["ishchilar", "Ishchilar"], ["xarajatlar", "Xarajatlar"], ["hisobot", "Hisobot"], ["tarix", "Tarix"], ["sozlama", "Sozlamalar"]];
+const PERMS = [["all", "To'liq huquq: hamma bo'limlar, hisobot, narxlar, o'chirish"], ["sales", "Do'konlar: yuk, to'lov, vozvrat, qarzlar"], ["firma", "Firma: firma do'konlari, yuk, to'lov, vozvrat"], ["prod", "Ishlab chiqarish"], ["stock", "Xomashyo: xarid va sarf"], ["exp", "Xarajatlar"], ["wages", "Ishchilar va ish haqi"]];
+const VIEWOK = { bugun: () => true, dokonlar: () => can("sales"), firma: () => can("firma"), sklad: () => can("prod") || can("stock"), xomashyo: () => can("stock"), ishchilar: () => can("wages"), xarajatlar: () => can("exp"), hisobot: isOwner, nazorat: isBoss, tarix: isBoss, sozlama: () => isOwner() || !!PW() };
+const QUICK = [["f", "+", "Yuk berdim"], ["g", "$", "Pul oldim"], ["h", "↩", "Vozvrat"], ["d", "+", "Yuk berdim"], ["p", "$", "Pul oldim"], ["r", "↩", "Vozvrat"], ["m", "✓", "Mahsulot chiqdi"], ["b", "▣", "Xomashyo oldim"], ["B", "$", "Ta'minotchiga pul"], ["u", "−", "Xomashyo sarfi"], ["x", "−", "Xarajat"], ["v", "→", "Ishchiga pul"]];
+const VIEWS = [["bugun", "Bugun"], ["dokonlar", "Do'konlar"], ["firma", "Firma"], ["sklad", "Sklad"], ["xomashyo", "Xomashyo"], ["ishchilar", "Ishchilar"], ["xarajatlar", "Xarajatlar"], ["hisobot", "Hisobot"], ["nazorat", "Nazorat"], ["tarix", "Tarix"], ["sozlama", "Sozlamalar"]];
 
 const S = {
   db: null, dl: null, noDb: false, ready: false, slow: false, stale: false, canWrite: true, dead: false,
   loaded: {}, known: new Set(), jSize: {},
-  ref: { shops: {}, products: {}, materials: {}, workers: {} }, entries: [],
-  log: null, logBusy: false, logErr: false, logWho: "",
-  view: "bugun", day: today(), month: today().slice(0, 7), shopId: null, workerId: null, q: ""
+  ref: { shops: {}, fshops: {}, products: {}, materials: {}, workers: {} }, entries: [],
+  ctl: { norms: {}, inv: {} }, invId: null, log: null, logBusy: false, logErr: false, logWho: "",
+  view: "bugun", day: today(), month: today().slice(0, 7), shopId: null, fshopId: null, workerId: null, q: ""
 };
 let D = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {}, sup: {} };
 let F = null;
 
 /* ---------- derived numbers ---------- */
 const sumItems = e => (e.i || []).reduce((a, r) => a + (+r.q || 0) * (+r.pr || 0), 0);
-const amt = e => "drb".includes(e.t) ? sumItems(e) : (+e.a || 0);
+const amt = e => "drbfh".includes(e.t) ? sumItems(e) : (+e.a || 0);
 /* Xomashyo xaridi: pd yo'q bo'lsa to'liq to'langan (eski yozuvlar), pd = 0 qarzga, pd > 0 qisman. k = "pay": ta'minotchiga keyin berilgan pul. */
 const isPay = e => e.t === "b" && e.k === "pay";
 const paidB = e => isPay(e) ? (+e.a || 0) : e.pd == null ? sumItems(e) : Math.max(0, +e.pd || 0);
@@ -283,9 +292,9 @@ function compute() {
   const d = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {}, sup: {} };
   const sh = id => d.shop[id] || (d.shop[id] = { bal: 0, lastD: "", lastP: "" });
   const mt = id => d.mat[id] || (d.mat[id] = { q: 0, pr: null, in: 0, out: 0 });
-  for (const [id, s] of Object.entries(S.ref.shops)) sh(id).bal = +s.open || 0;
-  for (const e of S.entries) {
-    const a = amt(e);
+  for (const cat of ["shops", "fshops"]) for (const [id, s] of Object.entries(S.ref[cat])) sh(id).bal = +s.open || 0;
+  for (const e0 of S.entries) {
+    const a = amt(e0), e = isF(e0.t) ? { ...e0, t: bt(e0.t) } : e0;
     if (e.t === "d") { const s = sh(e.s); s.bal += a; s.lastD = e.d; for (const r of e.i || []) { d.prod[r.p] = (d.prod[r.p] || 0) - (+r.q || 0); d.lastPr[e.s + "|" + r.p] = r.pr; } }
     else if (e.t === "p") { const s = sh(e.s); s.bal -= a; s.lastP = e.d; }
     else if (e.t === "r") { sh(e.s).bal -= a; if (e.st) for (const r of e.i || []) d.prod[r.p] = (d.prod[r.p] || 0) + (+r.q || 0); }
@@ -331,8 +340,8 @@ function mapLinks(s) {
 }
 const callBtn = ph => window.DAFTAR_PWA ? `<a class="btn small" href="tel:${esc(String(ph).replace(/[^\d+]/g, ""))}">Qo'ng'iroq qilish</a>` : "";
 function sumText(e) {
-  const a = isPay(e) ? paidB(e) : amt(e), who = e.s ? rname("shops", e.s) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
-  return [dm(e.d), who, e.i ? itemsText(e, "drb".includes(e.t)) : "", a ? fmt(a) + " so'm" : "", isPay(e) ? "ta'minotchiga pul berildi" : payNote(e), e.m, e.n].filter(Boolean).join(" · ");
+  const a = isPay(e) ? paidB(e) : amt(e), who = e.s ? rname(shopCat(e.t), e.s) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
+  return [dm(e.d), who, e.i ? itemsText(e, "drbfh".includes(e.t)) : "", a ? fmt(a) + " so'm" : "", isPay(e) ? "ta'minotchiga pul berildi" : payNote(e), e.m, e.n].filter(Boolean).join(" · ");
 }
 const refText = x => [x.name, x.price ? fmt(x.price) + " so'm" : "", x.open ? "boshlang'ich qarz " + fmt(x.open) : "", x.phone, x.addr].filter(Boolean).join(" · ");
 const sumOf = (list, t) => list.filter(e => e.t === t).reduce((a, e) => a + amt(e), 0);
@@ -341,10 +350,10 @@ const sumOf = (list, t) => list.filter(e => e.t === t).reduce((a, e) => a + amt(
 function rowHTML(e, showDate) {
   let title = "", detail = "", val = "", cls = "";
   const a = amt(e);
-  switch (e.t) {
-    case "d": title = rname("shops", e.s); detail = itemsText(e, true); val = "+" + fmt(a); break;
-    case "p": title = rname("shops", e.s); detail = e.m || ""; val = "−" + fmt(a); cls = "paid"; break;
-    case "r": title = rname("shops", e.s); detail = itemsText(e, true) + (e.st ? " · skladga qaytdi" : " · yaroqsiz"); val = "−" + fmt(a); cls = "debt"; break;
+  switch (bt(e.t)) {
+    case "d": title = rname(shopCat(e.t), e.s); detail = itemsText(e, true); val = "+" + fmt(a); break;
+    case "p": title = rname(shopCat(e.t), e.s); detail = e.m || ""; val = "−" + fmt(a); cls = "paid"; break;
+    case "r": title = rname(shopCat(e.t), e.s); detail = itemsText(e, true) + (e.st ? " · skladga qaytdi" : " · yaroqsiz"); val = "−" + fmt(a); cls = "debt"; break;
     case "m": title = "Ishlab chiqarildi"; detail = itemsText(e, false); val = qtyByUnit([e]); cls = "paid"; break;
     case "b": if (isPay(e)) { title = e.sup || "Ta'minotchi"; detail = ["ta'minotchiga pul berildi", e.m].filter(Boolean).join(" · "); val = "−" + fmt(paidB(e)); }
       else { title = e.sup || "Xomashyo xaridi"; detail = [itemsText(e, true), payNote(e)].filter(Boolean).join(" · "); val = fmt(a); if (e.pd != null) cls = "debt"; } break;
@@ -399,18 +408,18 @@ function viewBugun() {
     ${listHTML(day.slice().reverse(), false, "Bu kunga hali yozuv yo'q. Yuqoridagi tugmalardan birini bosib birinchi yozuvni kiriting.")}</div>`;
 }
 
-function shopRows() {
+function shopRows(cat = "shops") {
   const q = S.q.trim().toLowerCase();
-  const list = active("shops").filter(([, s]) => !q || [s.name, s.owner, s.phone, s.addr].join(" ").toLowerCase().includes(q))
+  const list = active(cat).filter(([, s]) => !q || [s.name, s.owner, s.phone, s.addr].join(" ").toLowerCase().includes(q))
     .map(([id, s]) => ({ id, s, d: D.shop[id] || { bal: 0, lastD: "", lastP: "" } })).sort((a, b) => b.d.bal - a.d.bal);
   if (!list.length) return `<div class="empty">${q ? "Bunday do'kon topilmadi." : "Hali do'kon yo'q. Do'kon qo'shsangiz, shu yerda nomi, telefoni va qarzi ko'rinadi."}</div>`;
-  return list.map(({ id, s, d }) => `<button type="button" class="row" data-open="shops:${id}">
+  return list.map(({ id, s, d }) => `<button type="button" class="row" data-open="${cat}:${id}">
     <span class="row-main"><b>${esc(s.name)}</b><small>${esc([s.owner, s.phone].filter(Boolean).join(" · ") || "telefon kiritilmagan")}</small></span>
     <span class="row-val ${d.bal > 0.5 ? "debt" : d.bal < -0.5 ? "paid" : "muted"}">${d.bal > 0.5 ? fmt(d.bal) : d.bal < -0.5 ? "+" + fmt(-d.bal) : "qarzi yo'q"}
       <small>yuk ${dshort(d.lastD)} · pul ${dshort(d.lastP)}</small></span></button>`).join("");
 }
 function viewDokonlar() {
-  if (S.shopId && S.ref.shops[S.shopId]) return viewShop(S.shopId);
+  if (S.shopId && S.ref.shops[S.shopId]) return viewShop("shops", S.shopId);
   return `<div class="head"><h1>Do'konlar</h1>${W(`<button type="button" class="btn primary" data-ref="shops">Do'kon qo'shish</button>`)}</div>
   <input class="search" id="shopSearch" type="search" placeholder="Nomi, egasi yoki telefon bo'yicha qidirish" value="${esc(S.q)}" aria-label="Do'kon qidirish">
   <div class="list" id="shopList">${shopRows()}</div>
@@ -422,26 +431,42 @@ function ledger(openBal, list, plusT, label) {
   for (const e of list) {
     const a = amt(e), plus = plusT.includes(e.t); bal += plus ? a : -a;
     const det = e.i ? itemsText(e, true) : (e.m || "");
-    rows.push(`<tr><td class="num">${dm(e.d)}</td><td><b>${TYPES[e.t].label}</b>${det || e.n ? `<br><span class="muted">${esc([det, e.n].filter(Boolean).join(" · "))}</span>` : ""}</td>
+    rows.push(`<tr><td class="num">${dm(e.d)}</td><td><b>${TYPES[bt(e.t)].label}</b>${det || e.n ? `<br><span class="muted">${esc([det, e.n].filter(Boolean).join(" · "))}</span>` : ""}</td>
       <td class="n">${plus ? fmt(a) : ""}</td><td class="n">${plus ? "" : fmt(a)}</td><td class="n">${fmt(bal)}</td>
       <td>${W(`<button type="button" class="btn small" data-edit="${e.id}">Tuzatish</button>`)}</td></tr>`);
   }
   if (!rows.length) return `<div class="list"><div class="empty">Hali yozuv yo'q.</div></div>`;
   return `<div class="tblwrap"><table><thead><tr><th>Sana</th><th>Amal</th><th class="n">${label[0]}</th><th class="n">${label[1]}</th><th class="n">Qoldiq</th><th></th></tr></thead><tbody>${rows.reverse().join("")}</tbody></table></div>`;
 }
-function viewShop(id) {
-  const s = S.ref.shops[id], d = D.shop[id] || { bal: 0 };
-  const list = S.entries.filter(e => e.s === id && "dpr".includes(e.t));
-  return `<div><button type="button" class="btn small" data-back>‹ Do'konlar</button></div>
-  <div class="head"><h1>${esc(s.name)}</h1>${W(`<button type="button" class="btn small" data-ref="shops" data-id="${id}">Ma'lumotni tuzatish</button>`)}</div>
+function viewShop(cat, id) {
+  const fm = cat === "fshops", T = fm ? "fgh" : "dpr";
+  const s = S.ref[cat][id], d = D.shop[id] || { bal: 0 };
+  const list = S.entries.filter(e => e.s === id && T.includes(e.t));
+  return `<div><button type="button" class="btn small" data-back>‹ ${fm ? "Firma" : "Do'konlar"}</button></div>
+  <div class="head"><h1>${esc(s.name)}</h1>${W(`<button type="button" class="btn small" data-ref="${cat}" data-id="${id}">Ma'lumotni tuzatish</button>`)}</div>
   <div class="card"><div class="info">
     ${s.owner ? `<div><span>Egasi:</span> ${esc(s.owner)}</div>` : ""}
     <div class="phone"><span class="muted">Telefon:</span> ${s.phone ? `<code id="ph">${esc(s.phone)}</code><button type="button" class="btn small" data-copy="${esc(s.phone)}">Nusxa olish</button>${callBtn(s.phone)}` : "kiritilmagan"}</div>
     ${s.addr ? `<div><span>Manzil:</span> ${esc(s.addr)}</div>` : ""}<div class="maprow">${mapLinks(s)}</div>${s.note ? `<div><span>Izoh:</span> ${esc(s.note)}</div>` : ""}</div></div>
   <div class="banner"><div><small>${d.bal < -0.5 ? "Ortiqcha to'lagan" : "Hozirgi qarzi"}</small><div class="big num">${fmt(Math.abs(d.bal))} so'm</div></div>
     <div class="side">oxirgi yuk ${dshort(d.lastD)} · oxirgi pul ${dshort(d.lastP)}</div></div>
-  ${W(`<div class="quick"><button type="button" class="btn" data-add="d" data-s="${id}"><i>+</i>Yuk berdim</button><button type="button" class="btn" data-add="p" data-s="${id}"><i>$</i>Pul oldim</button><button type="button" class="btn" data-add="r" data-s="${id}"><i>↩</i>Vozvrat</button></div>`)}
-  <div class="sec"><h2>Hisob-kitob tarixi</h2>${ledger(+s.open || 0, list, "d", ["Yuk", "To'lov / vozvrat"])}</div>`;
+  ${W(`<div class="quick"><button type="button" class="btn" data-add="${T[0]}" data-s="${id}"><i>+</i>Yuk berdim</button><button type="button" class="btn" data-add="${T[1]}" data-s="${id}"><i>$</i>Pul oldim</button><button type="button" class="btn" data-add="${T[2]}" data-s="${id}"><i>↩</i>Vozvrat</button></div>`)}
+  <div class="sec"><h2>Hisob-kitob tarixi</h2>${ledger(+s.open || 0, list, T[0], ["Yuk", "To'lov / vozvrat"])}</div>`;
+}
+function viewFirma() {
+  if (S.fshopId && S.ref.fshops[S.fshopId]) return viewShop("fshops", S.fshopId);
+  const m = S.entries.filter(e => "fgh".includes(e.t) && e.d.startsWith(S.month));
+  const debt = Object.entries(D.shop).filter(([id]) => S.ref.fshops[id] && !S.ref.fshops[id].del).reduce((a, [, x]) => a + Math.max(0, x.bal), 0);
+  const tile = (label, t, cls = "") => `<div class="tile"><small>${label}</small><b class="${cls}">${fmt(sumOf(m, t))}</b> <em>so'm</em>${t === "g" ? "" : `<div class="hint">${esc(qtyByUnit(m.filter(e => e.t === t)))}</div>`}</div>`;
+  return `<div class="head"><h1>Firma</h1>${W(`<button type="button" class="btn primary" data-ref="fshops">Firma do'konini qo'shish</button>`)}</div>
+  <div class="head"><h2>${monthName(S.month)} yakuni</h2>${monthStepper()}</div>
+  <div class="tiles">${tile("Firmaga yuk berildi", "f")}${tile("Vozvrat", "h")}${tile("Pul tushdi", "g", "paid")}
+    <div class="tile"><small>Firma do'konlari qarzi (hozir)</small><b class="debt">${fmt(debt)}</b> <em>so'm</em></div></div>
+  ${quick("fgh")}
+  <input class="search" id="shopSearch" type="search" placeholder="Nomi, egasi yoki telefon bo'yicha qidirish" value="${esc(S.q)}" aria-label="Firma do'konini qidirish">
+  <div class="list" id="shopList">${shopRows("fshops")}</div>
+  <div class="sec"><h2>${monthName(S.month)} yozuvlari</h2>${listHTML(m.slice().reverse(), true, "Bu oyda firma yozuvi yo'q.")}</div>
+  <p class="hint">Firma summalari alohida hisoblanadi: Bugun, Do'konlar va Hisobotdagi naqd summalarga qo'shilmaydi. Faqat tayyor mahsulot qoldig'i umumiy.</p>`;
 }
 
 function viewSklad() {
@@ -454,9 +479,9 @@ function viewSklad() {
   ${quick("mbBu")}
   ${can("stock") && sups.length ? `<div class="sec"><h2>Ta'minotchilarga qarzim: ${fmt(supDebt)} so'm</h2><div class="list">${sups.map(x => `<${S.canWrite ? 'button type="button"' : "div"} class="row" ${S.canWrite ? `data-add="B" data-sup="${esc(x.name)}"` : ""}><span class="row-main"><b>${esc(x.name)}</b><small>${x.bal > 0 ? (S.canWrite ? "pul berganda shu yerni bosing" : "qarzim") : "ortiqcha to'langan"}</small></span><span class="row-val ${x.bal > 0 ? "debt" : "paid"}">${fmt(Math.abs(x.bal))}</span></${S.canWrite ? "button" : "div"}>`).join("")}</div>
     <p class="hint">Qarzga olingan xomashyo shu yerda turadi. Pulini berganingizda «Ta'minotchiga pul» ni yozsangiz, qarz kamayadi va o'sha kungi «Pul chiqdi» ga qo'shiladi.</p></div>` : ""}
-  ${can("sales") && can("prod") ? `<div class="sec"><h2>Tayyor mahsulot qoldig'i</h2>
+  ${can("sales") && can("prod") && can("firma") ? `<div class="sec"><h2>Tayyor mahsulot qoldig'i</h2>
     ${prods.length ? `<div class="tblwrap"><table><thead><tr><th>Mahsulot</th><th class="n">Qoldiq</th></tr></thead><tbody>${prods.map(([id, p]) => `<tr><td>${esc(p.name)}</td>${stockCell(D.prod[id] || 0, p.unit)}</tr>`).join("")}</tbody></table></div>
-    <p class="hint">Qoldiq = ishlab chiqarilgan − do'konlarga berilgan + skladga qaytgan vozvrat. Minus chiqsa, ishlab chiqarish yozuvi kiritilmay qolgan.</p>`
+    <p class="hint">Qoldiq = ishlab chiqarilgan − do'konlarga va firmaga berilgan + skladga qaytgan vozvrat. Minus chiqsa, ishlab chiqarish yozuvi kiritilmay qolgan.</p>`
       : `<div class="list"><div class="empty">Mahsulot turlari hali kiritilmagan. Sozlamalar bo'limida qo'shing.</div></div>`}</div>` : ""}
   ${can("stock") ? `<div class="sec"><div class="head"><h2>Xomashyo qoldig'i</h2>${W(`<button type="button" class="btn small" data-ref="materials">Xomashyo turini qo'shish</button>`)}</div>
     ${mats.length ? `<div class="tblwrap"><table><thead><tr><th>Nomi</th><th class="n">Olindi</th><th class="n">Ishlatildi</th><th class="n">Qoldiq</th><th class="n">Oxirgi narx</th></tr></thead><tbody>${mats.map(([id, m]) => { const x = D.mat[id] || { q: 0, pr: null, in: 0, out: 0 }; return `<tr><td>${esc(m.name)}</td><td class="n">${fq(x.in)}</td><td class="n">${fq(x.out)}</td>${stockCell(x.q, m.unit)}<td class="n">${x.pr != null ? fmt(x.pr) : "—"}</td></tr>`; }).join("")}</tbody></table></div>`
@@ -510,7 +535,7 @@ function viewHisobot() {
   const shopRowsH = Object.entries(shopsAgg).filter(([, x]) => x.d || x.r || x.p || Math.abs(x.bal) > 0.5).sort((a, b) => b[1].bal - a[1].bal);
   const debtEnd = shopRowsH.reduce((a, [, x]) => a + Math.max(0, x.bal), 0);
   const pa = {};
-  for (const e of m) if ("mdr".includes(e.t)) for (const r of e.i || []) { const x = pa[r.p] || (pa[r.p] = { m: 0, d: 0, r: 0 }); x[e.t] += +r.q || 0; }
+  for (const e of m) if ("mdrfh".includes(e.t)) for (const r of e.i || []) { const x = pa[r.p] || (pa[r.p] = { m: 0, d: 0, r: 0, f: 0, h: 0 }); x[e.t] += +r.q || 0; }
   const units = t => { const u = {}; for (const e of m) if (e.t === t) for (const r of e.i || []) { const k = runit("products", r.p) || "dona"; u[k] = (u[k] || 0) + (+r.q || 0); } return u; };
   const uD = units("d"), uR = units("r"), uN = {};
   for (const k of new Set([...Object.keys(uD), ...Object.keys(uR)])) uN[k] = (uD[k] || 0) - (uR[k] || 0);
@@ -532,8 +557,9 @@ function viewHisobot() {
     ${kv("Ta'minotchilarga qarzim (hozir)", fmt(supDebt), supDebt > 0.5 ? "debt" : "")}
     ${kv("Oy oxirida do'konlar qarzi", fmt(debtEnd), "debt")}
   </div></div><p class="hint">Taxminiy foyda = sof sotuv − xomashyo xaridi − ish haqi − boshqa xarajatlar. Soliq va amortizatsiya hisobga olinmagan.</p></div>
-  <div class="sec"><h2>Mahsulot bo'yicha</h2>${Object.keys(pa).length ? `<div class="tblwrap"><table><thead><tr><th>Mahsulot</th><th class="n">Chiqdi</th><th class="n">Berildi</th><th class="n">Vozvrat</th></tr></thead><tbody>
-    ${Object.entries(pa).map(([id, x]) => `<tr><td>${esc(rname("products", id))}</td><td class="n">${fq(x.m)} ${esc(runit("products", id))}</td><td class="n">${fq(x.d)}</td><td class="n">${fq(x.r)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="list"><div class="empty">Bu oyda mahsulot yozuvi yo'q.</div></div>`}</div>
+  <div class="sec"><h2>Mahsulot bo'yicha</h2>${Object.keys(pa).length ? `<div class="tblwrap"><table class="tight"><thead><tr><th>Mahsulot</th><th class="n">Chiqdi</th><th class="n">Naqdga</th><th class="n">Firmaga</th><th class="n">Vozvrat</th><th class="n">Sotildi</th></tr></thead><tbody>
+    ${Object.entries(pa).map(([id, x]) => `<tr><td>${esc(rname("products", id))}${runit("products", id) ? ` <span class="muted">(${esc(runit("products", id))})</span>` : ""}</td><td class="n">${fq(x.m)}</td><td class="n">${fq(x.d)}</td><td class="n">${fq(x.f)}</td><td class="n">${fq(x.r + x.h)}</td><td class="n"><b>${fq(x.d + x.f - x.r - x.h)}</b></td></tr>`).join("")}</tbody></table></div>
+    <p class="hint">Sotildi = naqdga + firmaga − vozvrat. Summalar bo'yicha yuqoridagi yakun faqat naqd savdoni ko'rsatadi, firma summalari Firma bo'limida.</p>` : `<div class="list"><div class="empty">Bu oyda mahsulot yozuvi yo'q.</div></div>`}</div>
   <div class="sec"><h2>Do'konlar bo'yicha</h2>${shopRowsH.length ? `<div class="tblwrap"><table><thead><tr><th>Do'kon</th><th class="n">Yuk</th><th class="n">Vozvrat</th><th class="n">To'lov</th><th class="n">Oy oxirida qarz</th></tr></thead><tbody>
     ${shopRowsH.map(([id, x]) => `<tr><td>${esc(rname("shops", id))}</td><td class="n">${fmt(x.d)}</td><td class="n">${fmt(x.r)}</td><td class="n">${fmt(x.p)}</td><td class="n ${x.bal > 0.5 ? "debt" : ""}">${fmt(x.bal)}</td></tr>`).join("")}
     <tr class="total"><td>Jami</td><td class="n">${fmt(sold)}</td><td class="n">${fmt(ret)}</td><td class="n">${fmt(paid)}</td><td class="n">${fmt(debtEnd)}</td></tr></tbody></table></div>` : `<div class="list"><div class="empty">Bu oyda do'konlar bilan hisob-kitob yo'q.</div></div>`}</div>
@@ -590,7 +616,128 @@ function viewXomashyo() {
     <p class="hint">Boshida — o'tgan oydan qolgani. Qoldiq = boshida + olindi − ishlatildi (oy oxiridagi qoldiq). Oyni tepadagi ‹ › tugmalari bilan almashtirasiz.</p>`
     : `<div class="list"><div class="empty">Xomashyo turlari hali kiritilmagan. Sklad bo'limida qo'shing.</div></div>`}`;
 }
-const VIEWFN = { bugun: viewBugun, dokonlar: viewDokonlar, sklad: viewSklad, xomashyo: viewXomashyo, ishchilar: viewIshchilar, xarajatlar: viewXarajatlar, hisobot: viewHisobot, tarix: viewTarix, sozlama: viewSozlama };
+/* ---------- nazorat (faqat rahbar): norma, tan narx (AVECO), sarf solishtiruvi, inventarizatsiya ---------- */
+const fq4 = n => sp((+n || 0).toLocaleString("ru-RU", { maximumFractionDigits: 4 }));
+/* Oylik o'rtacha narx: (oy boshidagi qoldiq × oldingi o'rtacha + oydagi xaridlar summasi) ÷ (oy boshidagi qoldiq + olingan miqdor). */
+function aveco(month) {
+  const res = {}, byM = {}, st = {};
+  const list = S.entries.filter(e => "bu".includes(e.t) && !isPay(e));
+  if (!list.length || list[0].d.slice(0, 7) > month) return res;
+  for (const e of list) { const k = e.d.slice(0, 7); (byM[k] || (byM[k] = [])).push(e); }
+  for (let cur = list[0].d.slice(0, 7), n = 0; n < 600; cur = shiftMonth(cur, 1), n++) {
+    const agg = {};
+    for (const e of byM[cur] || []) for (const r of e.i || []) {
+      const x = agg[r.p] || (agg[r.p] = { in: 0, pq: 0, pv: 0, out: 0 }), q = +r.q || 0;
+      if (e.t === "b") { x.in += q; if (+r.pr > 0) { x.pq += q; x.pv += q * r.pr; } } else x.out += q;
+    }
+    for (const id of new Set([...Object.keys(st), ...Object.keys(agg)])) {
+      const s0 = st[id] || (st[id] = { q: 0, avg: null }), x = agg[id] || { in: 0, pq: 0, pv: 0, out: 0 }, oq = Math.max(0, s0.q);
+      if (x.pq > 0) s0.avg = s0.avg == null ? x.pv / x.pq : (s0.avg * oq + x.pv) / (oq + x.pq);
+      if (cur === month) res[id] = { avg: s0.avg, open: s0.q, in: x.in, out: x.out };
+      s0.q += x.in - x.out;
+    }
+    if (cur === month) break;
+  }
+  return res;
+}
+const bookQty = (id, day) => S.entries.reduce((a, e) => "bu".includes(e.t) && e.d <= day ? a + (e.i || []).reduce((b, r) => r.p === id ? b + (e.t === "b" ? 1 : -1) * (+r.q || 0) : b, 0) : a, 0);
+function viewNazorat() {
+  const av = aveco(S.month), price = id => av[id] && av[id].avg != null ? av[id].avg : null;
+  const m = S.entries.filter(e => e.d.startsWith(S.month));
+  const norm = id => (S.ctl.norms[id] && S.ctl.norms[id].i) || [];
+  const mu = id => runit("materials", id);
+  /* 1. tan narx */
+  const prodRows = active("products").map(([id, p]) => {
+    const n = norm(id), miss = []; let cost = 0;
+    for (const r of n) { const pr = price(r.p); if (pr == null) miss.push(rname("materials", r.p)); else cost += r.q * pr; }
+    const small = n.length ? n.map(r => `${rname("materials", r.p)} ${fq4(r.q)} ${mu(r.p)}`).join(", ") : "norma kiritilmagan — kiritish uchun bosing";
+    const marg = p.price && n.length ? ` · sotuv ${fmt(p.price)} · farq ${fmt(p.price - cost)}` : "";
+    return `<button type="button" class="row" data-norm="${id}"><span class="row-main"><b>${esc(p.name)}${p.unit ? ` <span class="muted">(1 ${esc(p.unit)})</span>` : ""}</b><small>${esc(small)}</small>${miss.length ? `<small class="debt">narxi yo'q, hisobga kirmadi: ${esc(miss.join(", "))}</small>` : ""}</span>
+      <span class="row-val">${n.length ? fmt(cost) : "—"}<small>${n.length ? "xomashyo tan narxi" + esc(marg) : ""}</small></span></button>`;
+  }).join("");
+  let useVal = 0; const noPrice = new Set();
+  for (const e of m) if (e.t === "u") for (const r of e.i || []) { const pr = price(r.p); if (pr == null) noPrice.add(rname("materials", r.p)); else useVal += (+r.q || 0) * pr; }
+  const made = m.filter(e => e.t === "m"), madeQty = made.reduce((a, e) => a + (e.i || []).reduce((b, r) => b + (+r.q || 0), 0), 0);
+  const wage = sumOf(m, "w"), exp = sumOf(m, "x"), full = useVal + wage + exp;
+  const priceRows = active("materials").filter(([id]) => av[id] || (D.mat[id] && D.mat[id].pr != null)).map(([id, x]) => `<tr><td>${esc(x.name)}${x.unit ? ` <span class="muted">(${esc(x.unit)})</span>` : ""}</td><td class="n">${price(id) != null ? fmt(price(id)) : "—"}</td><td class="n">${D.mat[id] && D.mat[id].pr != null ? fmt(D.mat[id].pr) : "—"}</td></tr>`).join("");
+  /* 2. norma bilan sarf */
+  const need = {}, used = {}, noNorm = new Set();
+  for (const e of made) for (const r of e.i || []) { const n = norm(r.p); if (!n.length) noNorm.add(rname("products", r.p)); for (const x of n) need[x.p] = (need[x.p] || 0) + (+r.q || 0) * x.q; }
+  for (const e of m) if (e.t === "u") for (const r of e.i || []) used[r.p] = (used[r.p] || 0) + (+r.q || 0);
+  let diffSum = 0;
+  const cmpRows = [...new Set([...Object.keys(need), ...Object.keys(used)])].sort((a, b) => rname("materials", a).localeCompare(rname("materials", b))).map(id => {
+    const nq = need[id] || 0, uq = used[id] || 0, df = uq - nq, pr = price(id), sum = pr != null ? df * pr : null; if (sum) diffSum += sum;
+    const cls = df > 0.0005 ? "debt" : "";
+    return `<tr><td>${esc(rname("materials", id))}${mu(id) ? ` <span class="muted">(${esc(mu(id))})</span>` : ""}</td><td class="n">${fq4(nq)}</td><td class="n">${fq4(uq)}</td><td class="n ${cls}">${df > 0.0005 ? "+" : ""}${fq4(df)}</td><td class="n ${cls}">${sum == null ? "—" : (sum > 0.5 ? "+" : "") + fmt(sum)}</td></tr>`;
+  }).join("");
+  /* 3. inventarizatsiya */
+  const invs = Object.entries(S.ctl.inv).map(([id, x]) => ({ id, ...x })).sort((a, b) => a.d < b.d ? 1 : a.d > b.d ? -1 : (b.ts || 0) - (a.ts || 0));
+  const cur = invs.find(x => x.id === S.invId) || invs[0];
+  let invHtml = `<div class="list"><div class="empty">Hali inventarizatsiya qilinmagan. Skladdagi xomashyoni sanab kiritsangiz, daftardagi qoldiq bilan farqi shu yerda chiqadi.</div></div>`;
+  if (cur) {
+    const ia = aveco(cur.d.slice(0, 7)); let tot = 0;
+    const rows = (cur.i || []).map(r => { const bk = bookQty(r.p, cur.d), df = r.q - bk, pr = ia[r.p] && ia[r.p].avg != null ? ia[r.p].avg : null, sum = pr != null ? df * pr : null; if (sum) tot += sum;
+      const cls = df < -0.0005 ? "debt" : df > 0.0005 ? "paid" : "";
+      return `<tr><td>${esc(rname("materials", r.p))}${mu(r.p) ? ` <span class="muted">(${esc(mu(r.p))})</span>` : ""}</td><td class="n">${fq4(bk)}</td><td class="n">${fq4(r.q)}</td><td class="n ${cls}">${df > 0.0005 ? "+" : ""}${fq4(df)}</td><td class="n ${cls}">${sum == null ? "—" : (sum > 0.5 ? "+" : "") + fmt(sum)}</td></tr>`; }).join("");
+    invHtml = `<div class="head"><b>${dm(cur.d)} kungi sanoq${cur.n ? " · " + esc(cur.n) : ""}</b><button type="button" class="btn small" data-inv="${cur.id}">Tuzatish</button></div>
+    <div class="tblwrap"><table class="tight"><thead><tr><th>Nomi</th><th class="n">Daftarda</th><th class="n">Sanaldi</th><th class="n">Farq</th><th class="n">So'm</th></tr></thead><tbody>${rows}
+      <tr class="total"><td>Jami</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n ${tot < -0.5 ? "debt" : ""}">${(tot > 0.5 ? "+" : "") + fmt(tot)}</td></tr></tbody></table></div>
+    <p class="hint">Farq = sanaldi − daftarda. Minus (qizil) — kamomad: daftarda bor, skladda yo'q. Daftarni to'g'rilash uchun kamomadni «Xomashyo sarfi» ga izoh bilan yozing.</p>
+    ${invs.length > 1 ? `<div class="list">${invs.map(x => `<button type="button" class="row" data-invsel="${x.id}"><span class="row-main"><b>${dm(x.d)}</b><small>${(x.i || []).length} ta xomashyo sanalgan${x.n ? " · " + esc(x.n) : ""}</small></span><span class="row-val muted">${x.id === cur.id ? "ko'rsatilmoqda" : "ko'rish"}</span></button>`).join("")}</div>` : ""}`;
+  }
+  return `<div class="head"><h1>Nazorat</h1>${monthStepper()}</div>
+  <p class="hint">Bu bo'lim faqat sizga ko'rinadi. Xodimlar, shu jumladan to'liq huquqlilar ham, uni ko'rmaydi.</p>
+  <div class="sec"><h2>Tan narx va norma</h2>
+    <div class="list">${prodRows || `<div class="empty">Mahsulotlar hali kiritilmagan.</div>`}</div>
+    <p class="hint">Mahsulotni bosib, 1 birligiga ketadigan xomashyoni (normani) kiriting. Xomashyo tan narxi = norma × ${monthName(S.month)} o'rtacha narxi (AVECO).</p>
+    <div class="tiles"><div class="tile"><small>Sarflangan xomashyo qiymati</small><b>${fmt(useVal)}</b> <em>so'm</em></div>
+      <div class="tile"><small>Ish haqi + xarajatlar</small><b>${fmt(wage + exp)}</b> <em>so'm</em></div>
+      <div class="tile"><small>Amalda 1 birlik tan narxi</small><b>${madeQty > 0 ? fmt(full / madeQty) : "—"}</b> <em>so'm</em></div></div>
+    <p class="hint">Amaldagi tan narx = (yozilgan xomashyo sarfi qiymati + hisoblangan ish haqi + boshqa xarajatlar) ÷ ${monthName(S.month)}da ishlab chiqarilgan ${fq(madeQty)} birlik.${noPrice.size ? ` Narxi yo'q xomashyo hisobga kirmadi: ${esc([...noPrice].join(", "))}.` : ""}</p>
+    ${priceRows ? `<div class="tblwrap"><table><thead><tr><th>Xomashyo</th><th class="n">O'rtacha narx (AVECO)</th><th class="n">Oxirgi narx</th></tr></thead><tbody>${priceRows}</tbody></table></div>
+    <p class="hint">O'rtacha narx = (oy boshidagi qoldiq summasi + oydagi xaridlar summasi) ÷ (oy boshidagi miqdor + olingan miqdor).</p>` : ""}</div>
+  <div class="sec"><h2>Norma bilan sarf: ${monthName(S.month)}</h2>
+    ${cmpRows ? `<div class="tblwrap"><table class="tight"><thead><tr><th>Nomi</th><th class="n">Norma</th><th class="n">Yozilgan</th><th class="n">Farq</th><th class="n">So'm</th></tr></thead><tbody>${cmpRows}
+      <tr class="total"><td>Jami</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n ${diffSum > 0.5 ? "debt" : ""}">${(diffSum > 0.5 ? "+" : "") + fmt(diffSum)}</td></tr></tbody></table></div>` : `<div class="list"><div class="empty">Bu oyda ishlab chiqarish yoki xomashyo sarfi yozuvi yo'q.</div></div>`}
+    ${noNorm.size ? `<p class="err">Normasi yo'q mahsulot ishlab chiqarilgan, uning sarfi «Norma» ustuniga kirmadi: ${esc([...noNorm].join(", "))}.</p>` : ""}
+    <p class="hint">Norma = ishlab chiqarilgan miqdor × 1 birlik normasi. Farq = yozilgan sarf − norma. Plyus (qizil) — normadan ortiq sarf yozilgan, minus — kam yozilgan.</p></div>
+  <div class="sec"><div class="head"><h2>Inventarizatsiya</h2><button type="button" class="btn small primary" data-inv="">Qoldiqni sanab kiritish</button></div>${invHtml}</div>`;
+}
+function normForm(pid) {
+  const p = S.ref.products[pid]; if (!p) return;
+  if (!active("materials").length) { openForm({ title: "Norma: " + p.name, noSave: true, body: `<p class="hint">Avval xomashyo turlarini kiriting.</p><button type="button" class="btn primary" data-ref="materials">Xomashyo turini qo'shish</button>` }); return; }
+  const rows = (S.ctl.norms[pid] && S.ctl.norms[pid].i && S.ctl.norms[pid].i.length) ? S.ctl.norms[pid].i : [{}];
+  openForm({
+    t: "u", hasPrice: false, title: "Norma: " + p.name,
+    body: `<p class="hint">1 ${esc(p.unit || "birlik")} ${esc(p.name)} uchun ketadigan xomashyo. Miqdor xomashyoning o'z birligida yoziladi: 150 gramm = 0,15 kg, 5 gramm = 0,005 kg.</p>
+      <div class="field"><span class="flabel">Xomashyo, miqdor</span><div class="rows" id="f-rows">${rows.map(r => itemRow("materials", false, r)).join("")}</div>
+      <div><button type="button" class="btn small" data-add-row>+ Yana qator</button></div></div>`,
+    submit: async () => {
+      const by = {}; for (const r of readRows(false)) by[r.p] = (by[r.p] || 0) + r.q;
+      await put("ctl", "norms", pid, { i: Object.entries(by).map(([k, q]) => ({ p: k, q })) });
+    }
+  });
+}
+function invForm(id) {
+  const ex = id ? S.ctl.inv[id] : null, mats = active("materials");
+  if (!mats.length) { openForm({ title: "Inventarizatsiya", noSave: true, body: `<p class="hint">Avval xomashyo turlarini kiriting.</p>` }); return; }
+  const have = {}; if (ex) for (const r of ex.i || []) have[r.p] = r.q;
+  const day = ex ? ex.d : today();
+  openForm({
+    title: (ex ? "Tuzatish: " : "") + "inventarizatsiya",
+    body: inp("f-d", "Sanoq sanasi", day, 'type="date" required') + `<p class="hint">Skladda haqiqatda bor miqdorni yozing. Sanamaganingizni bo'sh qoldiring. Umuman qolmagan bo'lsa, 0 yozing.</p>
+      <div class="rows">${mats.map(([mid, x]) => `<div class="irow noprice" style="align-items:center"><span>${esc(x.name)}${x.unit ? ` (${esc(x.unit)})` : ""}</span><input class="inv-q" data-p="${mid}" inputmode="decimal" placeholder="daftarda ${fq4(bookQty(mid, day))}" value="${have[mid] ?? ""}" aria-label="${esc(x.name)} sanalgan miqdor"><span></span></div>`).join("")}</div>` + inp("f-n", "Izoh (ixtiyoriy)", ex ? ex.n || "" : ""),
+    onDelete: ex ? async () => { await put("ctl", "inv", id, null); if (S.invId === id) S.invId = null; } : null,
+    submit: async () => {
+      const d = $("#f-d").value; if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) throw "Sanani kiriting.";
+      const i = $$("#frmBody .inv-q").filter(el => el.value.trim() !== "").map(el => ({ p: el.dataset.p, q: num(el.value) }));
+      if (!i.length) throw "Kamida bitta xomashyoning sanalgan miqdorini yozing.";
+      const nid = id || newId();
+      await put("ctl", "inv", nid, { d, i, n: $("#f-n").value.trim(), ts: ex && ex.ts || Date.now() }); S.invId = nid;
+    }
+  });
+}
+const VIEWFN = { bugun: viewBugun, dokonlar: viewDokonlar, firma: viewFirma, sklad: viewSklad, xomashyo: viewXomashyo, nazorat: viewNazorat, ishchilar: viewIshchilar, xarajatlar: viewXarajatlar, hisobot: viewHisobot, tarix: viewTarix, sozlama: viewSozlama };
 
 function render() {
   const tabs = $("#tabs");
@@ -609,7 +756,7 @@ function render() {
   compute();
   v.innerHTML = VIEWFN[S.view]();
 }
-function go(view) { S.view = view; S.shopId = S.workerId = null; try { if (location.hash !== "#" + view) location.hash = view; } catch (e) {} render(); window.scrollTo(0, 0); }
+function go(view) { S.view = view; S.shopId = S.fshopId = S.workerId = null; S.q = ""; try { if (location.hash !== "#" + view) location.hash = view; } catch (e) {} render(); window.scrollTo(0, 0); }
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
 
 /* ---------- store ---------- */
@@ -662,7 +809,7 @@ async function start() {
   S.db = db;
   S.timer = setTimeout(() => { if (S.ready) S.stale = true; else S.slow = true; render(); }, 10000);
   db.collection("ref").onSnapshot(snap => {
-    const ref = { shops: {}, products: {}, materials: {}, workers: {} };
+    const ref = { shops: {}, fshops: {}, products: {}, materials: {}, workers: {} };
     for (const doc of snap.docs) { S.known.add("ref/" + doc.id); if (ref[doc.id]) for (const [id, x] of Object.entries((doc.data() || {}).e || {})) if (x) ref[doc.id][id] = x; }
     S.ref = ref; got("ref", snap.metadata);
   }, onDead);
@@ -676,6 +823,11 @@ async function start() {
     arr.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : (a.ts || 0) - (b.ts || 0));
     S.entries = arr; got("j", snap.metadata);
   }, onDead);
+  if (isBoss()) db.collection("ctl").onSnapshot(snap => {
+    const c = { norms: {}, inv: {} };
+    for (const doc of snap.docs) { S.known.add("ctl/" + doc.id); if (c[doc.id]) for (const [id, x] of Object.entries((doc.data() || {}).e || {})) if (x) c[doc.id][id] = x; }
+    S.ctl = c; if (S.ready) render();
+  }, () => {});
   claude.use("user").then(async u => { if (u && (await u.can("data.write")) === false) { S.canWrite = false; render(); } }).catch(() => {});
   claude.use("downloads").then(d => { if (d) { S.dl = d; if (S.ready && S.view === "hisobot") render(); } }).catch(() => {});
 }
@@ -724,20 +876,20 @@ const readRows = hasPrice => $$("#frmBody .irow").map(row => { const r = { p: $(
 
 function entryForm(t, init = {}, ex = null) {
   const need = [];
-  if ("dpr".includes(t) && !active("shops").length) need.push("shops");
-  if ("drm".includes(t) && !active("products").length) need.push("products");
+  if ("dprfgh".includes(t) && !active(shopCat(t)).length) need.push(shopCat(t));
+  if ("drmfh".includes(t) && !active("products").length) need.push("products");
   if ("bu".includes(t) && !active("materials").length) need.push("materials");
   if ("wv".includes(t) && !active("workers").length) need.push("workers");
   if (need.length && !ex) {
     openForm({ title: TYPES[t].title, noSave: true, body: need.map(r => `<p class="hint">Bu yozuv uchun avval ${REFS[r].one.toLowerCase()} kiritilgan bo'lishi kerak.${r === "products" && !isOwner() ? " Mahsulotlarni rahbar kiritadi." : ""}</p>${r === "products" && !isOwner() ? "" : `<button type="button" class="btn primary" data-ref="${r}">${REFS[r].add}</button>`}`).join("") });
     return;
   }
-  const e = ex || init, cat = catOf(t), isP = t === "b" && e.k === "pay", rowsT = "drmbu".includes(t) && !isP, hasPrice = "drb".includes(t) && !isP;
+  const e = ex || init, cat = catOf(t), isP = t === "b" && e.k === "pay", rowsT = "drmbufh".includes(t) && !isP, hasPrice = "drbfh".includes(t) && !isP;
   const supNames = [...new Set(S.entries.filter(x => x.t === "b" && x.sup).map(x => String(x.sup).trim()))].sort();
   const supList = `<datalist id="supList">${supNames.map(n => `<option value="${esc(n)}">`).join("")}</datalist>`;
   const pm = e.pd == null ? "f" : +e.pd > 0 ? "p" : "c";
   let b = inp("f-d", "Sana", e.d || (S.view === "bugun" ? S.day : today()), 'type="date" required');
-  if ("dpr".includes(t)) b += sel("f-s", "Do'kon", [["", "Do'konni tanlang"], ...active("shops", e.s).map(([id, s]) => [id, s.name])], e.s || "");
+  if ("dprfgh".includes(t)) b += sel("f-s", isF(t) ? "Firma do'koni" : "Do'kon", [["", "Do'konni tanlang"], ...active(shopCat(t), e.s).map(([id, s]) => [id, s.name])], e.s || "");
   if ("wv".includes(t)) b += sel("f-w", "Ishchi", [["", "Ishchini tanlang"], ...active("workers", e.w).map(([id, w]) => [id, w.name])], e.w || "");
   if (t === "b") b += inp("f-sup", isP ? "Kimga pul berildi" : "Kimdan olindi (qarzga olinsa, albatta yozing)", e.sup || "", 'list="supList" autocomplete="off" placeholder="Bozor, yetkazib beruvchi"') + supList + (isP ? `<p class="hint" id="f-sdebt"></p>` : "");
   if (rowsT) {
@@ -749,10 +901,10 @@ function entryForm(t, init = {}, ex = null) {
   if (t === "b" && !isP) b += sel("f-pm", "Puli berildimi?", [["f", "Ha, to'liq to'landi"], ["c", "Yo'q, qarzga olindi (pul hali berilmadi)"], ["p", "Bir qismi to'landi"]], pm)
     + `<div id="f-pdw" ${pm === "p" ? "" : "hidden"}>${inp("f-pd", "Hozir berilgan pul, so'm", pm === "p" ? e.pd : "", 'inputmode="decimal" placeholder="0"')}</div>
     <p class="hint">Qarzga olingan xomashyo skladga kiradi, lekin «Pul chiqdi» ga qo'shilmaydi. Pulini berganingizda «Ta'minotchiga pul» ni yozasiz.</p>`;
-  if (t === "r") b += `<label class="check"><input type="checkbox" id="f-st" ${e.st ? "checked" : ""}> Mahsulot yaroqli, skladga qaytdi</label>`;
+  if (bt(t) === "r") b += `<label class="check"><input type="checkbox" id="f-st" ${e.st ? "checked" : ""}> Mahsulot yaroqli, skladga qaytdi</label>`;
   if (t === "x") b += sel("f-c", "Xarajat turi", CATS.map(c => [c, c]), e.c || CATS[0]);
-  if ("pxwv".includes(t) || isP) b += inp("f-a", "Summa, so'm", e.a ?? "", 'inputmode="decimal" placeholder="0"');
-  if (t === "p") b += sel("f-m", "To'lov turi", METHODS.map(m => [m, m]), e.m || METHODS[0]) + `<p class="hint" id="f-debt"></p>`;
+  if ("pxwvg".includes(t) || isP) b += inp("f-a", "Summa, so'm", e.a ?? "", 'inputmode="decimal" placeholder="0"');
+  if (bt(t) === "p") b += sel("f-m", "To'lov turi", METHODS.map(m => [m, m]), e.m || METHODS[t === "g" ? 2 : 0]) + `<p class="hint" id="f-debt"></p>`;
   if (isP) b += sel("f-m", "To'lov turi", METHODS.map(m => [m, m]), e.m || METHODS[0]);
   b += inp("f-n", "Izoh (ixtiyoriy)", e.n || "");
   openForm({
@@ -766,7 +918,7 @@ function entryForm(t, init = {}, ex = null) {
       if ($("#f-w")) { o.w = $("#f-w").value; if (!o.w) throw "Ishchini tanlang."; }
       if (rowsT) { o.i = readRows(hasPrice); if (!o.i.length) throw "Kamida bitta qatorda miqdorni kiriting."; if (hasPrice && t !== "b" && o.i.some(r => !(r.pr > 0))) throw "Narxni kiriting."; }
       if ($("#f-a")) { o.a = num($("#f-a").value); if (!(o.a > 0)) throw "Summani kiriting."; }
-      if (t === "r") o.st = $("#f-st").checked;
+      if (bt(t) === "r") o.st = $("#f-st").checked;
       if (t === "x") o.c = $("#f-c").value;
       if ($("#f-m")) o.m = $("#f-m").value;
       if (t === "b") {
@@ -792,8 +944,9 @@ function entryForm(t, init = {}, ex = null) {
 }
 function refForm(cat, id) {
   const x = id ? S.ref[cat][id] || {} : {};
-  let b = inp("r-name", cat === "shops" ? "Do'kon nomi" : cat === "workers" ? "Ism" : "Nomi", x.name || "", "required");
-  if (cat === "shops") b += `<div class="two">${inp("r-owner", "Egasi yoki sotuvchi", x.owner || "")}${inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"')}</div>` + inp("r-addr", "Manzil", x.addr || "")
+  const shopLike = cat === "shops" || cat === "fshops";
+  let b = inp("r-name", shopLike ? "Do'kon nomi" : cat === "workers" ? "Ism" : "Nomi", x.name || "", "required");
+  if (shopLike) b += `<div class="two">${inp("r-owner", "Egasi yoki sotuvchi", x.owner || "")}${inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"')}</div>` + inp("r-addr", "Manzil", x.addr || "")
     + `<div class="field"><label for="r-loc">Lokatsiya (koordinata yoki xarita havolasi)</label><input id="r-loc" value="${esc(x.loc || "")}" placeholder="41.311081, 69.240562">
       ${window.DAFTAR_PWA ? `<div><button type="button" class="btn small" data-geo>Hozir turgan joyimni saqlash</button></div>` : ""}
       <span class="hint">${window.DAFTAR_PWA ? "Do'kon oldida turib tugmani bosing yoki " : ""}Google yoki Yandex xaritadan koordinata yoki havolani nusxalab qo'ying.</span></div>` + inp("r-open", "Boshlang'ich qarz, so'm (daftardagi eski qarzi)", x.open ?? "", 'inputmode="decimal" placeholder="0"') + inp("r-note", "Izoh", x.note || "");
@@ -803,7 +956,7 @@ function refForm(cat, id) {
   openForm({
     title: (id ? "Tuzatish: " : "Yangi: ") + REFS[cat].one.toLowerCase(), body: b,
     delText: "Ro'yxatdan olib tashlash",
-    onDelete: id && isOwner() ? async () => { await put("ref", cat, id, { ...x, del: true }); logEv("del", REFS[cat].one, refText(x)); if (S.shopId === id) S.shopId = null; if (S.workerId === id) S.workerId = null; } : null,
+    onDelete: id && isOwner() ? async () => { await put("ref", cat, id, { ...x, del: true }); logEv("del", REFS[cat].one, refText(x)); if (S.shopId === id) S.shopId = null; if (S.fshopId === id) S.fshopId = null; if (S.workerId === id) S.workerId = null; } : null,
     submit: async () => {
       const o = { name: $("#r-name").value.trim() }; if (!o.name) throw "Nomini kiriting.";
       for (const k of ["owner", "phone", "addr", "note", "unit"]) if ($("#r-" + k)) o[k] = $("#r-" + k).value.trim();
@@ -855,8 +1008,8 @@ async function exportCsv() {
   const q = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
   const lines = [["Sana", "Turi", "Kim / nima", "Nomi", "Miqdor", "Birlik", "Narx", "Summa", "Izoh"].map(q).join(";")];
   for (const e of S.entries) {
-    const who = e.s ? rname("shops", e.s) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
-    const note = [payNote(e), e.m, e.t === "r" ? (e.st ? "skladga qaytdi" : "yaroqsiz") : "", e.n].filter(Boolean).join(", ");
+    const who = e.s ? rname(shopCat(e.t), e.s) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
+    const note = [payNote(e), e.m, bt(e.t) === "r" ? (e.st ? "skladga qaytdi" : "yaroqsiz") : "", e.n].filter(Boolean).join(", ");
     if (e.i) for (const r of e.i) lines.push([dm(e.d), TYPES[e.t].label, who, rname(catOf(e.t), r.p), String(r.q).replace(".", ","), runit(catOf(e.t), r.p), r.pr ?? "", r.pr != null ? Math.round(r.q * r.pr) : "", note].map(q).join(";"));
     else lines.push([dm(e.d), isPay(e) ? "Ta'minotchiga to'lov" : TYPES[e.t].label, who, "", "", "", "", Math.round(e.a || 0), note].map(q).join(";"));
   }
@@ -866,14 +1019,14 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel]");
   if (!el) return;
   const ds = el.dataset;
   if ("nav" in ds) go(ds.nav);
   else if ("add" in ds) { if (ds.add === "B") { const x = D.sup[supKey(ds.sup)]; entryForm("b", { k: "pay", sup: ds.sup || "", a: x && x.bal > 0.5 ? Math.round(x.bal) : undefined }); } else entryForm(ds.add, { s: ds.s, w: ds.w }); }
   else if ("edit" in ds) { const e = S.entries.find(x => x.id === ds.edit); if (e) entryForm(e.t, {}, e); }
-  else if ("open" in ds) { const [cat, id] = ds.open.split(":"); if (cat === "shops") S.shopId = id; else S.workerId = id; render(); window.scrollTo(0, 0); }
-  else if ("back" in ds) { S.shopId = S.workerId = null; render(); }
+  else if ("open" in ds) { const [cat, id] = ds.open.split(":"); if (cat === "shops") S.shopId = id; else if (cat === "fshops") S.fshopId = id; else S.workerId = id; render(); window.scrollTo(0, 0); }
+  else if ("back" in ds) { S.shopId = S.fshopId = S.workerId = null; render(); }
   else if ("ref" in ds) refForm(ds.ref, ds.id);
   else if ("day" in ds) { S.day = shiftDay(S.day, +ds.day); render(); }
   else if ("month" in ds) { S.month = shiftMonth(S.month, +ds.month); render(); }
@@ -883,6 +1036,9 @@ document.addEventListener("click", async ev => {
   else if ("export" in ds) exportCsv();
   else if ("logout" in ds) window.DAFTAR_PWA.logout();
   else if ("user" in ds) userForm(ds.user || null);
+  else if ("norm" in ds) normForm(ds.norm);
+  else if ("inv" in ds) invForm(ds.inv || null);
+  else if ("invsel" in ds) { S.invId = ds.invsel; render(); }
   else if ("reloadLog" in ds) { loadLog(); render(); }
   else if ("geo" in ds) {
     const er = $("#frmErr"), label = el.textContent, fail = () => { el.disabled = false; el.textContent = label; er.textContent = "Joylashuvni aniqlab bo'lmadi. Telefonda joylashuvga ruxsat bering yoki xarita havolasini qo'ying."; er.hidden = false; };
@@ -904,8 +1060,8 @@ document.addEventListener("click", async ev => {
   }
 });
 document.addEventListener("change", ev => { if (ev.target.id === "dayPick" && ev.target.value) { S.day = ev.target.value; render(); } if (ev.target.id === "logWho") { S.logWho = ev.target.value; render(); } });
-document.addEventListener("input", ev => { if (ev.target.id === "shopSearch") { S.q = ev.target.value; $("#shopList").innerHTML = shopRows(); } });
-window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && VIEWOK[hv]() && hv !== S.view) { S.view = hv; S.shopId = S.workerId = null; render(); } });
+document.addEventListener("input", ev => { if (ev.target.id === "shopSearch") { S.q = ev.target.value; $("#shopList").innerHTML = shopRows(S.view === "firma" ? "fshops" : "shops"); } });
+window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && VIEWOK[hv]() && hv !== S.view) { S.view = hv; S.shopId = S.fshopId = S.workerId = null; render(); } });
 start();
 </script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
