@@ -156,6 +156,9 @@ dialog::backdrop{background:rgba(10,14,26,.5)}
 .field label,.flabel{font-size:12px;font-weight:600;color:var(--muted)}
 .field input,.field select,.field textarea,.irow input,.irow select{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:8px 10px;width:100%;min-width:0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.orow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px;gap:6px}
+.orow input{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:8px 10px;width:100%;min-width:0}
+.st-ok{color:var(--paid)} .st-part{color:var(--warn)} .st-no{color:var(--debt)}
 .irow{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr) minmax(0,1fr) 42px;gap:6px}
 .irow.noprice{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) 42px}
 .rows{display:flex;flex-direction:column;gap:6px}
@@ -317,6 +320,53 @@ function compute() {
   }
   D = d;
 }
+/* ---------- qarz taqsimoti: qaysi to'lov qaysi yukni yopgani ----------
+   Do'kon/filialda: oi = [{ id, d, a }] — sanasi bilan boshlang'ich qarzlar (open = ularning yig'indisi).
+   To'lov/vozvrat yozuvida: to = yuk id yoki "o:<id>" (boshlang'ich qarz). Tanlanmasa — eng eski qarzdan. */
+const oiOf = x => x && Array.isArray(x.oi) && x.oi.length ? x.oi : (x && +x.open ? [{ id: "", d: "", a: +x.open }] : []);
+const oKey = it => "o:" + (it.id || "");
+function acctList(t, sid, bid) {
+  const fm = isF(t), T = fm ? "fgh" : "dpr", hasBr = fm && brList(sid, bid).length;
+  return S.entries.filter(e => e.s === sid && T.includes(e.t) && (!fm || !hasBr || (bid && bid !== "-" ? e.b === bid : !brOf(sid, e.b))));
+}
+function acctOpen(t, sid, bid) {
+  const f = S.ref[shopCat(t)][sid]; if (!f) return [];
+  if (isF(t) && bid && bid !== "-") return oiOf(f.br && f.br[bid]);
+  if (isF(t) && bid === "-") return [];
+  return oiOf(f);
+}
+function alloc(openItems, list, skipId) {
+  const debts = [], byKey = {}, cr = {};
+  for (const it of openItems) { const x = { key: oKey(it), d: it.d || "", a: +it.a || 0, open: true, paid: 0, pays: [] }; debts.push(x); byKey[x.key] = x; }
+  for (const e of list) if (bt(e.t) === "d" && e.id !== skipId) { const x = { key: e.id, d: e.d, a: amt(e), e, paid: 0, pays: [] }; debts.push(x); byKey[x.key] = x; }
+  const order = debts.slice().sort((a, b) => (a.d || "") < (b.d || "") ? -1 : (a.d || "") > (b.d || "") ? 1 : 0);
+  let avans = 0;
+  for (const e of list) {
+    if (e.id === skipId || bt(e.t) === "d") continue;
+    let left = amt(e); const parts = cr[e.id] = [];
+    const give = (x, v) => { if (v <= 0.5) return; x.paid += v; x.pays.push({ d: e.d, a: v, e }); parts.push({ x, a: v }); left -= v; };
+    const tg = e.to && byKey[e.to];
+    if (tg) give(tg, Math.min(left, tg.a - tg.paid));
+    for (const x of order) { if (left <= 0.5) break; give(x, Math.min(left, x.a - x.paid)); }
+    if (left > 0.5) { avans += left; parts.push({ x: null, a: left }); }
+  }
+  return { debts: order, byKey, cr, avans, owed: order.reduce((a, x) => a + Math.max(0, x.a - x.paid), 0) };
+}
+const debtName = x => (x.open ? "Boshlang'ich qarz" : "Yuk") + " " + (x.d ? dm(x.d) : "(sanasiz)");
+const daysAgo = d => d ? Math.max(0, Math.round((new Date(today() + "T12:00:00") - new Date(d + "T12:00:00")) / 864e5)) : null;
+function debtStatus(x) {
+  const r = x.a - x.paid;
+  if (r <= 0.5) return `<span class="st-ok">✓ to'liq to'langan</span>`;
+  if (x.paid > 0.5) return `<span class="st-part">to'landi ${fmt(x.paid)} · qoldi ${fmt(r)}</span>`;
+  return `<span class="st-no">to'lanmagan</span>`;
+}
+function openDebtsHTML(A) {
+  const open = A.debts.filter(x => x.a - x.paid > 0.5);
+  if (!open.length) return A.avans > 0.5 ? `<p class="hint">Hamma qarz yopilgan. Avans (ortiqcha to'lov): ${fmt(A.avans)} so'm.</p>` : "";
+  return `<div class="sec"><h2>Yopilmagan qarzlar</h2><div class="tblwrap"><table><thead><tr><th>Sana</th><th>Nima</th><th class="n">Summa</th><th class="n">To'landi</th><th class="n">Qoldi</th><th class="n">Necha kun</th></tr></thead><tbody>
+    ${open.map(x => { const k = daysAgo(x.d); return `<tr><td class="num">${x.d ? dm(x.d) : "—"}</td><td><b>${x.open ? "Boshlang'ich qarz" : "Yuk"}</b>${x.e ? `<br><span class="muted">${esc(itemsText(x.e, true))}</span>` : ""}</td><td class="n">${fmt(x.a)}</td><td class="n">${x.paid > 0.5 ? fmt(x.paid) : ""}</td><td class="n debt">${fmt(x.a - x.paid)}</td><td class="n ${k != null && k > 30 ? "debt" : ""}">${k == null ? "—" : k}</td></tr>`; }).join("")}
+    </tbody></table></div>${A.avans > 0.5 ? `<p class="hint">Avans (ortiqcha to'lov): ${fmt(A.avans)} so'm — keyingi yukka yechiladi.</p>` : ""}</div>`;
+}
 const rname = (cat, id) => S.ref[cat][id]?.name || "(o'chirilgan)";
 const runit = (cat, id) => S.ref[cat][id]?.unit || "";
 const active = (cat, keep) => Object.entries(S.ref[cat]).filter(([id, x]) => x && (!x.del || id === keep)).sort((a, b) => String(a[1].name).localeCompare(String(b[1].name)));
@@ -351,7 +401,7 @@ function sumText(e) {
   const a = isPay(e) ? paidB(e) : amt(e), who = e.s ? shopName(e) : e.w ? rname("workers", e.w) : e.t === "x" ? e.c : e.t === "b" ? e.sup : "";
   return [dm(e.d), who, e.i ? itemsText(e, "drbfh".includes(e.t)) : "", a ? fmt(a) + " so'm" : "", isPay(e) ? "ta'minotchiga pul berildi" : payNote(e), e.m, e.n].filter(Boolean).join(" · ");
 }
-const refText = x => [x.name, x.price ? fmt(x.price) + " so'm" : "", x.open ? "boshlang'ich qarz " + fmt(x.open) : "", x.phone, x.addr].filter(Boolean).join(" · ");
+const refText = x => [x.name, x.price ? fmt(x.price) + " so'm" : "", x.open ? "boshlang'ich qarz " + fmt(x.open) + (openText(x) ? " (" + openText(x) + ")" : "") : "", x.phone, x.addr].filter(Boolean).join(" · ");
 const sumOf = (list, t) => list.filter(e => e.t === t).reduce((a, e) => a + amt(e), 0);
 
 /* ---------- rows ---------- */
@@ -433,13 +483,19 @@ function viewDokonlar() {
   <div class="list" id="shopList">${shopRows()}</div>
   <p class="hint">Qizil raqam — do'konning qarzi. Ostida oxirgi yuk berilgan va oxirgi pul olingan sana.</p>`;
 }
-function ledger(openBal, list, plusT, label) {
-  let bal = openBal; const rows = [];
-  if (openBal) rows.push(`<tr><td>—</td><td>Boshlang'ich qoldiq</td><td class="n"></td><td class="n"></td><td class="n">${fmt(bal)}</td><td></td></tr>`);
+function ledger(openItems, list, plusT, label, A) {
+  let bal = 0; const rows = [];
+  for (const it of openItems.slice().sort((a, b) => (a.d || "") < (b.d || "") ? -1 : 1)) {
+    const x = A.byKey[oKey(it)]; bal += +it.a || 0;
+    rows.push(`<tr><td class="num">${it.d ? dm(it.d) : "—"}</td><td>Boshlang'ich qarz${x ? `<br>${debtStatus(x)}` : ""}</td><td class="n">${fmt(it.a)}</td><td class="n"></td><td class="n">${fmt(bal)}</td><td></td></tr>`);
+  }
   for (const e of list) {
     const a = amt(e), plus = plusT.includes(e.t); bal += plus ? a : -a;
     const det = e.i ? itemsText(e, true) : (e.m || "");
-    rows.push(`<tr><td class="num">${dm(e.d)}</td><td><b>${TYPES[bt(e.t)].label}</b>${det || e.n ? `<br><span class="muted">${esc([det, e.n].filter(Boolean).join(" · "))}</span>` : ""}</td>
+    let st = "";
+    if (plus) { const x = A.byKey[e.id]; if (x) st = debtStatus(x); }
+    else { const parts = A.cr[e.id] || []; st = parts.map(p => p.x ? `→ ${debtName(p.x)} uchun ${fmt(p.a)}` : `→ avans ${fmt(p.a)}`).join("<br>"); if (parts.length && !e.to) st += ` <span class="muted">(avtomatik)</span>`; }
+    rows.push(`<tr><td class="num">${dm(e.d)}</td><td><b>${TYPES[bt(e.t)].label}</b>${det || e.n ? `<br><span class="muted">${esc([det, e.n].filter(Boolean).join(" · "))}</span>` : ""}${st ? `<br><small>${st}</small>` : ""}</td>
       <td class="n">${plus ? fmt(a) : ""}</td><td class="n">${plus ? "" : fmt(a)}</td><td class="n">${fmt(bal)}</td>
       <td>${W(`<button type="button" class="btn small" data-edit="${e.id}">Tuzatish</button>`)}</td></tr>`);
   }
@@ -454,6 +510,7 @@ function viewShop(cat, id, bid) {
   const d = br ? (D.br[id + "|" + bid] || { bal: 0 }) : none ? { bal: (D.shop[id] || { bal: 0 }).bal - brSum } : (D.shop[id] || { bal: 0 });
   const list = S.entries.filter(e => e.s === id && T.includes(e.t) && (!bid || (none ? !brOf(id, e.b) : e.b === bid)));
   const bAttr = br ? ` data-b="${bid}"` : "";
+  const oItems = none ? [] : oiOf(s), A = alloc(oItems, list);
   return `<div><button type="button" class="btn small" data-back>‹ ${bid ? esc(f.name) : fm ? "Firma" : "Do'konlar"}</button></div>
   <div class="head"><h1>${none ? "Filial ko'rsatilmagan" : esc(s.name)}</h1>${none ? "" : W(br ? `<button type="button" class="btn small" data-br="${bid}" data-firm="${id}">Ma'lumotni tuzatish</button>` : `<span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">${fm ? `<button type="button" class="btn small" data-br="" data-firm="${id}">Filial qo'shish</button>` : ""}<button type="button" class="btn small" data-ref="${cat}" data-id="${id}">Ma'lumotni tuzatish</button></span>`)}</div>
   ${none ? `<p class="hint">${esc(f.name)}: filiali belgilanmagan yozuvlar. Yozuvni ochib filialni tanlasangiz, u o'sha filialga o'tadi.</p>` : `<div class="card"><div class="info">
@@ -463,7 +520,8 @@ function viewShop(cat, id, bid) {
   <div class="banner"><div><small>${d.bal < -0.5 ? "Ortiqcha to'lagan" : "Hozirgi qarzi"}</small><div class="big num">${fmt(Math.abs(d.bal))} so'm</div></div>
     ${none ? "" : `<div class="side">oxirgi yuk ${dshort(d.lastD)} · oxirgi pul ${dshort(d.lastP)}</div>`}</div>
   ${none ? "" : W(`<div class="quick"><button type="button" class="btn" data-add="${T[0]}" data-s="${id}"${bAttr}><i>+</i>Yuk berdim</button><button type="button" class="btn" data-add="${T[1]}" data-s="${id}"${bAttr}><i>$</i>Pul oldim</button><button type="button" class="btn" data-add="${T[2]}" data-s="${id}"${bAttr}><i>↩</i>Vozvrat</button></div>`)}
-  <div class="sec"><h2>Hisob-kitob tarixi</h2>${ledger(+s.open || 0, list, T[0], ["Yuk", "To'lov / vozvrat"])}</div>`;
+  ${openDebtsHTML(A)}
+  <div class="sec"><h2>Hisob-kitob tarixi</h2>${ledger(oItems, list, T[0], ["Yuk", "To'lov / vozvrat"], A)}</div>`;
 }
 /* Filiallari bor firma: filiallar ro'yxati, har birining qarzi bilan. */
 function viewFirmBranches(id) {
@@ -902,8 +960,25 @@ function fillBranches() {
   w.hidden = !list.length;
   el.innerHTML = [["", "Filialni tanlang"], ...list.map(([id, x]) => [id, x.name]), ["-", "Filialsiz (umumiy)"]].map(([v, t]) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(t)}</option>`).join("");
 }
+function fillDebts() {
+  const el = $("#f-to"); if (!el || !F) return;
+  const sid = $("#f-s").value, bv = $("#f-b") && !$("#f-bw").hidden ? $("#f-b").value : "-";
+  const cur = el.dataset.cur || "";
+  if (!sid) { el.innerHTML = `<option value="">Avval do'konni tanlang</option>`; F.A = null; return; }
+  const A = F.A = alloc(acctOpen(F.t, sid, bv), acctList(F.t, sid, bv), F.exId);
+  const opts = [["", "Avtomatik — eng eski qarzdan"]];
+  for (const x of A.debts) { const r = x.a - x.paid; if (r > 0.5 || x.key === cur) opts.push([x.key, `${debtName(x)} · ${fmt(x.a)} · qoldi ${fmt(Math.max(0, r))}`]); }
+  el.innerHTML = opts.map(([v, t]) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(t)}</option>`).join("");
+}
 function updateTotal() {
   if (!F) return;
+  const th = $("#f-tohint");
+  if (th) {
+    const A = F.A, k = $("#f-to").value, x = A && k ? A.byKey[k] : null;
+    const sum = $("#f-a") ? num($("#f-a").value) : $$("#frmBody .irow").reduce((a, row) => a + num($(".i-q", row).value) * num($(".i-pr", row)?.value), 0);
+    const r = x ? x.a - x.paid : 0;
+    th.textContent = x ? (sum > r + 0.5 ? `Bu qarzning qoldig'i ${fmt(r)} so'm. Ortig'i ${fmt(sum - r)} so'm eng eski boshqa qarzga yoziladi.` : `Bu qarzdan ${fmt(Math.max(0, r - sum))} so'm qoladi.`) : "Tanlanmasa, pul eng eski yopilmagan qarzga yoziladi.";
+  }
   const tl = $("#f-total");
   if (tl) tl.textContent = fmt($$("#frmBody .irow").reduce((a, row) => a + num($(".i-q", row).value) * num($(".i-pr", row)?.value), 0)) + " so'm";
   const sd = $("#f-sdebt");
@@ -945,11 +1020,12 @@ function entryForm(t, init = {}, ex = null) {
   if (t === "x") b += sel("f-c", "Xarajat turi", CATS.map(c => [c, c]), e.c || CATS[0]);
   if ("pxwvg".includes(t) || isP) b += inp("f-a", "Summa, so'm", e.a ?? "", 'inputmode="decimal" placeholder="0"');
   if (bt(t) === "p") b += sel("f-m", "To'lov turi", METHODS.map(m => [m, m]), e.m || METHODS[t === "g" ? 2 : 0]) + `<p class="hint" id="f-debt"></p>`;
+  if ("pr".includes(bt(t))) b += `<div class="field"><label for="f-to">Qaysi qarz uchun</label><select id="f-to" data-cur="${esc(e.to || "")}"></select><span class="hint" id="f-tohint"></span></div>`;
   if (isP) b += sel("f-m", "To'lov turi", METHODS.map(m => [m, m]), e.m || METHODS[0]);
   b += inp("f-n", "Izoh (ixtiyoriy)", e.n || "");
   openForm({
-    t, hasPrice, title: (ex ? "Tuzatish: " : "") + (isP ? "Ta'minotchiga pul berish" : TYPES[t].title), body: b,
-    after: () => { fillBranches(); refreshPrices(); updateTotal(); },
+    t, hasPrice, exId: ex ? ex.id : null, title: (ex ? "Tuzatish: " : "") + (isP ? "Ta'minotchiga pul berish" : TYPES[t].title), body: b,
+    after: () => { fillBranches(); refreshPrices(); fillDebts(); updateTotal(); },
     onDelete: ex && isOwner() ? async () => { await put("j", ex._doc, ex.id, null); logEv("del", isP ? "Ta'minotchiga to'lov" : TYPES[t].label, sumText(ex)); } : null,
     submit: async () => {
       const o = { d: $("#f-d").value, ts: ex?.ts || Date.now() };
@@ -962,6 +1038,7 @@ function entryForm(t, init = {}, ex = null) {
       if (bt(t) === "r") o.st = $("#f-st").checked;
       if (t === "x") o.c = $("#f-c").value;
       if ($("#f-m")) o.m = $("#f-m").value;
+      if ($("#f-to")) o.to = $("#f-to").value || null;
       if (t === "b") {
         o.sup = $("#f-sup").value.trim();
         if (isP) { o.k = "pay"; if (!o.sup) throw "Kimga pul berilganini yozing."; }
@@ -983,6 +1060,23 @@ function entryForm(t, init = {}, ex = null) {
     }
   });
 }
+const oRow = (it = {}) => `<div class="orow" data-oid="${esc(it.id || "")}"><input type="date" class="o-d" value="${esc(it.d || "")}" aria-label="Sana"><input class="o-a" inputmode="decimal" placeholder="Summa" value="${it.a ?? ""}" aria-label="Summa"><button type="button" class="icon-btn" data-rm-orow aria-label="Qatorni o'chirish">×</button></div>`;
+function openEditor(x, label) {
+  const items = oiOf(x);
+  return `<div class="field"><span class="flabel">${label}</span><div class="rows" id="o-rows">${(items.length ? items : [{}]).map(oRow).join("")}</div>
+    <div><button type="button" class="btn small" data-add-orow>+ Yana qarz qo'shish</button></div>
+    <span class="hint">Daftardagi eski qarzlarni sanasi bilan alohida yozing (qaysi kuni qancha yuk berilgan). Jami: <b id="o-total">${fmt(items.reduce((a, i) => a + (+i.a || 0), 0))}</b> so'm</span></div>`;
+}
+function readOpen() {
+  const oi = [];
+  for (const row of $$("#o-rows .orow")) {
+    const a = num($(".o-a", row).value), d = $(".o-d", row).value; if (!(a > 0)) continue;
+    oi.push({ id: row.dataset.oid || newId(), d: /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : "", a });
+  }
+  oi.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+  return { oi, open: oi.reduce((a, i) => a + i.a, 0) };
+}
+const openText = x => (x.oi || []).length > 1 ? x.oi.map(i => (i.d ? dm(i.d) : "sanasiz") + " " + fmt(i.a)).join(", ") : "";
 function refForm(cat, id) {
   const x = id ? S.ref[cat][id] || {} : {};
   const shopLike = cat === "shops" || cat === "fshops";
@@ -990,7 +1084,7 @@ function refForm(cat, id) {
   if (shopLike) b += `<div class="two">${inp("r-owner", "Egasi yoki sotuvchi", x.owner || "")}${inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"')}</div>` + inp("r-addr", "Manzil", x.addr || "")
     + `<div class="field"><label for="r-loc">Lokatsiya (koordinata yoki xarita havolasi)</label><input id="r-loc" value="${esc(x.loc || "")}" placeholder="41.311081, 69.240562">
       ${window.DAFTAR_PWA ? `<div><button type="button" class="btn small" data-geo>Hozir turgan joyimni saqlash</button></div>` : ""}
-      <span class="hint">${window.DAFTAR_PWA ? "Do'kon oldida turib tugmani bosing yoki " : ""}Google yoki Yandex xaritadan koordinata yoki havolani nusxalab qo'ying.</span></div>` + inp("r-open", "Boshlang'ich qarz, so'm (daftardagi eski qarzi)", x.open ?? "", 'inputmode="decimal" placeholder="0"') + inp("r-note", "Izoh", x.note || "");
+      <span class="hint">${window.DAFTAR_PWA ? "Do'kon oldida turib tugmani bosing yoki " : ""}Google yoki Yandex xaritadan koordinata yoki havolani nusxalab qo'ying.</span></div>` + openEditor(x, "Boshlang'ich qarz (daftardagi eski qarzi): sana va summa") + inp("r-note", "Izoh", x.note || "");
   if (cat === "products") b += `<div class="two">${sel("r-unit", "O'lchov birligi", ["kg", "dona", "pachka", "quti"].map(u => [u, u]), x.unit || "kg")}${inp("r-price", "Sotuv narxi, so'm", x.price ?? "", 'inputmode="decimal" placeholder="0"')}</div>`;
   if (cat === "materials") b += sel("r-unit", "O'lchov birligi", ["kg", "dona", "litr", "qop", "pachka"].map(u => [u, u]), x.unit || "kg");
   if (cat === "workers") b += inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel"') + inp("r-note", "Izoh (lavozimi, kunlik stavkasi)", x.note || "");
@@ -1002,7 +1096,7 @@ function refForm(cat, id) {
       const o = { name: $("#r-name").value.trim() }; if (!o.name) throw "Nomini kiriting.";
       for (const k of ["owner", "phone", "addr", "note", "unit"]) if ($("#r-" + k)) o[k] = $("#r-" + k).value.trim();
       if ($("#r-loc")) { const raw = $("#r-loc").value.trim(), L = parseLoc(raw); if (raw && !L) throw "Lokatsiyani tushunmadim. Koordinata (41.311081, 69.240562) yoki xarita havolasini kiriting."; o.loc = L ? (L.url || L.lat.toFixed(6) + ", " + L.lng.toFixed(6)) : ""; }
-      if ($("#r-open")) o.open = num($("#r-open").value);
+      if ($("#o-rows")) Object.assign(o, readOpen());
       if ($("#r-price")) o.price = num($("#r-price").value);
       if (x.br) o.br = x.br;
       await put("ref", cat, id || newId(), o);
@@ -1016,7 +1110,7 @@ function brForm(fid, bid) {
   const b = inp("r-name", "Filial nomi", x.name || "", 'required placeholder="Masalan: Chilonzor filiali"') + inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"') + inp("r-addr", "Manzil", x.addr || "")
     + `<div class="field"><label for="r-loc">Lokatsiya (koordinata yoki xarita havolasi)</label><input id="r-loc" value="${esc(x.loc || "")}" placeholder="41.311081, 69.240562">
       ${window.DAFTAR_PWA ? `<div><button type="button" class="btn small" data-geo>Hozir turgan joyimni saqlash</button></div>` : ""}</div>`
-    + inp("r-open", "Boshlang'ich qarz, so'm (shu filialning eski qarzi)", x.open ?? "", 'inputmode="decimal" placeholder="0"') + inp("r-note", "Izoh", x.note || "");
+    + openEditor(x, "Boshlang'ich qarz (shu filialning eski qarzi): sana va summa") + inp("r-note", "Izoh", x.note || "");
   const save = (id, val) => put("ref", "fshops", fid, { ...f, br: { ...(f.br || {}), [id]: val } });
   openForm({
     title: (bid ? "Tuzatish: " : "Yangi filial: ") + f.name, body: b, delText: "Ro'yxatdan olib tashlash",
@@ -1025,7 +1119,7 @@ function brForm(fid, bid) {
       const o = { name: $("#r-name").value.trim() }; if (!o.name) throw "Filial nomini kiriting.";
       for (const k of ["phone", "addr", "note"]) o[k] = $("#r-" + k).value.trim();
       const raw = $("#r-loc").value.trim(), L = parseLoc(raw); if (raw && !L) throw "Lokatsiyani tushunmadim. Koordinata (41.311081, 69.240562) yoki xarita havolasini kiriting.";
-      o.loc = L ? (L.url || L.lat.toFixed(6) + ", " + L.lng.toFixed(6)) : ""; o.open = num($("#r-open").value); o.del = false;
+      o.loc = L ? (L.url || L.lat.toFixed(6) + ", " + L.lng.toFixed(6)) : ""; Object.assign(o, readOpen()); o.del = false;
       await save(bid || newId(), o);
       logEv(bid ? "edit" : "add", "Filial", f.name + " — " + refText(o), bid ? f.name + " — " + refText(x) : "");
     }
@@ -1062,8 +1156,11 @@ $("#frm").addEventListener("submit", async ev => {
   catch (err) { er.textContent = typeof err === "string" ? err : errText(err); er.hidden = false; }
   sv.disabled = false;
 });
-$("#frm").addEventListener("input", ev => { if (ev.target.classList.contains("i-pr")) delete ev.target.dataset.auto; updateTotal(); });
-$("#frm").addEventListener("change", ev => { if (ev.target.id === "f-s") { const fb = $("#f-b"); if (fb) fb.dataset.cur = ""; fillBranches(); } if (ev.target.classList.contains("i-p") || ev.target.id === "f-s") refreshPrices(); if (ev.target.id === "f-pm") $("#f-pdw").hidden = ev.target.value !== "p"; updateTotal(); });
+const updateOTotal = () => { const t = $("#o-total"); if (t) t.textContent = fmt($$("#o-rows .o-a").reduce((a, i) => a + num(i.value), 0)); };
+$("#frm").addEventListener("input", ev => { updateOTotal(); if (ev.target.classList.contains("i-pr")) delete ev.target.dataset.auto; updateTotal(); });
+$("#frm").addEventListener("change", ev => { if (ev.target.id === "f-s") { const fb = $("#f-b"); if (fb) fb.dataset.cur = ""; fillBranches(); }
+  if (ev.target.id === "f-s" || ev.target.id === "f-b") { const ft = $("#f-to"); if (ft) ft.dataset.cur = ""; fillDebts(); }
+  if (ev.target.id === "f-to") $("#f-to").dataset.cur = ev.target.value; if (ev.target.classList.contains("i-p") || ev.target.id === "f-s") refreshPrices(); if (ev.target.id === "f-pm") $("#f-pdw").hidden = ev.target.value !== "p"; updateTotal(); });
 dlg.addEventListener("close", () => { F = null; });
 
 /* ---------- export ---------- */
@@ -1082,7 +1179,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br]");
   if (!el) return;
   const ds = el.dataset;
   if ("nav" in ds) go(ds.nav);
@@ -1097,6 +1194,8 @@ document.addEventListener("click", async ev => {
   else if ("month" in ds) { S.month = shiftMonth(S.month, +ds.month); render(); }
   else if ("close" in ds) dlg.close();
   else if ("addRow" in ds) { $("#f-rows").insertAdjacentHTML("beforeend", itemRow(catOf(F.t), F.hasPrice, {})); refreshPrices(); updateTotal(); }
+  else if ("addOrow" in ds) { $("#o-rows").insertAdjacentHTML("beforeend", oRow({})); }
+  else if ("rmOrow" in ds) { if ($$("#o-rows .orow").length > 1) el.closest(".orow").remove(); else { $(".o-a", el.closest(".orow")).value = ""; $(".o-d", el.closest(".orow")).value = ""; } updateOTotal(); }
   else if ("rmRow" in ds) { if ($$("#frmBody .irow").length > 1) el.closest(".irow").remove(); updateTotal(); }
   else if ("export" in ds) exportCsv();
   else if ("logout" in ds) window.DAFTAR_PWA.logout();
