@@ -188,6 +188,58 @@ body{margin:0} img{max-width:100%} [hidden]{display:none!important}
 .photo .pv{width:64px;height:64px;border-radius:50%;background:var(--accent-soft) center/cover no-repeat;border:2px solid var(--line);flex:none;display:grid;place-items:center;color:var(--accent);font-weight:800}
 .photo label.btn{cursor:pointer}
 .photo input{display:none}
+/* ---------- do'konlar ro'yxati v2 ---------- */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:760px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kt{position:relative;overflow:hidden;border-radius:18px;padding:14px 14px 12px;color:#fff;display:flex;flex-direction:column;gap:1px;box-shadow:var(--shadow);animation:rise .4s both}
+.kt.a{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))} .kt.b{background:linear-gradient(135deg,#f59e0b,#f97316)}
+.kt.c{background:linear-gradient(135deg,#e11d48,#be123c)} .kt.d{background:linear-gradient(135deg,#475569,#1e293b)}
+.kt::after{content:"";position:absolute;right:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.14)}
+.kt .ki{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;margin-bottom:6px}
+.kt .ki .ic{width:18px;height:18px}
+.kt small{font-size:12px;opacity:.9;font-weight:600}
+.kt b{font-family:var(--display);font-size:22px;line-height:1.15;white-space:nowrap;font-variant-numeric:tabular-nums}
+.kt em{font-style:normal;font-size:11.5px;opacity:.85}
+.tops{display:flex;flex-direction:column;gap:6px}
+.topr{display:grid;grid-template-columns:32px minmax(90px,170px) 1fr auto;gap:10px;align-items:center;background:none;border:0;padding:4px 0;cursor:pointer;text-align:left;width:100%}
+.topr .av{width:32px;height:32px;font-size:12px}
+.topr .tn{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topr .tb{height:10px;border-radius:9px;background:var(--line);overflow:hidden}
+.topr .tb i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#f97316,#e11d48);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.topr b{font-size:13.5px;color:var(--debt);font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (max-width:600px){.topr{grid-template-columns:32px 1fr auto;row-gap:5px}.topr .av{grid-row:1/3}.topr .tb{grid-column:2/4;grid-row:2;height:8px}}
+.fbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.chips::-webkit-scrollbar{display:none}
+.fchip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)}
+.fchip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+#srtSel{min-height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 10px;font-size:13px}
+.shopgrid{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:700px){.shopgrid{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1000px){.shopgrid{grid-template-columns:repeat(3,1fr)}}
+.sc2{display:flex;flex-direction:column;gap:12px;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s;animation:rise .4s both;min-width:0}
+.sc2:hover{transform:translateY(-3px);box-shadow:0 12px 26px color-mix(in srgb,var(--accent) 14%,transparent)}
+.sc2:active{transform:scale(.98)}
+.sc2 .top{display:flex;gap:12px;align-items:center;min-width:0}
+.sc2 .tt{flex:1;min-width:0;display:flex;flex-direction:column}
+.sc2 .nm{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc2 .sub{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stp{flex:none;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+.stp.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.stp.mid{background:color-mix(in srgb,var(--mid) 18%,transparent);color:color-mix(in srgb,var(--mid) 70%,#000)}
+.stp.bad{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.sc2 .mid{display:flex;justify-content:space-between;align-items:flex-end}
+.sc2 .mid small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.sc2 .mid b{font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}
+.sc2 .mid .r{text-align:right} .sc2 .mid .r b{font-size:17px}
+.pbar{height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.pbar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--ok),color-mix(in srgb,var(--ok) 55%,#fff));transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.sc2 .spark{height:26px}
+.sc2 .foot{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--muted);background:var(--bg);padding:4px 9px;border-radius:999px}
+.chip .ic{width:13px;height:13px}
+.chip.warn{background:color-mix(in srgb,var(--mid) 18%,transparent);color:color-mix(in srgb,var(--mid) 70%,#000)}
+:root[data-skin="tungi"] .stp.mid,:root[data-skin="tungi"] .chip.warn{color:var(--mid)}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -652,20 +704,34 @@ function countUp(root) {
   }
   requestAnimationFrame(() => requestAnimationFrame(() => { for (const el of root.querySelectorAll("[data-w]")) el.style.width = el.dataset.w; for (const el of root.querySelectorAll("[data-arc]")) el.setAttribute("stroke-dasharray", el.dataset.arc); }));
 }
+const FLT = [["all", "Hammasi"], ["debt", "Qarzdorlar"], ["old", "Eski qarz"], ["idle", "Yuk olmayapti"], ["none", "Qarzi yo'q"]];
+const SRT = [["bal", "Qarz bo'yicha"], ["name", "Nomi bo'yicha"], ["last", "Oxirgi yuk bo'yicha"]];
+function shopInfo(cat, id, s, d) {
+  const h = shopHealth(cat, id), T = cat === "fshops" ? "f" : "d";
+  const given = h.A.debts.reduce((a, x) => a + x.a, 0), paid = h.A.debts.reduce((a, x) => a + x.paid, 0);
+  const yukN = S.entries.filter(e => e.s === id && e.t === T).length;
+  return { h, given, paid, pct: given ? Math.round(paid / given * 100) : 100, idle: d.lastD ? daysAgo(d.lastD) : null, yukN, T };
+}
 function shopCardsJ(cat, list) {
-  const T = cat === "fshops" ? "f" : "d", from = shiftDay(today(), -29);
-  const vol = id => S.entries.filter(e => e.s === id && e.t === T && e.d >= from).reduce((a, e) => a + amt(e), 0);
-  const top = list.reduce((b, x) => vol(x.id) > (b ? vol(b.id) : 0) ? x : b, null);
-  return `<div class="shopcards">${list.map(({ id, s, d }, i) => {
-    const h = shopHealth(cat, id), bd = [];
-    if (top && top.id === id) bd.push(`<span class="bdg gold">🏆 Top mijoz</span>`);
-    if (d.bal <= 0.5) bd.push(`<span class="bdg ok">✓ Qarzi yo'q</span>`); else if (h.old != null && h.old > 30) bd.push(`<span class="bdg bad">⏰ ${h.old} kunlik qarz</span>`);
-    if (cat === "fshops" && brList(id).length) bd.push(`<span class="bdg">${brList(id).length} ta filial</span>`);
-    return `<button type="button" class="sc" data-open="${cat}:${id}" style="animation-delay:${Math.min(i, 8) * 40}ms">
-    ${avHTML(id, s.name, h.ring)}
-    <span><span class="nm">${esc(s.name)}</span><br><span class="sub">${esc([s.owner, s.phone].filter(Boolean).join(" · ") || "telefon kiritilmagan")}</span>${bd.length ? `<span class="badges">${bd.join("")}</span>` : ""}</span>
-    <span class="amt ${d.bal > 0.5 ? "debt" : "paid"}">${d.bal > 0.5 ? fmt(d.bal) : d.bal < -0.5 ? "+" + fmt(-d.bal) : "0"}<small>yuk ${dshort(d.lastD)} · pul ${dshort(d.lastP)}</small></span>
-    ${sparkSVG(id, T)}</button>`; }).join("")}</div>`;
+  const f = S.flt || "all", srt = S.srt || "bal";
+  let L = list.map(x => Object.assign(x, { inf: shopInfo(cat, x.id, x.s, x.d) }));
+  L = L.filter(({ d, inf }) => f === "all" || (f === "debt" ? d.bal > 0.5 : f === "none" ? d.bal <= 0.5 : f === "old" ? inf.h.old != null && inf.h.old > 30 && d.bal > 0.5 : inf.idle != null && inf.idle > 14));
+  if (srt === "name") L.sort((a, b) => String(a.s.name).localeCompare(String(b.s.name)));
+  else if (srt === "last") L.sort((a, b) => (b.d.lastD || "").localeCompare(a.d.lastD || ""));
+  if (!L.length) return `<div class="list"><div class="empty">Bu filtrga mos do'kon yo'q.</div></div>`;
+  return `<div class="shopgrid">${L.map(({ id, s, d, inf }, i) => {
+    const st = d.bal <= 0.5 ? ["ok", "Qarzi yo'q"] : inf.h.old != null && inf.h.old > 30 ? ["bad", inf.h.old + " kunlik qarz"] : ["mid", "Qarzi bor"];
+    const idleC = inf.idle == null ? "" : inf.idle > 14 ? "warn" : "";
+    return `<button type="button" class="sc2" data-open="${cat}:${id}" style="animation-delay:${Math.min(i, 12) * 30}ms">
+      <span class="top">${avHTML(id, s.name, inf.h.ring)}<span class="tt"><span class="nm">${esc(s.name)}</span><span class="sub">${esc([s.owner, s.phone].filter(Boolean).join(" · ") || "telefon kiritilmagan")}</span></span>
+        <span class="stp ${st[0]}">${st[1]}</span></span>
+      <span class="mid"><span><small>Qarzi</small><b class="${d.bal > 0.5 ? "debt" : "paid"}">${d.bal < -0.5 ? "+" + fmt(-d.bal) : fmt(Math.max(0, d.bal))}</b></span>
+        <span class="r"><small>To'langan</small><b>${inf.given ? inf.pct + "%" : "—"}</b></span></span>
+      <span class="pbar"><i data-w="${inf.given ? inf.pct : 0}%"></i></span>
+      ${inf.yukN >= 5 ? sparkSVG(id, inf.T) : ""}
+      <span class="foot"><span class="chip ${idleC}">${ic("box")}${inf.idle == null ? "yuk yo'q" : inf.idle === 0 ? "bugun yuk" : "oxirgi yuk " + inf.idle + " kun oldin"}</span>
+        <span class="chip">${ic("cash")}${d.lastP ? "pul " + dshort(d.lastP) : "pul olinmagan"}</span></span>
+    </button>`; }).join("")}</div>`;
 }
 
 function shopRows(cat = "shops") {
@@ -679,14 +745,31 @@ function shopRows(cat = "shops") {
     <span class="row-val ${d.bal > 0.5 ? "debt" : d.bal < -0.5 ? "paid" : "muted"}">${d.bal > 0.5 ? fmt(d.bal) : d.bal < -0.5 ? "+" + fmt(-d.bal) : "qarzi yo'q"}
       <small>yuk ${dshort(d.lastD)} · pul ${dshort(d.lastP)}</small></span></button>`).join("");
 }
+function topDebtors(cat) {
+  const L = active(cat).map(([id, x]) => ({ id, x, b: (D.shop[id] || { bal: 0 }).bal })).filter(o => o.b > 0.5).sort((a, b) => b.b - a.b).slice(0, 5);
+  if (!L.length) return "";
+  const mx = L[0].b;
+  return `<div class="panel"><div class="ph"><h2>Eng katta 5 qarzdor</h2></div><div class="tops">${L.map(o => `<button type="button" class="topr" data-open="${cat}:${o.id}">${avHTML(o.id, o.x.name, "")}<span class="tn">${esc(o.x.name)}</span><span class="tb"><i data-w="${Math.max(4, o.b / mx * 100)}%"></i></span><b>${fmt(o.b)}</b></button>`).join("")}</div></div>`;
+}
+function shopsHead(cat) {
+  const L = active(cat).map(([id, x]) => ({ id, d: D.shop[id] || { bal: 0 }, h: shopHealth(cat, id) }));
+  const tot = L.reduce((a, o) => a + Math.max(0, o.d.bal), 0), n = L.filter(o => o.d.bal > 0.5).length;
+  const old = L.filter(o => o.d.bal > 0.5 && o.h.old != null && o.h.old > 30), oldSum = old.reduce((a, o) => a + o.h.open.filter(x => daysAgo(x.d) > 30).reduce((s, x) => s + x.a - x.paid, 0), 0);
+  const tile = (cls, icon, label, val, sub) => `<div class="kt ${cls}"><span class="ki">${ic(icon)}</span><small>${label}</small><b>${val}</b>${sub ? `<em>${sub}</em>` : ""}</div>`;
+  return `<div class="kpis">${tile("a", "box", cat === "fshops" ? "Firma do'konlari" : "Do'konlar", L.length, "")}${tile("b", "clock", "Qarzdorlar", n, L.length ? Math.round(n / L.length * 100) + "% do'konlar" : "")}
+    ${tile("c", "cash", "Jami qarz", fmt(tot), "so'm")}${tile("d", "cal", "30 kundan eski", old.length, oldSum ? fmt(oldSum) + " so'm" : "yo'q")}</div>`;
+}
+const fltBar = () => `<div class="fbar"><div class="chips">${FLT.map(([k, t]) => `<button type="button" class="fchip" data-flt="${k}" aria-pressed="${(S.flt || "all") === k}">${t}</button>`).join("")}</div>
+  <select id="srtSel" aria-label="Saralash">${SRT.map(([k, t]) => `<option value="${k}" ${(S.srt || "bal") === k ? "selected" : ""}>${t}</option>`).join("")}</select></div>`;
 function viewDokonlar() {
   if (S.shopId && S.ref.shops[S.shopId]) return viewShop("shops", S.shopId);
+  const J = JON();
   return `<div class="head"><h1>Do'konlar</h1>${W(`<button type="button" class="btn primary" data-ref="shops">Do'kon qo'shish</button>`)}</div>
-  ${JON() ? (() => { const L = active("shops").map(([id]) => D.shop[id] || { bal: 0 }); const tot = L.reduce((a, x) => a + Math.max(0, x.bal), 0), n = L.filter(x => x.bal > 0.5).length;
-    return `<div class="sumhead"><div><small>Do'konlar</small><b>${L.length}</b></div><div><small>Qarzdorlar</small><b class="debt">${n}</b></div><div><small>Jami qarz</small><b class="debt">${fmt(tot)}</b></div></div>`; })() : ""}
+  ${J ? shopsHead("shops") + topDebtors("shops") : ""}
   <input class="search" id="shopSearch" type="search" placeholder="Nomi, egasi yoki telefon bo'yicha qidirish" value="${esc(S.q)}" aria-label="Do'kon qidirish">
-  <div class="${JON() ? "" : "list"}" id="shopList">${shopRows()}</div>
-  <p class="hint">${JON() ? "Halqa rangi: yashil — qarzi yo'q, sariq — qarzi bor, qizil — 30 kundan eski qarz. Ustunchalar — oxirgi 30 kunda olgan yuki." : "Qizil raqam — do'konning qarzi. Ostida oxirgi yuk berilgan va oxirgi pul olingan sana."}</p>`;
+  ${J ? fltBar() : ""}
+  <div class="${J ? "" : "list"}" id="shopList">${shopRows()}</div>
+  <p class="hint">${J ? "Halqa: yashil — qarzi yo'q, sariq — qarzi bor, qizil — 30 kundan eski qarz. «Oxirgi yuk» 14 kundan oshsa sariq bo'ladi." : "Qizil raqam — do'konning qarzi. Ostida oxirgi yuk berilgan va oxirgi pul olingan sana."}</p>`;
 }
 function ledger(openItems, list, plusT, label, A) {
   let bal = 0; const rows = [];
@@ -798,7 +881,7 @@ function viewShopJ({ cat, id, bid, fm, T, f, br, s, d, list, bAttr, oItems, A })
       <div class="wt"><h1>${esc(s.name)}</h1><small>${esc([br ? f.name : "", s.owner, s.addr].filter(Boolean).join(" · ") || "ma'lumot kiritilmagan")}</small>${starH}</div>
       ${W(`<button type="button" class="camb" ${editAttr} title="Rasm qo'yish">${ic("cam")}</button>`)}</div>
     <div class="hstats">
-      <div><b>${st.since == null ? "—" : st.since}</b><small>kun mijoz</small></div>
+      <div><b>${d.lastD ? (daysAgo(d.lastD) === 0 ? "bugun" : daysAgo(d.lastD) + " kun") : "—"}</b><small>oxirgi yukdan beri</small></div>
       <div><b>${st.yukN}</b><small>marta yuk</small></div>
       <div><b>${st.avgPay == null ? "—" : st.avgPay + " kun"}</b><small>o'rtacha to'lash</small></div>
     </div>
@@ -855,6 +938,7 @@ function viewFirma() {
     <div class="tile"><small>Firma do'konlari qarzi (hozir)</small><b class="debt">${fmt(debt)}</b> <em>so'm</em></div></div>
   ${quick("fgh")}
   <input class="search" id="shopSearch" type="search" placeholder="Nomi, egasi yoki telefon bo'yicha qidirish" value="${esc(S.q)}" aria-label="Firma do'konini qidirish">
+  ${JON() ? fltBar() : ""}
   <div class="${JON() ? "" : "list"}" id="shopList">${shopRows("fshops")}</div>
   <div class="sec"><h2>${monthName(S.month)} yozuvlari</h2>${listHTML(m.slice().reverse(), true, "Bu oyda firma yozuvi yo'q.")}</div>
   <p class="hint">Firma summalari alohida hisoblanadi: Bugun, Do'konlar va Hisobotdagi naqd summalarga qo'shilmaydi. Faqat tayyor mahsulot qoldig'i umumiy.</p>`;
@@ -1519,7 +1603,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-flt],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
   if (!el) return;
   const ds = el.dataset;
   if (el.classList.contains("skin") && "skin" in ds) { SKIN = ds.skin; try { localStorage.setItem("daftar-skin", SKIN); } catch (e) {} applySkin(); render(); toast(SKIN ? "Dizayn almashtirildi" : "Oddiy dizaynga qaytildi"); return; }
@@ -1535,6 +1619,7 @@ document.addEventListener("click", async ev => {
   else if ("month" in ds) { S.month = shiftMonth(S.month, +ds.month); render(); }
   else if ("close" in ds) dlg.close();
   else if ("addRow" in ds) { $("#f-rows").insertAdjacentHTML("beforeend", itemRow(catOf(F.t), F.hasPrice, {})); refreshPrices(); updateTotal(); }
+  else if ("flt" in ds) { S.flt = ds.flt; render(); }
   else if ("imgDel" in ds) { F.photo = "del"; const pv = $("#r-pv"); pv.style.backgroundImage = ""; pv.textContent = "—"; el.remove(); }
   else if ("addOrow" in ds) { $("#o-rows").insertAdjacentHTML("beforeend", oRow({})); }
   else if ("rmOrow" in ds) { if ($$("#o-rows .orow").length > 1) el.closest(".orow").remove(); else { $(".o-a", el.closest(".orow")).value = ""; $(".o-d", el.closest(".orow")).value = ""; } updateOTotal(); }
@@ -1565,8 +1650,8 @@ document.addEventListener("click", async ev => {
     el.disabled = false;
   }
 });
-document.addEventListener("change", ev => { if (ev.target.id === "dayPick" && ev.target.value) { S.day = ev.target.value; render(); } if (ev.target.id === "logWho") { S.logWho = ev.target.value; render(); } });
-document.addEventListener("input", ev => { if (ev.target.id === "shopSearch") { S.q = ev.target.value; $("#shopList").innerHTML = shopRows(S.view === "firma" ? "fshops" : "shops"); } });
+document.addEventListener("change", ev => { if (ev.target.id === "dayPick" && ev.target.value) { S.day = ev.target.value; render(); } if (ev.target.id === "logWho") { S.logWho = ev.target.value; render(); } if (ev.target.id === "srtSel") { S.srt = ev.target.value; render(); } });
+document.addEventListener("input", ev => { if (ev.target.id === "shopSearch") { S.q = ev.target.value; $("#shopList").innerHTML = shopRows(S.view === "firma" ? "fshops" : "shops"); if (JON()) countUp($("#shopList")); } });
 window.addEventListener("hashchange", () => { const hv = location.hash.slice(1); if (VIEWFN[hv] && VIEWOK[hv]() && hv !== S.view) { S.view = hv; S.shopId = S.fshopId = S.fbrId = S.workerId = null; render(); } });
 start();
 </script>
