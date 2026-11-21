@@ -134,6 +134,60 @@ body{margin:0} img{max-width:100%} [hidden]{display:none!important}
 .skin[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .skin i{width:30px;height:30px;border-radius:50%;flex:none;background:var(--sw)}
 
+/* ---------- do'kon sahifasi v2 ---------- */
+.ic{width:20px;height:20px;flex:none}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.sgrid{display:grid;gap:18px;align-items:start}
+.scol{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (min-width:900px){.sgrid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)} .feedcol{position:sticky;top:110px;max-height:calc(100vh - 130px);overflow:auto;padding-right:4px}}
+.hero2{position:relative;overflow:hidden;border-radius:24px;padding:20px;color:#fff;background:var(--hero);box-shadow:0 16px 34px color-mix(in srgb,var(--accent) 30%,transparent);display:flex;flex-direction:column;gap:16px;animation:rise .4s both;isolation:isolate}
+.hero2::before{content:"";position:absolute;z-index:-1;width:260px;height:260px;border-radius:50%;right:-90px;top:-110px;background:rgba(255,255,255,.13)}
+.hero2::after{content:"";position:absolute;z-index:-1;width:160px;height:160px;border-radius:50%;left:-60px;bottom:-80px;background:rgba(255,255,255,.08)}
+.hero2 .hbg{position:absolute;inset:-20px;z-index:-2;background-size:cover;background-position:center;filter:blur(14px) saturate(1.3);opacity:.55}
+.hero2.has-img{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 75%,#000),color-mix(in srgb,var(--accent2,var(--accent)) 70%,#000))}
+.hero2 .who{display:flex;gap:16px;align-items:center}
+.hero2 .wt{flex:1;min-width:0}
+.hero2 h1{color:#fff;font-size:26px;line-height:1.1}
+.hero2 .wt small{display:block;opacity:.85;font-size:13px;margin-top:2px}
+.hero2 .av{box-shadow:0 0 0 4px rgba(255,255,255,.22)}
+.stars{display:inline-block;margin-top:6px;font-size:15px;letter-spacing:2px;color:#ffd257}
+.stars i{font-style:normal;color:rgba(255,255,255,.3)}
+.stars.new{font-size:11px;letter-spacing:.04em;font-weight:700;background:rgba(255,255,255,.2);color:#fff;padding:2px 8px;border-radius:99px}
+.camb{align-self:flex-start;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;cursor:pointer}
+.camb .ic{width:18px;height:18px}
+.hstats{display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:16px;backdrop-filter:blur(6px)}
+.hstats div{padding:10px 8px;text-align:center}
+.hstats div+div{border-left:1px solid rgba(255,255,255,.18)}
+.hstats b{display:block;font-family:var(--display);font-size:19px;line-height:1.1;white-space:nowrap}
+.hstats small{font-size:11px;opacity:.85}
+.acts2{display:flex;gap:8px;flex-wrap:wrap}
+.act2{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.95);color:var(--accent);font-weight:700;font-size:13px;text-decoration:none;border:0;cursor:pointer;transition:transform .15s}
+.act2 .ic{width:17px;height:17px}
+.act2:active{transform:scale(.95)}
+.act2:first-child{background:#fff;color:var(--ok)}
+.qa .btn i .ic{width:19px;height:19px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;animation:rise .45s .08s both}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ph .lg{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.ph .lg i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.mchart{width:100%;height:auto;max-height:190px;display:block;overflow:visible}
+.mchart .cl{font-size:10px;fill:var(--muted);font-weight:600}
+.mchart .cv{font-size:8.5px;fill:var(--muted);font-weight:700}
+.mchart .cb{transform-box:fill-box;transform-origin:bottom;animation:grow .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
+@keyframes grow{from{transform:scaleY(0)}to{transform:none}}
+.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.minis div{display:flex;gap:8px;align-items:center;min-width:0}
+.minis .ic{color:var(--accent);background:var(--accent-soft);padding:7px;width:32px;height:32px;border-radius:10px}
+.minis span{min-width:0}
+.minis small{display:block;font-size:10.5px;color:var(--muted)}
+.minis b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi::before{content:""}
+@media (max-width:420px){.minis{grid-template-columns:1fr 1fr}.minis div:last-child{grid-column:1/-1}}
+
+.photo{display:flex;align-items:center;gap:12px}
+.photo .pv{width:64px;height:64px;border-radius:50%;background:var(--accent-soft) center/cover no-repeat;border:2px solid var(--line);flex:none;display:grid;place-items:center;color:var(--accent);font-weight:800}
+.photo label.btn{cursor:pointer}
+.photo input{display:none}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -372,7 +426,7 @@ const S = {
   db: null, dl: null, noDb: false, ready: false, slow: false, stale: false, canWrite: true, dead: false,
   loaded: {}, known: new Set(), jSize: {},
   ref: { shops: {}, fshops: {}, products: {}, materials: {}, workers: {} }, entries: [],
-  ctl: { norms: {}, inv: {} }, invId: null, log: null, logBusy: false, logErr: false, logWho: "",
+  ctl: { norms: {}, inv: {} }, img: {}, invId: null, log: null, logBusy: false, logErr: false, logWho: "",
   view: "bugun", day: today(), month: today().slice(0, 7), shopId: null, fshopId: null, fbrId: null, workerId: null, q: ""
 };
 let D = { shop: {}, prod: {}, mat: {}, wrk: {}, lastPr: {}, sup: {}, br: {} };
@@ -608,7 +662,7 @@ function shopCardsJ(cat, list) {
     if (d.bal <= 0.5) bd.push(`<span class="bdg ok">✓ Qarzi yo'q</span>`); else if (h.old != null && h.old > 30) bd.push(`<span class="bdg bad">⏰ ${h.old} kunlik qarz</span>`);
     if (cat === "fshops" && brList(id).length) bd.push(`<span class="bdg">${brList(id).length} ta filial</span>`);
     return `<button type="button" class="sc" data-open="${cat}:${id}" style="animation-delay:${Math.min(i, 8) * 40}ms">
-    <span class="av ${h.ring}" style="--c:${avColor(s.name)}">${esc(initials(s.name))}</span>
+    ${avHTML(id, s.name, h.ring)}
     <span><span class="nm">${esc(s.name)}</span><br><span class="sub">${esc([s.owner, s.phone].filter(Boolean).join(" · ") || "telefon kiritilmagan")}</span>${bd.length ? `<span class="badges">${bd.join("")}</span>` : ""}</span>
     <span class="amt ${d.bal > 0.5 ? "debt" : "paid"}">${d.bal > 0.5 ? fmt(d.bal) : d.bal < -0.5 ? "+" + fmt(-d.bal) : "0"}<small>yuk ${dshort(d.lastD)} · pul ${dshort(d.lastP)}</small></span>
     ${sparkSVG(id, T)}</button>`; }).join("")}</div>`;
@@ -675,40 +729,99 @@ function viewShop(cat, id, bid) {
   ${openDebtsHTML(A)}
   <div class="sec"><h2>Hisob-kitob tarixi</h2>${ledger(oItems, list, T[0], ["Yuk", "To'lov / vozvrat"], A)}</div>`;
 }
+const IC = {
+  phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+  nav: '<polygon points="3 11 22 2 13 21 11 13 3 11"/>',
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  cam: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', cash: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/>',
+  back: '<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  box: '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>', cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'
+};
+const ic = k => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
+const shopImg = id => (S.img && S.img[id]) || "";
+const avHTML = (id, name, ring, lg) => { const im = shopImg(id); return `<span class="av ${lg ? "lg" : ""} ${ring}" style="--c:${avColor(name)}">${im ? `<img src="${esc(im)}" alt="">` : esc(initials(name))}</span>`; };
+function shopStats(A, list, oItems) {
+  const dates = [...oItems.map(i => i.d).filter(Boolean), ...list.map(e => e.d)].sort();
+  const since = dates.length ? daysAgo(dates[0]) : null;
+  const yuk = list.filter(e => bt(e.t) === "d"), yukSum = yuk.reduce((a, e) => a + amt(e), 0);
+  const closed = A.debts.filter(x => x.d && x.a - x.paid <= 0.5 && x.pays.length);
+  let w = 0, wd = 0; for (const x of closed) { const last = x.pays[x.pays.length - 1].d, dd = Math.max(0, (new Date(last + "T12:00:00") - new Date(x.d + "T12:00:00")) / 864e5); w += x.a; wd += dd * x.a; }
+  const avgPay = w ? Math.round(wd / w) : null;
+  const open = A.debts.filter(x => x.a - x.paid > 0.5), oldest = open.length && open[0].d ? daysAgo(open[0].d) : 0;
+  const ref = avgPay != null ? avgPay : oldest;
+  let stars = ref <= 7 ? 5 : ref <= 14 ? 4 : ref <= 21 ? 3 : ref <= 30 ? 2 : 1;
+  if (oldest > 30) stars = Math.max(1, stars - 1);
+  const pq = {}; for (const e of yuk) for (const r of e.i || []) pq[r.p] = (pq[r.p] || 0) + (+r.q || 0);
+  const topP = Object.entries(pq).sort((a, b) => b[1] - a[1])[0];
+  return { since, yukSum, yukN: yuk.length, avgYuk: yuk.length ? yukSum / yuk.length : 0, avgPay, stars: dates.length ? stars : 0, topP };
+}
+function monthsChart(list) {
+  const ms = []; for (let i = 5; i >= 0; i--) ms.push(shiftMonth(today().slice(0, 7), -i));
+  const yv = ms.map(m => list.filter(e => bt(e.t) === "d" && e.d.startsWith(m)).reduce((a, e) => a + amt(e), 0));
+  const pv = ms.map(m => list.filter(e => bt(e.t) !== "d" && e.d.startsWith(m)).reduce((a, e) => a + amt(e), 0));
+  const mx = Math.max(...yv, ...pv, 1), H = 110, W = 320, gw = W / 6, bw = 13;
+  const short = v => v >= 1e6 ? (v / 1e6).toFixed(v >= 1e7 ? 0 : 1).replace(".0", "") + "m" : v >= 1e3 ? Math.round(v / 1e3) + "k" : v ? String(v) : "";
+  let g = "";
+  ms.forEach((m, i) => {
+    const x = i * gw + gw / 2, hy = yv[i] / mx * (H - 22), hp = pv[i] / mx * (H - 22);
+    g += `<rect class="cb" x="${x - bw - 1.5}" y="${H - hy}" width="${bw}" height="${Math.max(hy, 1.5)}" rx="3" fill="var(--accent)" style="--d:${i * 60}ms"/>`
+      + `<rect class="cb" x="${x + 1.5}" y="${H - hp}" width="${bw}" height="${Math.max(hp, 1.5)}" rx="3" fill="var(--ok)" style="--d:${i * 60 + 30}ms"/>`
+      + (yv[i] ? `<text x="${x - bw / 2 - 1.5}" y="${H - hy - 4}" text-anchor="middle" class="cv">${short(yv[i])}</text>` : "")
+      + `<text x="${x}" y="${H + 15}" text-anchor="middle" class="cl">${["Yan","Fev","Mar","Apr","May","Iyn","Iyl","Avg","Sen","Okt","Noy","Dek"][+m.slice(5) - 1]}</text>`;
+  });
+  return `<svg class="mchart" viewBox="0 -6 ${W} ${H + 22}" role="img" aria-label="Oxirgi 6 oy: yuk va to'lov">${g}</svg>`;
+}
 function viewShopJ({ cat, id, bid, fm, T, f, br, s, d, list, bAttr, oItems, A }) {
   const given = A.debts.reduce((a, x) => a + x.a, 0), paid = A.debts.reduce((a, x) => a + x.paid, 0), pct = given ? Math.round(paid / given * 100) : 100;
   const C = 2 * Math.PI * 38, L = parseLoc(s.loc), tel = s.phone ? String(s.phone).replace(/[^\d+]/g, "") : "";
   const mapHref = L && L.lat != null ? "https://www.google.com/maps/dir/?api=1&destination=" + L.lat + "," + L.lng : L && L.url ? L.url : s.addr ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s.addr) : "";
   const editAttr = br ? `data-br="${bid}" data-firm="${id}"` : `data-ref="${cat}" data-id="${id}"`;
-  const h = shopHealth(cat, id);
+  const h = shopHealth(cat, id), st = shopStats(A, list, oItems), imgKey = br ? id + "_" + bid : id, im = shopImg(imgKey);
   const openD = A.debts.filter(x => x.a - x.paid > 0.5);
   let run = 0; const feed = [];
-  for (const it of oItems.slice().sort((a, b) => (a.d || "") < (b.d || "") ? -1 : 1)) { run += +it.a || 0; const x = A.byKey[oKey(it)]; feed.push(`<div class="fi k-o" data-ic="•"><span class="t">Boshlang'ich qarz</span><span class="v">${fmt(it.a)}</span><span class="dt">${it.d ? dm(it.d) : "sanasiz"}</span><span class="bal">qoldiq ${fmt(run)}</span>${x ? `<span class="d">${debtStatus(x)}</span>` : ""}</div>`); }
-  list.forEach((e, i) => {
+  for (const it of oItems.slice().sort((a, b) => (a.d || "") < (b.d || "") ? -1 : 1)) { run += +it.a || 0; const x = A.byKey[oKey(it)]; feed.push(`<div class="fi k-o"><span class="t">Boshlang'ich qarz</span><span class="v">${fmt(it.a)}</span><span class="dt">${it.d ? dm(it.d) : "sanasiz"}</span><span class="bal">qoldiq ${fmt(run)}</span>${x ? `<span class="d">${debtStatus(x)}</span>` : ""}</div>`); }
+  list.forEach(e => {
     const a = amt(e), k = bt(e.t), plus = k === "d"; run += plus ? a : -a;
     const det = [e.i ? itemsText(e, true) : e.m, e.n].filter(Boolean).join(" · ");
     let al = "";
     if (plus) { const x = A.byKey[e.id]; if (x) al = debtStatus(x); }
     else al = (A.cr[e.id] || []).map(p => p.x ? `→ ${debtName(p.x)} uchun ${fmt(p.a)}` : `→ avans ${fmt(p.a)}`).join("<br>") + (e.to ? "" : ` <span class="muted">(avtomatik)</span>`);
-    feed.push(`<button type="button" class="fi k-${k}" data-ic="${k === "d" ? "+" : k === "p" ? "$" : "↩"}" ${S.canWrite ? `data-edit="${e.id}"` : ""}><span class="t">${TYPES[k].label}</span><span class="v">${plus ? "+" : "−"}${fmt(a)}</span><span class="dt">${dm(e.d)}</span><span class="bal">qoldiq ${fmt(run)}</span>${det ? `<span class="d">${esc(det)}</span>` : ""}${al ? `<span class="${plus ? "d" : "al"}">${al}</span>` : ""}</button>`);
+    feed.push(`<button type="button" class="fi k-${k}" ${S.canWrite ? `data-edit="${e.id}"` : ""}><span class="t">${TYPES[k].label}</span><span class="v">${plus ? "+" : "−"}${fmt(a)}</span><span class="dt">${dm(e.d)}</span><span class="bal">qoldiq ${fmt(run)}</span>${det ? `<span class="d">${esc(det)}</span>` : ""}${al ? `<span class="${plus ? "d" : "al"}">${al}</span>` : ""}</button>`);
   });
-  return `<div><button type="button" class="btn small" data-back>‹ ${bid ? esc(f.name) : fm ? "Firma" : "Do'konlar"}</button></div>
-  <div class="hero"><div class="who"><span class="av lg ${h.ring}" style="--c:${avColor(s.name)}">${esc(initials(s.name))}</span>
-    <div><h1>${esc(s.name)}</h1><small>${esc([br ? f.name : "", s.owner, s.addr].filter(Boolean).join(" · ") || "ma'lumot kiritilmagan")}</small></div></div>
-    <div class="acts">
-      ${tel ? `<a class="act" href="tel:${esc(tel)}"><i>📞</i>Qo'ng'iroq</a>` : ""}
-      ${mapHref ? `<a class="act" href="${esc(mapHref)}" target="_blank" rel="noopener"><i>🗺️</i>Yo'l</a>` : ""}
-      ${tel ? `<button type="button" class="act" data-copy="${esc(s.phone)}"><i>📋</i>Nusxa</button>` : ""}
-      ${tel ? `<a class="act" href="https://t.me/${esc(tel.replace("+", "+"))}" target="_blank" rel="noopener"><i>✈️</i>Telegram</a>` : ""}
-      ${W(`<button type="button" class="act" ${editAttr}><i>✏️</i>Tahrir</button>`)}
+  const starH = st.stars ? `<span class="stars" title="To'lov intizomi">${"★".repeat(st.stars)}<i>${"★".repeat(5 - st.stars)}</i></span>` : `<span class="stars new">yangi mijoz</span>`;
+  const left = `
+  <div class="hero2 ${im ? "has-img" : ""}">${im ? `<div class="hbg" style="background-image:url('${esc(im)}')"></div>` : ""}
+    <div class="who">${avHTML(imgKey, s.name, h.ring, true)}
+      <div class="wt"><h1>${esc(s.name)}</h1><small>${esc([br ? f.name : "", s.owner, s.addr].filter(Boolean).join(" · ") || "ma'lumot kiritilmagan")}</small>${starH}</div>
+      ${W(`<button type="button" class="camb" ${editAttr} title="Rasm qo'yish">${ic("cam")}</button>`)}</div>
+    <div class="hstats">
+      <div><b>${st.since == null ? "—" : st.since}</b><small>kun mijoz</small></div>
+      <div><b>${st.yukN}</b><small>marta yuk</small></div>
+      <div><b>${st.avgPay == null ? "—" : st.avgPay + " kun"}</b><small>o'rtacha to'lash</small></div>
+    </div>
+    <div class="acts2">
+      ${tel ? `<a class="act2" href="tel:${esc(tel)}">${ic("phone")}<span>Qo'ng'iroq</span></a>` : ""}
+      ${mapHref ? `<a class="act2" href="${esc(mapHref)}" target="_blank" rel="noopener">${ic("nav")}<span>Yo'l</span></a>` : ""}
+      ${tel ? `<a class="act2" href="https://t.me/${esc(tel)}" target="_blank" rel="noopener">${ic("send")}<span>Telegram</span></a>` : ""}
+      ${tel ? `<button type="button" class="act2" data-copy="${esc(s.phone)}">${ic("copy")}<span>Nusxa</span></button>` : ""}
+      ${W(`<button type="button" class="act2" ${editAttr}>${ic("edit")}<span>Tahrir</span></button>`)}
     </div></div>
   <div class="debtcard"><div><small>${d.bal < -0.5 ? "Ortiqcha to'lagan" : "Hozirgi qarzi"}</small>
     <div class="big ${d.bal <= 0.5 ? "zero" : ""}" data-count="${Math.round(Math.abs(d.bal))}">0 so'm</div>
     <div class="meta">Jami berilgan ${fmt(given)} · to'langan ${fmt(paid)}<br>oxirgi yuk ${dshort(d.lastD)} · oxirgi pul ${dshort(d.lastP)}</div></div>
-    <div class="donut"><svg width="92" height="92" viewBox="0 0 92 92"><circle cx="46" cy="46" r="38" fill="none" stroke="var(--line)" stroke-width="9"/><circle class="arc" cx="46" cy="46" r="38" fill="none" stroke="var(--ok)" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 ${C}" data-arc="${(C * pct / 100).toFixed(1)} ${C}"/></svg><b>${pct}%<small>to'langan</small></b></div></div>
-  ${W(`<div class="qa"><button type="button" class="btn q-d" data-add="${T[0]}" data-s="${id}"${bAttr}><i>+</i>Yuk berdim</button><button type="button" class="btn q-p" data-add="${T[1]}" data-s="${id}"${bAttr}><i>$</i>Pul oldim</button><button type="button" class="btn q-r" data-add="${T[2]}" data-s="${id}"${bAttr}><i>↩</i>Vozvrat</button></div>`)}
-  ${openD.length ? `<div class="sec"><h2>Yopilmagan qarzlar · ${openD.length} ta</h2><div class="dlist">${openD.map(x => { const k = daysAgo(x.d); return `<div class="dl"><span><b>${x.open ? "Boshlang'ich qarz" : "Yuk"} · ${x.d ? dm(x.d) : "sanasiz"}</b><br><span class="age ${k != null && k > 30 ? "old" : ""}">${k == null ? "" : k + " kun oldin"}${x.paid > 0.5 ? " · to'landi " + fmt(x.paid) + " / " + fmt(x.a) : " · " + fmt(x.a)}</span></span><span class="r">${fmt(x.a - x.paid)}<small>qoldi</small></span><span class="bar"><i data-w="${Math.round(x.paid / x.a * 100)}%"></i></span></div>`; }).join("")}</div></div>` : ""}
-  <div class="sec"><h2>Hisob-kitob lentasi</h2>${feed.length ? `<div class="feed">${feed.reverse().join("")}</div>` : `<div class="list"><div class="empty">Hali yozuv yo'q.</div></div>`}</div>`;
+    <div class="donut"><svg width="92" height="92" viewBox="0 0 92 92"><circle cx="46" cy="46" r="38" fill="none" stroke="var(--line)" stroke-width="9"/>${pct > 0 ? `<circle class="arc" cx="46" cy="46" r="38" fill="none" stroke="var(--ok)" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 ${C}" data-arc="${(C * pct / 100).toFixed(1)} ${C}"/>` : ""}</svg><b>${pct}%<small>to'langan</small></b></div></div>
+  ${W(`<div class="qa"><button type="button" class="btn q-d" data-add="${T[0]}" data-s="${id}"${bAttr}><i>${ic("plus")}</i>Yuk berdim</button><button type="button" class="btn q-p" data-add="${T[1]}" data-s="${id}"${bAttr}><i>${ic("cash")}</i>Pul oldim</button><button type="button" class="btn q-r" data-add="${T[2]}" data-s="${id}"${bAttr}><i>${ic("back")}</i>Vozvrat</button></div>`)}
+  <div class="panel"><div class="ph"><h2>Oxirgi 6 oy</h2><span class="lg"><i style="background:var(--accent)"></i>yuk <i style="background:var(--ok)"></i>to'lov</span></div>${monthsChart(list)}
+    <div class="minis"><div>${ic("box")}<span><small>Ko'p olgani</small><b>${st.topP ? esc(rname("products", st.topP[0])) : "—"}</b></span></div>
+      <div>${ic("cal")}<span><small>O'rtacha yuk</small><b>${st.avgYuk ? fmt(st.avgYuk) : "—"}</b></span></div>
+      <div>${ic("clock")}<span><small>Jami olgan</small><b>${fmt(st.yukSum)}</b></span></div></div></div>
+  ${openD.length ? `<div class="sec"><h2>Yopilmagan qarzlar · ${openD.length} ta</h2><div class="dlist">${openD.map(x => { const k = daysAgo(x.d); return `<div class="dl"><span><b>${x.open ? "Boshlang'ich qarz" : "Yuk"} · ${x.d ? dm(x.d) : "sanasiz"}</b><br><span class="age ${k != null && k > 30 ? "old" : ""}">${k == null ? "" : k + " kun oldin · "}${x.paid > 0.5 ? "to'landi " + fmt(x.paid) + " / " + fmt(x.a) : fmt(x.a)}</span></span><span class="r">${fmt(x.a - x.paid)}<small>qoldi</small></span><span class="bar"><i data-w="${Math.round(x.paid / x.a * 100)}%"></i></span></div>`; }).join("")}</div></div>` : ""}`;
+  const right = `<div class="sec"><h2>Hisob-kitob lentasi</h2>${feed.length ? `<div class="feed">${feed.reverse().join("")}</div>` : `<div class="list"><div class="empty">Hali yozuv yo'q.</div></div>`}</div>`;
+  return `<div><button type="button" class="btn small" data-back>‹ ${bid ? esc(f.name) : fm ? "Firma" : "Do'konlar"}</button></div>
+  <div class="sgrid"><div class="scol">${left}</div><div class="scol feedcol">${right}</div></div>`;
 }
 /* Filiallari bor firma: filiallar ro'yxati, har birining qarzi bilan. */
 function viewFirmBranches(id) {
@@ -1105,6 +1218,10 @@ async function start() {
     arr.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : (a.ts || 0) - (b.ts || 0));
     S.entries = arr; got("j", snap.metadata);
   }, onDead);
+  db.collection("img").onSnapshot(snap => {
+    const m = {}; for (const doc of snap.docs) { S.known.add("img/" + doc.id); const a = (doc.data() || {}).e?.a; if (a) m[doc.id] = a; }
+    S.img = m; if (S.ready) render();
+  }, () => {});
   if (isBoss()) db.collection("ctl").onSnapshot(snap => {
     const c = { norms: {}, inv: {} };
     for (const doc of snap.docs) { S.known.add("ctl/" + doc.id); if (c[doc.id]) for (const [id, x] of Object.entries((doc.data() || {}).e || {})) if (x) c[doc.id][id] = x; }
@@ -1268,11 +1385,34 @@ function readOpen() {
   return { oi, open: oi.reduce((a, i) => a + i.a, 0) };
 }
 const openText = x => (x.oi || []).length > 1 ? x.oi.map(i => (i.d ? dm(i.d) : "sanasiz") + " " + fmt(i.a)).join(", ") : "";
+/* Do'kon rasmi: telefonda kamera yoki galereya. Rasm 320px gacha kichraytirilib, img/<kalit> yozuviga saqlanadi. */
+function shrinkImg(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = () => rej("Rasmni o'qib bo'lmadi.");
+    r.onload = () => { const im = new Image(); im.onerror = () => rej("Bu fayl rasm emas."); im.onload = () => {
+      const k = Math.min(1, 320 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      let q = .78, url = c.toDataURL("image/jpeg", q); while (url.length > 60000 && q > .4) { q -= .1; url = c.toDataURL("image/jpeg", q); }
+      res(url); }; im.src = r.result; };
+    r.readAsDataURL(file);
+  });
+}
+const photoField = (key, name) => { const im = key ? shopImg(key) : ""; return `<div class="field"><span class="flabel">Rasm (do'kon, vitrina yoki logotip)</span><div class="photo">
+  <span class="pv" id="r-pv" style="${im ? `background-image:url('${esc(im)}')` : ""}">${im ? "" : esc(initials(name || "?"))}</span>
+  <label class="btn small">${im ? "Rasmni almashtirish" : "Rasm qo'yish"}<input type="file" id="r-img" accept="image/*"></label>
+  ${im ? `<button type="button" class="btn small danger" data-img-del>Olib tashlash</button>` : ""}</div></div>`; };
+async function savePhoto(key) {
+  if (!F || !F.photo || !key) return;
+  if (F.photo === "del") { await put("img", key, "a", null); S.img[key] && delete S.img[key]; return; }
+  S.img[key] = F.photo; await put("img", key, "a", F.photo);
+}
 function refForm(cat, id) {
   const x = id ? S.ref[cat][id] || {} : {};
   const shopLike = cat === "shops" || cat === "fshops";
   let b = inp("r-name", shopLike ? "Do'kon nomi" : cat === "workers" ? "Ism" : "Nomi", x.name || "", "required");
-  if (shopLike) b += `<div class="two">${inp("r-owner", "Egasi yoki sotuvchi", x.owner || "")}${inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"')}</div>` + inp("r-addr", "Manzil", x.addr || "")
+  if (shopLike) b += photoField(id, x.name) + `<div class="two">${inp("r-owner", "Egasi yoki sotuvchi", x.owner || "")}${inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"')}</div>` + inp("r-addr", "Manzil", x.addr || "")
     + `<div class="field"><label for="r-loc">Lokatsiya (koordinata yoki xarita havolasi)</label><input id="r-loc" value="${esc(x.loc || "")}" placeholder="41.311081, 69.240562">
       ${window.DAFTAR_PWA ? `<div><button type="button" class="btn small" data-geo>Hozir turgan joyimni saqlash</button></div>` : ""}
       <span class="hint">${window.DAFTAR_PWA ? "Do'kon oldida turib tugmani bosing yoki " : ""}Google yoki Yandex xaritadan koordinata yoki havolani nusxalab qo'ying.</span></div>` + openEditor(x, "Boshlang'ich qarz (daftardagi eski qarzi): sana va summa") + inp("r-note", "Izoh", x.note || "");
@@ -1290,7 +1430,9 @@ function refForm(cat, id) {
       if ($("#o-rows")) Object.assign(o, readOpen());
       if ($("#r-price")) o.price = num($("#r-price").value);
       if (x.br) o.br = x.br;
-      await put("ref", cat, id || newId(), o);
+      const rid = id || newId();
+      await put("ref", cat, rid, o);
+      if (shopLike) await savePhoto(rid);
       logEv(id ? "edit" : "add", REFS[cat].one, refText(o), id ? refText(x) : "");
     }
   });
@@ -1298,7 +1440,7 @@ function refForm(cat, id) {
 function brForm(fid, bid) {
   const f = S.ref.fshops[fid]; if (!f) return;
   const x = bid && f.br && f.br[bid] ? f.br[bid] : {};
-  const b = inp("r-name", "Filial nomi", x.name || "", 'required placeholder="Masalan: Chilonzor filiali"') + inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"') + inp("r-addr", "Manzil", x.addr || "")
+  const b = inp("r-name", "Filial nomi", x.name || "", 'required placeholder="Masalan: Chilonzor filiali"') + photoField(bid ? fid + "_" + bid : "", x.name) + inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"') + inp("r-addr", "Manzil", x.addr || "")
     + `<div class="field"><label for="r-loc">Lokatsiya (koordinata yoki xarita havolasi)</label><input id="r-loc" value="${esc(x.loc || "")}" placeholder="41.311081, 69.240562">
       ${window.DAFTAR_PWA ? `<div><button type="button" class="btn small" data-geo>Hozir turgan joyimni saqlash</button></div>` : ""}</div>`
     + openEditor(x, "Boshlang'ich qarz (shu filialning eski qarzi): sana va summa") + inp("r-note", "Izoh", x.note || "");
@@ -1311,7 +1453,9 @@ function brForm(fid, bid) {
       for (const k of ["phone", "addr", "note"]) o[k] = $("#r-" + k).value.trim();
       const raw = $("#r-loc").value.trim(), L = parseLoc(raw); if (raw && !L) throw "Lokatsiyani tushunmadim. Koordinata (41.311081, 69.240562) yoki xarita havolasini kiriting.";
       o.loc = L ? (L.url || L.lat.toFixed(6) + ", " + L.lng.toFixed(6)) : ""; Object.assign(o, readOpen()); o.del = false;
-      await save(bid || newId(), o);
+      const nb = bid || newId();
+      await save(nb, o);
+      await savePhoto(fid + "_" + nb);
       logEv(bid ? "edit" : "add", "Filial", f.name + " — " + refText(o), bid ? f.name + " — " + refText(x) : "");
     }
   });
@@ -1349,7 +1493,12 @@ $("#frm").addEventListener("submit", async ev => {
 });
 const updateOTotal = () => { const t = $("#o-total"); if (t) t.textContent = fmt($$("#o-rows .o-a").reduce((a, i) => a + num(i.value), 0)); };
 $("#frm").addEventListener("input", ev => { updateOTotal(); if (ev.target.classList.contains("i-pr")) delete ev.target.dataset.auto; updateTotal(); });
-$("#frm").addEventListener("change", ev => { if (ev.target.id === "f-s") { const fb = $("#f-b"); if (fb) fb.dataset.cur = ""; fillBranches(); }
+$("#frm").addEventListener("change", async ev => {
+  if (ev.target.id === "r-img" && ev.target.files && ev.target.files[0]) {
+    try { const url = await shrinkImg(ev.target.files[0]); F.photo = url; const pv = $("#r-pv"); pv.style.backgroundImage = `url('${url}')`; pv.textContent = ""; }
+    catch (err) { const e = $("#frmErr"); e.textContent = String(err); e.hidden = false; }
+    return;
+  } if (ev.target.id === "f-s") { const fb = $("#f-b"); if (fb) fb.dataset.cur = ""; fillBranches(); }
   if (ev.target.id === "f-s" || ev.target.id === "f-b") { const ft = $("#f-to"); if (ft) ft.dataset.cur = ""; fillDebts(); }
   if (ev.target.id === "f-to") $("#f-to").dataset.cur = ev.target.value; if (ev.target.classList.contains("i-p") || ev.target.id === "f-s") refreshPrices(); if (ev.target.id === "f-pm") $("#f-pdw").hidden = ev.target.value !== "p"; updateTotal(); });
 dlg.addEventListener("close", () => { F = null; });
@@ -1370,7 +1519,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
   if (!el) return;
   const ds = el.dataset;
   if (el.classList.contains("skin") && "skin" in ds) { SKIN = ds.skin; try { localStorage.setItem("daftar-skin", SKIN); } catch (e) {} applySkin(); render(); toast(SKIN ? "Dizayn almashtirildi" : "Oddiy dizaynga qaytildi"); return; }
@@ -1386,6 +1535,7 @@ document.addEventListener("click", async ev => {
   else if ("month" in ds) { S.month = shiftMonth(S.month, +ds.month); render(); }
   else if ("close" in ds) dlg.close();
   else if ("addRow" in ds) { $("#f-rows").insertAdjacentHTML("beforeend", itemRow(catOf(F.t), F.hasPrice, {})); refreshPrices(); updateTotal(); }
+  else if ("imgDel" in ds) { F.photo = "del"; const pv = $("#r-pv"); pv.style.backgroundImage = ""; pv.textContent = "—"; el.remove(); }
   else if ("addOrow" in ds) { $("#o-rows").insertAdjacentHTML("beforeend", oRow({})); }
   else if ("rmOrow" in ds) { if ($$("#o-rows .orow").length > 1) el.closest(".orow").remove(); else { $(".o-a", el.closest(".orow")).value = ""; $(".o-d", el.closest(".orow")).value = ""; } updateOTotal(); }
   else if ("rmRow" in ds) { if ($$("#frmBody .irow").length > 1) el.closest(".irow").remove(); updateTotal(); }

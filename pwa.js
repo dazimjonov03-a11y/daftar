@@ -106,6 +106,7 @@
         if (c === "j") for (const d of s.docs) if (!d.data().t && !fixed.has(d.id)) { fixed.add(d.id); fs.doc("j/" + d.id).set({ t: d.id.split("_")[1] }, { merge: true }).catch(() => {}); }
         next(s);
       }, e => { if (e && e.code === "permission-denied") { if (c !== "ctl") denied(); } else if (err) err({ code: code(e), message: String(e && e.message) }); });
+      if (c === "img") return has("sales") || has("firma") ? partial([fs.collection("img")], next) : next({ docs: [], metadata: { fromCache: false } });
       if (c === "ref") return partial([fs.doc("ref/products")].concat(Object.keys(REFS).filter(k => has(REFS[k])).map(k => fs.doc("ref/" + k))), next);
       const types = [].concat(...Object.keys(TYPES).filter(has).map(k => TYPES[k]));
       return partial(types.map(t => fs.collection("j").where("t", "==", t)), next);
