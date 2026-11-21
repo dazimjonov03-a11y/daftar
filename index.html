@@ -345,8 +345,11 @@ body.jon .tab:not([aria-current]):hover{background:var(--accent-soft);color:var(
 
 
 /* ---------- xomashyo oborotka ---------- */
-.obor th.gh{text-align:center;border-left:1px solid var(--line)}
-.obor td.sm{color:var(--muted);font-size:12.5px} .obor td.b{font-weight:800}
+.obor th.gh{text-align:center;font-size:11.5px}
+.obor .gs{border-left:2px solid var(--line)}
+.obor .g2{background:color-mix(in srgb,var(--ok) 6%,transparent)} .obor .g4{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.obor th.gh.g2{color:var(--ok)} .obor th.gh.g3{color:var(--bad)} .obor th.gh.g4{color:var(--ink)}
+.obor td.sm{font-size:13.5px} .obor td.b,.obor td.g4.sm{font-weight:800}
 .obor tbody tr[data-mat-open]{cursor:pointer} .obor tbody tr[data-mat-open]:hover td{background:var(--accent-soft)}
 .obor tr.idle td{opacity:.5} .obor tr.neg td{background:color-mix(in srgb,var(--bad) 7%,transparent)}
 .obor tr.total td{background:var(--accent-soft);font-weight:800}
@@ -1330,7 +1333,7 @@ function viewXomashyoJ() {
   const packs = S.entries.filter(e => e.t === "m" && e.d.startsWith(S.month)).reduce((a, e) => a + (e.i || []).reduce((s, r) => s + (+r.q || 0), 0), 0);
   const pu = (active("products")[0] || [, {}])[1].unit || "pachka";
   const share = rows.map(([id, m]) => [m.name, (agg[id] || {}).uv || 0]).filter(x => x[1] > 0.5).sort((a, b) => b[1] - a[1]);
-  const cell = (q, cls = "") => `<td class="n ${q < -0.001 ? "debt" : cls}">${fq(q)}</td>`, mc = v => `<td class="n sm">${v ? fmt(v) : "—"}</td>`;
+  const cell = (q, g, cls = "") => `<td class="n ${g} gs ${q < -0.001 ? "debt" : cls}">${fq(q)}</td>`, mc = (v, g) => `<td class="n sm ${g} ${v < -0.5 ? "debt" : ""}">${v ? fmt(v) : "—"}</td>`;
   return `<div class="head"><h1>Xomashyo</h1>${monthStepper()}</div>
   <div class="kpis">${kt("a", "box", "Oy xaridi", fmt(T.iv), mL.length + " ta xarid")}${kt("c", "down", "Ishlatilgan xomashyo", fmt(T.uv), "AVECO narx bo'yicha")}${kt("e", "wallet", "Skladdagi qoldiq qiymati", fmt(T.ev), "oy oxiriga")}${kt("b", "truck", "Qarzga olingan", fmt(credit), "shu oy xaridlaridan")}</div>
   ${boss ? `<div class="panel tann"><div class="ph"><h2>Xomashyo tannarxi · faqat sizga ko'rinadi</h2></div>
@@ -1340,11 +1343,11 @@ function viewXomashyoJ() {
       : `<p class="hint">Hisoblash uchun shu oyda ishlab chiqarish («Mahsulot chiqdi») va xomashyo sarfi yozilgan bo'lishi kerak.</p>`}</div>` : ""}
   ${W(`<div class="qgrid">${canT("b") ? `<button type="button" class="qb q-b" data-add="b"><i>${ic("box")}</i><span>Xomashyo oldim</span></button>` : ""}${canT("u") ? `<button type="button" class="qb q-u" data-add="u"><i>${ic("down")}</i><span>Xomashyo sarfi</span></button>` : ""}</div>`)}
   ${rows.length ? `<div class="sec"><h2>${monthName(S.month)} — oborotka</h2><div class="tblwrap"><table class="tight obor"><thead>
-    <tr><th rowspan="2">Nomi</th><th class="n gh" colspan="2">Boshida</th><th class="n gh" colspan="2">Olindi</th><th class="n gh" colspan="2">Ishlatildi</th><th class="n gh" colspan="2">Qoldiq</th></tr>
-    <tr><th class="n">miqdor</th><th class="n">summa</th><th class="n">miqdor</th><th class="n">summa</th><th class="n">miqdor</th><th class="n">summa</th><th class="n">miqdor</th><th class="n">summa</th></tr></thead><tbody>
+    <tr><th rowspan="2">Nomi</th><th class="n gh g1 gs" colspan="2">Boshida</th><th class="n gh g2 gs" colspan="2">Olindi</th><th class="n gh g3 gs" colspan="2">Ishlatildi</th><th class="n gh g4 gs" colspan="2">Qoldiq</th></tr>
+    <tr><th class="n g1 gs">miqdor</th><th class="n g1">summa</th><th class="n g2 gs">miqdor</th><th class="n g2">summa</th><th class="n g3 gs">miqdor</th><th class="n g3">summa</th><th class="n g4 gs">miqdor</th><th class="n g4">summa</th></tr></thead><tbody>
     ${rows.map(([id, m]) => { const x = agg[id] || { open: 0, in: 0, out: 0, ov: 0, iv: 0, uv: 0, ev: 0 }, q = x.open + x.in - x.out, idle = !x.out && !x.in;
-      return `<tr class="${idle ? "idle" : ""} ${q < -0.001 ? "neg" : ""}" data-mat-open="${id}"><td><b>${esc(m.name)}</b> <span class="muted">${esc(m.unit || "")}</span>${q < -0.001 ? `<br><small class="debt">minus: sarf ko'p yoki xarid yozilmagan</small>` : ""}</td>${cell(x.open)}${mc(x.ov)}${cell(x.in)}${mc(x.iv)}${cell(x.out)}${mc(x.uv)}${cell(q, "b")}${mc(x.ev)}</tr>`; }).join("")}
-    <tr class="total"><td>Jami</td><td></td><td class="n">${fmt(T.ov)}</td><td></td><td class="n">${fmt(T.iv)}</td><td></td><td class="n">${fmt(T.uv)}</td><td></td><td class="n">${fmt(T.ev)}</td></tr></tbody></table></div>
+      return `<tr class="${idle ? "idle" : ""} ${q < -0.001 ? "neg" : ""}" data-mat-open="${id}"><td><b>${esc(m.name)}</b> <span class="muted">${esc(m.unit || "")}</span>${q < -0.001 ? `<br><small class="debt">minus: sarf ko'p yoki xarid yozilmagan</small>` : ""}</td>${cell(x.open, "g1")}${mc(x.ov, "g1")}${cell(x.in, "g2")}${mc(x.iv, "g2")}${cell(x.out, "g3")}${mc(x.uv, "g3")}${cell(q, "g4", "b")}${mc(x.ev, "g4")}</tr>`; }).join("")}
+    <tr class="total"><td>Jami</td><td class="g1 gs"></td><td class="n g1">${fmt(T.ov)}</td><td class="g2 gs"></td><td class="n g2">${fmt(T.iv)}</td><td class="g3 gs"></td><td class="n g3">${fmt(T.uv)}</td><td class="g4 gs"></td><td class="n g4">${fmt(T.ev)}</td></tr></tbody></table></div>
     <p class="hint">Summalar o'rtacha tortilgan narx (AVECO) bo'yicha. Qatorni bossangiz, o'sha xomashyo sahifasi ochiladi. Xira qatorlar — shu oy harakat bo'lmagan.</p></div>`
     : `<div class="list"><div class="empty">Xomashyo turlari hali kiritilmagan. Sklad bo'limida qo'shing.</div></div>`}`;
 }
