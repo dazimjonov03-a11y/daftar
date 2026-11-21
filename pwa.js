@@ -6,7 +6,7 @@
   const never = new Promise(() => {});
   const cfg = window.FIREBASE_CONFIG;
   const TYPES = { sales: ["d", "p", "r"], firma: ["f", "g", "h"], prod: ["m"], stock: ["b", "u"], exp: ["x"], wages: ["w", "v"] };
-  const REFS = { shops: "sales", fshops: "firma", materials: "stock", workers: "wages" };
+  const REFS = { shops: "sales", fshops: "firma", materials: "stock", workers: "wages", routes: "sales" };
   const PWA = window.DAFTAR_PWA = { email: "", name: "", uid: "", owner: false, full: false, perms: [], users: [],
     logout() { firebase.auth().signOut().then(() => { try { history.replaceState(null, "", location.pathname); } catch (e) {} location.reload(); }); } };
   const block = text => { gate.hidden = false; gate.classList.add("nofields"); msg.textContent = text; };
@@ -37,9 +37,9 @@
         const ok = await new Promise(done => fs.collection("users").doc(u.uid).onSnapshot(d => {
           if (!d.exists) { if (first) { first = false; done(false); } else denied(); return; }
           const x = d.data(), s = JSON.stringify(x.perms || []);
-          if (first) { first = false; sig = s; PWA.perms = x.perms || []; PWA.name = x.name || x.login || ""; PWA.ui = x.ui || ""; done(true); }
+          if (first) { first = false; sig = s; PWA.perms = x.perms || []; PWA.name = x.name || x.login || ""; PWA.ui = x.ui || ""; PWA.route = !!x.route; done(true); }
           else if (s !== sig) location.reload();
-          else if ((x.ui || "") !== PWA.ui) { PWA.ui = x.ui || ""; rerender(); }
+          else if ((x.ui || "") !== PWA.ui || !!x.route !== PWA.route) { PWA.ui = x.ui || ""; PWA.route = !!x.route; rerender(); }
         }, () => { if (first) { first = false; done(false); } }));
         if (!ok) return denied();
       }
@@ -73,6 +73,7 @@
       const data = { name: o.name, perms: o.perms };
       if (o.login) data.login = o.login;
       if ("ui" in o) data.ui = o.ui || "";
+      if ("route" in o) data.route = !!o.route;
       await fs.collection("users").doc(uid).set(data, { merge: true });
     };
     PWA.removeUser = uid => fs.collection("users").doc(uid).delete();

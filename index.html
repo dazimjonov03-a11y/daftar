@@ -367,6 +367,46 @@ body.jon .tab:not([aria-current]):hover{background:var(--accent-soft);color:var(
 .obor td:first-child{min-width:130px}
 @media (max-width:600px){.sh{grid-template-columns:1fr auto auto;row-gap:4px}.sh .sb{grid-column:1/-1;grid-row:2}.tn-top b{font-size:30px}}
 
+/* ---------- yo'nalish ---------- */
+.rchips .fchip{display:flex;flex-direction:column;align-items:flex-start;border-radius:14px;padding:8px 14px}
+.rchips .fchip small{font-size:11px;font-weight:600;opacity:.8}
+.rmap{position:relative;border-radius:16px;overflow:hidden;background:var(--bg);border:1px solid var(--line)}
+.rmap.empty{padding:40px;text-align:center;color:var(--muted)}
+.rmap > svg{display:block;width:100%;height:auto}
+.rmap .ra{font-size:11px;font-weight:800;fill:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.rmap .rl{animation:dash 1.2s linear infinite} @keyframes dash{to{stroke-dashoffset:-26}}
+.rmap .mk circle{fill:var(--accent);stroke:var(--surface);stroke-width:3}
+.rmap .mk.need circle{fill:var(--bad)} .rmap .mk.done circle{fill:var(--ok)}
+.rmap .mk text{fill:#fff;font-size:11px;font-weight:800}
+.rmap-note{position:absolute;left:10px;bottom:8px;display:inline-flex;gap:5px;align-items:center;font-size:11px;font-weight:600;color:var(--muted);background:var(--surface);padding:3px 9px;border-radius:99px;border:1px solid var(--line)}
+.rmap-note .ic{width:13px;height:13px}
+.rgo{display:flex;gap:8px;flex-wrap:wrap} .rgo .btn{display:inline-flex;gap:8px;align-items:center} .rgo .ic{width:17px;height:17px}
+.rsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.rsum b{display:block;font-family:var(--display);font-size:20px} .rsum small{color:var(--muted);font-size:12px}
+.stops{position:relative;display:flex;flex-direction:column;gap:10px;padding-left:38px}
+.stops::before{content:"";position:absolute;left:15px;top:14px;bottom:14px;border-left:3px dashed var(--line)}
+.stop{position:relative;animation:rise .4s both}
+.stop .sn{position:absolute;left:-38px;top:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff;background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+.stop.need .sn{background:var(--bad)} .stop.done .sn{background:var(--ok)}
+.stop .sb{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow)}
+.stop.done .sb{opacity:.75} .stop.need .sb{border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
+.stop .st{display:flex;gap:10px;align-items:center} .stop .st .av{width:40px;height:40px;font-size:14px}
+.stop .tt{flex:1;min-width:0;display:flex;flex-direction:column} .stop .tt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .stop .tt small{color:var(--muted);font-size:12px}
+.stop .sv{text-align:right;font-weight:800;font-variant-numeric:tabular-nums} .stop .sv small{display:block;font-size:10.5px;color:var(--muted);font-weight:600}
+.chip.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.stop .sa{display:flex;gap:6px;flex-wrap:wrap} .stop .sa .btn{display:inline-flex;gap:5px;align-items:center} .stop .sa .ic{width:15px;height:15px}
+.stop .sa .q-d{color:var(--accent)} .stop .sa .q-p{color:var(--ok)}
+.rmap.leaflet-container{height:320px;border-radius:16px}
+.lmk{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font:800 12px/1 var(--body);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.lmk.need{background:var(--bad)} .lmk.done{background:var(--ok)}
+.rtip{background:rgba(255,255,255,.85);border:0;box-shadow:none;font-weight:800;font-size:11px;text-transform:uppercase;color:#334155}
+.stl{display:flex;gap:10px;align-items:center;flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.stop .sa .ord{margin-left:auto;display:flex;gap:4px} .stop .sa .ord .icon-btn{width:32px;height:32px} .stop .sa .ord .ic{width:16px;height:16px}
+.arow,.rrow{display:grid;gap:6px;grid-template-columns:1fr 1fr 42px;padding:8px;border:1px solid var(--line);border-radius:12px}
+.arow .a-from{grid-column:1/3} .arow input,.rrow input,.arow select{min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:6px 10px;min-width:0}
+.rrow{grid-template-columns:1fr 42px} .rrow .r-areas{grid-column:1/2}
+.rows{display:flex;flex-direction:column;gap:8px}
+
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -597,14 +637,14 @@ const logEv = (act, kind, text, was) => { const P = PW(); if (P && P.log) P.log(
 const TPERM = { d: "sales", p: "sales", r: "sales", m: "prod", b: "stock", B: "stock", u: "stock", x: "exp", w: "wages", v: "wages", f: "firma", g: "firma", h: "firma" };
 const canT = t => can(TPERM[t]);
 const PERMS = [["all", "To'liq huquq: hamma bo'limlar, hisobot, narxlar, o'chirish"], ["sales", "Do'konlar: yuk, to'lov, vozvrat, qarzlar"], ["firma", "Firma: firma do'konlari, yuk, to'lov, vozvrat"], ["prod", "Ishlab chiqarish"], ["stock", "Xomashyo: xarid va sarf"], ["exp", "Xarajatlar"], ["wages", "Ishchilar va ish haqi"]];
-const VIEWOK = { bugun: () => true, dokonlar: () => can("sales"), firma: () => can("firma"), sklad: () => can("prod") || can("stock"), xomashyo: () => can("stock"), ishchilar: () => can("wages"), xarajatlar: () => can("exp"), hisobot: isOwner, nazorat: isBoss, tarix: isBoss, sozlama: () => isOwner() || !!PW() };
+const VIEWOK = { bugun: () => true, dokonlar: () => can("sales"), yonalish: () => can("sales") && canRoute(), firma: () => can("firma"), sklad: () => can("prod") || can("stock"), xomashyo: () => can("stock"), ishchilar: () => can("wages"), xarajatlar: () => can("exp"), hisobot: isOwner, nazorat: isBoss, tarix: isBoss, sozlama: () => isOwner() || !!PW() };
 const QUICK = [["f", "+", "Yuk berdim"], ["g", "$", "Pul oldim"], ["h", "↩", "Vozvrat"], ["d", "+", "Yuk berdim"], ["p", "$", "Pul oldim"], ["r", "↩", "Vozvrat"], ["m", "✓", "Mahsulot chiqdi"], ["b", "▣", "Xomashyo oldim"], ["B", "$", "Ta'minotchiga pul"], ["u", "−", "Xomashyo sarfi"], ["x", "−", "Xarajat"], ["v", "→", "Ishchiga pul"]];
-const VIEWS = [["bugun", "Bugun"], ["dokonlar", "Do'konlar"], ["firma", "Firma"], ["sklad", "Sklad"], ["xomashyo", "Xomashyo"], ["ishchilar", "Ishchilar"], ["xarajatlar", "Xarajatlar"], ["hisobot", "Hisobot"], ["nazorat", "Nazorat"], ["tarix", "Tarix"], ["sozlama", "Sozlamalar"]];
+const VIEWS = [["bugun", "Bugun"], ["dokonlar", "Do'konlar"], ["yonalish", "Yo'nalish"], ["firma", "Firma"], ["sklad", "Sklad"], ["xomashyo", "Xomashyo"], ["ishchilar", "Ishchilar"], ["xarajatlar", "Xarajatlar"], ["hisobot", "Hisobot"], ["nazorat", "Nazorat"], ["tarix", "Tarix"], ["sozlama", "Sozlamalar"]];
 
 const S = {
   db: null, dl: null, noDb: false, ready: false, slow: false, stale: false, canWrite: true, dead: false,
   loaded: {}, known: new Set(), jSize: {},
-  ref: { shops: {}, fshops: {}, products: {}, materials: {}, workers: {} }, entries: [],
+  ref: { shops: {}, fshops: {}, products: {}, materials: {}, workers: {}, routes: {} }, entries: [],
   ctl: { norms: {}, inv: {} }, img: {}, invId: null, log: null, logBusy: false, logErr: false, logWho: "",
   view: "bugun", day: today(), month: today().slice(0, 7), shopId: null, fshopId: null, fbrId: null, workerId: null, q: ""
 };
@@ -1230,7 +1270,7 @@ Object.assign(IC, {
   tag: '<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.5"/>'
 });
 const TABIC = { bugun: "sun", dokonlar: "store", firma: "brief", sklad: "box", xomashyo: "truck", ishchilar: "users", xarajatlar: "wallet", hisobot: "chart", nazorat: "shield", tarix: "clock", sozlama: "gear" };
-const MAINV = ["bugun", "dokonlar", "sklad", "ishchilar"];
+const MAINV = ["bugun", "dokonlar", "yonalish", "sklad", "ishchilar"];
 function chromeJ() {
   const on = JON(), body = document.body;
   body.classList.toggle("jon", on);
@@ -1353,6 +1393,151 @@ function viewXomashyoJ() {
     <p class="hint">Summalar o'rtacha tortilgan narx (AVECO) bo'yicha. Qatorni bossangiz, o'sha xomashyo sahifasi ochiladi. Xira qatorlar — shu oy harakat bo'lmagan.</p></div>`
     : `<div class="list"><div class="empty">Xomashyo turlari hali kiritilmagan. Sklad bo'limida qo'shing.</div></div>`}`;
 }
+
+/* ---------- Yo'nalish: hududlar, yo'nalishlar, xarita, bekatlar ----------
+   ref/routes → e.cfg = { areas: [{ id, name, loc }], routes: [{ id, name, areas: [areaId], order: [shopId] }] }
+   Do'konda: hudud = qo'lda tanlangan hudud id (bo'lmasa — lokatsiyaga eng yaqin hudud markazi). */
+Object.assign(IC, { pin: '<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>', route: '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a4 4 0 0 0 0-8H8a4 4 0 0 1 0-8h8"/>', up: '<path d="m18 15-6-6-6 6"/>', dn: '<path d="m6 9 6 6 6-6"/>' });
+TABIC.yonalish = "route";
+const canRoute = () => !PW() || isBoss() || !!PW().route;
+const RCFG = () => { const c = (S.ref.routes || {}).cfg || {}; return { areas: Array.isArray(c.areas) ? c.areas : [], routes: Array.isArray(c.routes) ? c.routes : [] }; };
+const km = (a, b) => { const R = 6371, dLa = (b.lat - a.lat) * Math.PI / 180, dLo = (b.lng - a.lng) * Math.PI / 180, x = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
+function areaOf(s, cfg = RCFG()) {
+  if (s.hudud && cfg.areas.some(a => a.id === s.hudud)) return { id: s.hudud, auto: false };
+  const L = parseLoc(s.loc); if (!L || L.lat == null) return null;
+  let best = null, bd = 1e9;
+  for (const a of cfg.areas) { const C = parseLoc(a.loc); if (!C || C.lat == null) continue; const d = km(L, C); if (d < bd) { bd = d; best = a.id; } }
+  return best ? { id: best, auto: true } : null;
+}
+const areaName = (id, cfg = RCFG()) => (cfg.areas.find(a => a.id === id) || {}).name || "";
+function routeStops(R, cfg) {
+  const list = active("shops").map(([id, s]) => ({ id, s, ar: areaOf(s, cfg), L: parseLoc(s.loc) })).filter(x => x.ar && R.areas.includes(x.ar.id));
+  const ord = R.order || [];
+  const manual = list.filter(x => ord.includes(x.id)).sort((a, b) => ord.indexOf(a.id) - ord.indexOf(b.id));
+  // qolganlari: hudud tartibida, har hudud ichida eng yaqin qo'shni bo'yicha
+  let rest = list.filter(x => !ord.includes(x.id)), out = [];
+  let last = manual.length ? manual[manual.length - 1].L : null;
+  for (const aid of R.areas) {
+    let grp = rest.filter(x => x.ar.id === aid);
+    while (grp.length) {
+      let k = 0;
+      if (last && last.lat != null) { let bd = 1e9; grp.forEach((x, i) => { if (x.L && x.L.lat != null) { const d = km(last, x.L); if (d < bd) { bd = d; k = i; } } }); }
+      const x = grp.splice(k, 1)[0]; out.push(x); if (x.L && x.L.lat != null) last = x.L;
+    }
+  }
+  return manual.concat(out);
+}
+let LEAF = null;
+function loadLeaflet() {
+  if (window.L && window.L.map) return Promise.resolve(window.L);
+  if (LEAF) return LEAF;
+  LEAF = new Promise((res, rej) => {
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(css);
+    const js = document.createElement("script"); js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"; js.onload = () => res(window.L); js.onerror = () => { LEAF = null; rej(); }; document.head.appendChild(js);
+  });
+  return LEAF;
+}
+let RMAP = null;
+function drawRouteMap(info, cfg, R) {
+  const el = document.getElementById("rmap"); if (!el) return;
+  const pts = info.filter(x => x.L && x.L.lat != null);
+  if (!pts.length) return;
+  loadLeaflet().then(L => {
+    const el2 = document.getElementById("rmap"); if (!el2 || el2.dataset.ready) return; el2.dataset.ready = "1"; el2.innerHTML = "";
+    if (RMAP) { try { RMAP.remove(); } catch (e) {} }
+    const m = RMAP = L.map(el2, { zoomControl: true, attributionControl: true });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(m);
+    R.areas.forEach((aid, k) => { const a = cfg.areas.find(x => x.id === aid), C = a && parseLoc(a.loc); if (C && C.lat != null) L.circle([C.lat, C.lng], { radius: 900, color: CATCOL[k % CATCOL.length], weight: 1, fillOpacity: .08 }).addTo(m).bindTooltip(a.name, { direction: "top", className: "rtip" }); });
+    L.polyline(pts.map(p => [p.L.lat, p.L.lng]), { color: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb", weight: 3, dashArray: "7 7" }).addTo(m);
+    for (const p of pts) L.marker([p.L.lat, p.L.lng], { icon: L.divIcon({ className: "", html: `<span class="lmk ${p.done ? "done" : p.need ? "need" : ""}">${p.done ? "✓" : p.n}</span>`, iconSize: [26, 26], iconAnchor: [13, 13] }) }).addTo(m).bindPopup(`<b>${esc(p.s.name)}</b><br>qarz: ${fmt(Math.max(0, p.d.bal))}`);
+    m.fitBounds(L.latLngBounds(pts.map(p => [p.L.lat, p.L.lng])).pad(.15));
+  }).catch(() => { /* internet bo'lmasa sxematik xarita qoladi */ });
+}
+function schematic(info, cfg, R) {
+  const pts = info.filter(x => x.L && x.L.lat != null);
+  if (!pts.length) return `<div class="rmap empty">Bu yo'nalishdagi do'konlarning lokatsiyasi kiritilmagan</div>`;
+  const lats = pts.map(p => p.L.lat), lngs = pts.map(p => p.L.lng), pad = .006;
+  const a0 = Math.min(...lats) - pad, a1 = Math.max(...lats) + pad, o0 = Math.min(...lngs) - pad, o1 = Math.max(...lngs) + pad;
+  const W = 360, H = 260, X = g => (g - o0) / (o1 - o0 || 1) * W, Y = a => H - (a - a0) / (a1 - a0 || 1) * H;
+  const areas = R.areas.map((aid, k) => { const ps = pts.filter(p => p.ar.id === aid); if (!ps.length) return ""; const cx = ps.reduce((s, p) => s + X(p.L.lng), 0) / ps.length, cy = ps.reduce((s, p) => s + Y(p.L.lat), 0) / ps.length;
+    return `<ellipse cx="${cx}" cy="${cy}" rx="${42 + ps.length * 6}" ry="${30 + ps.length * 4}" fill="${CATCOL[k % CATCOL.length]}" opacity=".10"/><text x="${cx}" y="${cy - 30 - ps.length * 4}" text-anchor="middle" class="ra">${esc(areaName(aid, cfg))}</text>`; }).join("");
+  const line = pts.map(p => X(p.L.lng).toFixed(1) + "," + Y(p.L.lat).toFixed(1)).join(" ");
+  const mk = pts.map(p => `<g class="mk ${p.done ? "done" : p.need ? "need" : ""}" transform="translate(${X(p.L.lng).toFixed(1)},${Y(p.L.lat).toFixed(1)})"><circle r="11"/><text y="4" text-anchor="middle">${p.done ? "✓" : p.n}</text></g>`).join("");
+  return `<div class="rmap" id="rmap"><svg viewBox="-20 -24 ${W + 40} ${H + 44}"><defs><pattern id="rg" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0v24" fill="none" stroke="var(--line)" stroke-width="1"/></pattern></defs><rect x="-20" y="-24" width="${W + 40}" height="${H + 44}" fill="url(#rg)"/>${areas}<polyline class="rl" points="${line}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="7 6" stroke-linecap="round"/>${mk}</svg></div>`;
+}
+function viewYonalish() {
+  const cfg = RCFG(), boss = !PW() || isBoss();
+  const head = `<div class="head"><h1>Yo'nalish</h1>${boss ? `<button type="button" class="btn small" data-rcfg>Yo'nalishlarni sozlash</button>` : ""}</div>`;
+  if (!cfg.routes.length) return head + `<div class="list"><div class="empty">${boss ? "Hali yo'nalish yo'q. «Yo'nalishlarni sozlash» ni bosib hududlarni (Sergeli, Qumariq…) va yo'nalishlarni kiriting." : "Yo'nalishlar hali sozlanmagan. Rahbar sozlaydi."}</div></div>`;
+  const ri = Math.min(S.route || 0, cfg.routes.length - 1), R = cfg.routes[ri], t = today();
+  const info = routeStops(R, cfg).map((x, i) => {
+    const d = D.shop[x.id] || { bal: 0 }, idle = d.lastD ? daysAgo(d.lastD) : null, h = shopHealth("shops", x.id);
+    const todayE = S.entries.filter(e => e.s === x.id && e.d === t && "dpr".includes(e.t)), done = todayE.length > 0;
+    return Object.assign(x, { d, idle, h, done, need: !done && (idle == null || idle >= 7), n: i + 1, yuk: todayE.filter(e => e.t === "d").reduce((a, e) => a + amt(e), 0), pul: todayE.filter(e => e.t === "p").reduce((a, e) => a + amt(e), 0) });
+  });
+  const noArea = active("shops").filter(([, s]) => !areaOf(s, cfg));
+  const g = info.filter(p => !p.done && p.L && p.L.lat != null);
+  const gHref = g.length ? "https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=" + g[g.length - 1].L.lat + "," + g[g.length - 1].L.lng + (g.length > 1 ? "&waypoints=" + g.slice(0, -1).slice(0, 9).map(p => p.L.lat + "," + p.L.lng).join("|") : "") : "";
+  const yHref = g.length ? "https://yandex.uz/maps/?rtt=auto&rtext=~" + g.map(p => p.L.lat + "," + p.L.lng).join("~") : "";
+  const doneN = info.filter(x => x.done).length, debt = info.reduce((a, x) => a + Math.max(0, x.d.bal), 0), needN = info.filter(x => x.need).length;
+  const yk = info.reduce((a, x) => a + x.yuk, 0), pl = info.reduce((a, x) => a + x.pul, 0);
+  setTimeout(() => drawRouteMap(info, cfg, R), 0);
+  return head + `<div class="chips rchips">${cfg.routes.map((r, k) => `<button type="button" class="fchip" data-route="${k}" aria-pressed="${k === ri}">${esc(r.name)}<small>${esc(r.areas.map(a => areaName(a, cfg)).filter(Boolean).join(" · "))}</small></button>`).join("")}</div>
+  <div class="kpis">${kt("a", "store", "Do'konlar", info.length, R.areas.length + " ta hudud")}${kt("b", "alert", "Kirish kerak", needN, "7 kundan beri yuk olmagan")}${kt("c", "cash", "Yo'nalishdagi qarz", fmt(debt), "so'm")}${kt("e", "check", "Bugun kirildi", doneN + " / " + info.length, doneN ? "yuk " + fmt(yk) + " · pul " + fmt(pl) : "hali kirilmagan")}</div>
+  <div class="sgrid"><div class="scol">
+    <div class="panel"><div class="ph"><h2>${esc(R.name)} xaritasi</h2><span class="lg"><i style="background:var(--bad)"></i>kirish kerak <i style="background:var(--ok)"></i>kirildi</span></div>${schematic(info, cfg, R)}
+      <div class="rgo">${gHref ? `<a class="btn primary" href="${esc(gHref)}" target="_blank" rel="noopener">${ic("nav")} Google xaritada yo'lga chiqish</a>` : ""}${yHref ? `<a class="btn" href="${esc(yHref)}" target="_blank" rel="noopener">Yandex</a>` : ""}</div>
+      <p class="hint">Xarita hali kirilmagan do'konlarni ketma-ket bekat qilib ochadi${g.length > 10 ? " (Google bir martada 10 ta bekat ochadi, qolganini keyin)" : ""}. Tartib: hududlar ketma-ketligi va eng yaqin do'kon bo'yicha; ↑↓ bilan o'zgartirasiz.</p></div>
+    <div class="panel"><div class="ph"><h2>Bugungi xulosa</h2></div><div class="rsum"><div><b>${doneN}/${info.length}</b><small>do'konga kirildi</small></div><div><b>${fmt(yk)}</b><small>yuk berildi</small></div><div><b>${fmt(pl)}</b><small>pul yig'ildi</small></div></div>
+      ${info.filter(x => !x.done).length ? `<p class="hint">Kirilmagan: ${esc(info.filter(x => !x.done).map(x => x.s.name).join(", "))}</p>` : ""}</div>
+    ${noArea.length ? `<div class="panel"><div class="ph"><h2>Hududsiz do'konlar · ${noArea.length} ta</h2></div><p class="hint">Bu do'konlarning lokatsiyasi ham, hududi ham yo'q, shuning uchun hech bir yo'nalishga tushmadi. Do'kon oldida «Hozir turgan joyimni saqlash» ni bosing yoki Tahrirda hududini tanlang.</p>
+      <div class="dlist2">${noArea.map(([id, s]) => `<button type="button" class="dr" data-ref="shops" data-id="${id}">${avHTML(id, s.name, "")}<span class="dm"><b>${esc(s.name)}</b><small>${esc(s.owner || s.phone || "")}</small></span><span class="dv">${ic("pin")}</span></button>`).join("")}</div></div>` : ""}
+  </div><div class="scol feedcol"><div class="sec"><h2>Bekatlar · ${info.length} ta</h2>${info.length ? `<div class="stops">
+    ${info.map((x, i) => `<div class="stop ${x.done ? "done" : x.need ? "need" : ""}"><span class="sn">${x.done ? "✓" : x.n}</span>
+      <div class="sb"><div class="st"><button type="button" class="stl" data-open="shops:${x.id}">${avHTML(x.id, x.s.name, x.h.ring)}<span class="tt"><b>${esc(x.s.name)}</b><small>${esc(areaName(x.ar.id, cfg))}${x.ar.auto ? "" : " ✎"}${x.s.owner ? " · " + esc(x.s.owner) : ""}</small></span></button><span class="sv ${x.d.bal > 0.5 ? "debt" : "paid"}">${fmt(Math.max(0, x.d.bal))}<small>qarz</small></span></div>
+        <div class="sf">${x.done ? `<span class="chip ok">${ic("check")}bugun: ${x.yuk ? "yuk " + fmt(x.yuk) : ""}${x.yuk && x.pul ? " · " : ""}${x.pul ? "pul " + fmt(x.pul) : ""}${!x.yuk && !x.pul ? "vozvrat" : ""}</span>` : x.need ? `<span class="chip warn">${ic("alert")}${x.idle == null ? "hali yuk olmagan" : x.idle + " kundan beri yuk olmagan — kiring"}</span>` : `<span class="chip">${ic("box")}oxirgi yuk ${x.idle === 0 ? "bugun" : x.idle + " kun oldin"}</span>`}${!x.L || x.L.lat == null ? `<span class="chip warn">${ic("pin")}lokatsiya yo'q</span>` : ""}</div>
+        <div class="sa">${canT("d") ? `<button type="button" class="btn small q-d" data-add="d" data-s="${x.id}">${ic("plus")} Yuk</button>` : ""}${canT("p") ? `<button type="button" class="btn small q-p" data-add="p" data-s="${x.id}">${ic("cash")} Pul</button>` : ""}${x.L && x.L.lat != null ? `<a class="btn small" href="https://www.google.com/maps/dir/?api=1&destination=${x.L.lat},${x.L.lng}" target="_blank" rel="noopener">${ic("nav")} Yo'l</a>` : ""}${x.s.phone ? `<a class="btn small" href="tel:${esc(String(x.s.phone).replace(/[^\d+]/g, ""))}">${ic("phone")}</a>` : ""}
+          ${boss ? `<span class="ord"><button type="button" class="icon-btn" data-rmove="${ri}:${i}:-1" ${i === 0 ? "disabled" : ""} aria-label="Yuqoriga">${ic("up")}</button><button type="button" class="icon-btn" data-rmove="${ri}:${i}:1" ${i === info.length - 1 ? "disabled" : ""} aria-label="Pastga">${ic("dn")}</button></span>` : ""}</div></div></div>`).join("")}
+  </div>` : `<div class="list"><div class="empty">Bu yo'nalish hududlarida do'kon topilmadi. Hudud markazlari to'g'ri belgilanganini tekshiring.</div></div>`}</div></div></div>`;
+}
+async function saveRCFG(cfg) { await put("ref", "routes", "cfg", cfg); }
+function moveStop(ri, i, dir) {
+  const cfg = RCFG(), R = cfg.routes[ri]; if (!R) return;
+  const ids = routeStops(R, cfg).map(x => x.id), j = i + dir; if (j < 0 || j >= ids.length) return;
+  [ids[i], ids[j]] = [ids[j], ids[i]];
+  const routes = cfg.routes.map((r, k) => k === ri ? { ...r, order: ids } : r);
+  saveRCFG({ areas: cfg.areas, routes }).catch(err => toast(errText(err)));
+}
+function routeCfgForm() {
+  const cfg = RCFG(), shopsLoc = active("shops").filter(([, s]) => { const L = parseLoc(s.loc); return L && L.lat != null; });
+  const aRow = (a = {}) => `<div class="arow" data-aid="${esc(a.id || "")}"><input class="a-name" placeholder="Hudud nomi (Sergeli)" value="${esc(a.name || "")}"><input class="a-loc" placeholder="Markaz: 41.22, 69.22 yoki havola" value="${esc(a.loc || "")}">
+    <select class="a-from"><option value="">markazni do'kondan olish…</option>${shopsLoc.map(([id, s]) => `<option value="${esc(s.loc)}">${esc(s.name)}</option>`).join("")}</select><button type="button" class="icon-btn" data-rm-arow aria-label="O'chirish">×</button></div>`;
+  const rRow = (r = {}) => `<div class="rrow" data-rid="${esc(r.id || "")}" data-order="${esc(JSON.stringify(r.order || []))}"><input class="r-name" placeholder="Yo'nalish nomi (1-yo'nalish)" value="${esc(r.name || "")}"><input class="r-areas" placeholder="Hududlar tartibi bilan: Sergeli, Qumariq, Yangi Hayot" value="${esc((r.areas || []).map(a => areaName(a, cfg)).join(", "))}"><button type="button" class="icon-btn" data-rm-rrow aria-label="O'chirish">×</button></div>`;
+  const b = `<div class="field"><span class="flabel">Hududlar</span><div id="a-rows" class="rows">${(cfg.areas.length ? cfg.areas : [{}]).map(aRow).join("")}</div><div><button type="button" class="btn small" data-add-arow>+ Hudud qo'shish</button></div>
+      <span class="hint">Har hudud uchun markaz nuqtasini bering: koordinata, xarita havolasi yoki shu hududdagi bir do'konni tanlang. Lokatsiyasi bor do'konlar eng yaqin hudud markaziga o'zi biriktiriladi.</span></div>
+    <div class="field"><span class="flabel">Yo'nalishlar</span><div id="r-rows" class="rows">${(cfg.routes.length ? cfg.routes : [{}]).map(rRow).join("")}</div><div><button type="button" class="btn small" data-add-rrow>+ Yo'nalish qo'shish</button></div>
+      <span class="hint">Hududlarni yuradigan tartibingizda vergul bilan yozing. Nomlar yuqoridagi hududlar bilan bir xil bo'lsin.</span></div>`;
+  F_RC = { aRow, rRow };
+  openForm({ title: "Yo'nalishlarni sozlash", body: b, submit: async () => {
+    const areas = [];
+    for (const row of $$("#a-rows .arow")) {
+      const name = $(".a-name", row).value.trim(), raw = $(".a-loc", row).value.trim(); if (!name) continue;
+      const L = parseLoc(raw); if (!L || L.lat == null) throw `«${name}» hududining markazini tushunmadim. Koordinata (41.22, 69.22) kiriting yoki do'kondan tanlang.`;
+      if (areas.some(a => a.name.toLowerCase() === name.toLowerCase())) throw `«${name}» hududi ikki marta yozilgan.`;
+      areas.push({ id: row.dataset.aid || newId(), name, loc: L.lat.toFixed(6) + ", " + L.lng.toFixed(6) });
+    }
+    const routes = [];
+    for (const row of $$("#r-rows .rrow")) {
+      const name = $(".r-name", row).value.trim(), txt = $(".r-areas", row).value.trim(); if (!name && !txt) continue; if (!name) throw "Yo'nalish nomini kiriting.";
+      const ids = txt.split(/[,;]+/).map(x => x.trim()).filter(Boolean).map(n => { const a = areas.find(a => a.name.toLowerCase() === n.toLowerCase()); if (!a) throw `«${n}» degan hudud yuqorida yo'q.`; return a.id; });
+      if (!ids.length) throw `«${name}» yo'nalishiga hudud yozing.`;
+      let order = []; try { order = JSON.parse(row.dataset.order || "[]"); } catch (e) {}
+      routes.push({ id: row.dataset.rid || newId(), name, areas: ids, order });
+    }
+    await saveRCFG({ areas, routes });
+  } });
+}
+let F_RC = null;
 
 /* Filiallari bor firma: filiallar ro'yxati, har birining qarzi bilan. */
 function viewFirmBranches(id) {
@@ -1500,7 +1685,7 @@ function viewSozlama() {
   ${isOwner() ? block("products", "Mahsulotlar va narxi", x => x.price ? fmt(x.price) + " so'm" : "narx yo'q", "Ishlab chiqaradigan mahsulotlaringizni qo'shing: masalan, chuchvara turlari va har birining sotuv narxi.") : ""}
   ${isOwner() ? block("materials", "Xomashyo turlari", () => "", "Sotib oladigan narsalaringiz: un, go'sht, piyoz, qadoq va boshqalar.") : ""}
   ${us ? `<div class="sec"><div class="head"><h2>Xodimlar va ruxsatlar</h2><button type="button" class="btn small" data-user="">Xodim qo'shish</button></div>
-    <div class="list">${us.length ? us.map(u => `<button type="button" class="row" data-user="${esc(u.uid)}"><span class="row-main"><b>${esc(u.name)}</b><small>login: ${esc(u.login)} · ${esc(PERMS.filter(x => (u.perms || []).includes(x[0])).map(x => x[1].split(":")[0]).join(", ") || "ruxsat yo'q")}${u.ui ? " · yangi dizayn" : ""}</small></span><span class="row-val muted">o'zgartirish</span></button>`).join("")
+    <div class="list">${us.length ? us.map(u => `<button type="button" class="row" data-user="${esc(u.uid)}"><span class="row-main"><b>${esc(u.name)}</b><small>login: ${esc(u.login)} · ${esc(PERMS.filter(x => (u.perms || []).includes(x[0])).map(x => x[1].split(":")[0]).join(", ") || "ruxsat yo'q")}${u.ui ? " · yangi dizayn" : ""}${u.route ? " · yo'nalish" : ""}</small></span><span class="row-val muted">o'zgartirish</span></button>`).join("")
       : `<div class="empty">Hali xodim qo'shilmagan. Xodim qo'shsangiz, u o'z logini va PIN-kodi bilan kirib, faqat siz ruxsat bergan bo'limlarni ko'radi.</div>`}</div></div>` : ""}
   ${canSkin() ? `<div class="sec"><h2>Dizayn — o'zingiz uchun</h2><div class="skins">${SKINS.map(([k, t, sw]) => `<button type="button" class="skin" data-skin="${k}" aria-pressed="${(document.documentElement.dataset.skin || "") === k}"><i style="--sw:${sw}"></i>${t}</button>`).join("")}</div>
     <p class="hint">Bu tanlov faqat sizga, shu telefonda saqlanadi.</p></div>
@@ -1669,7 +1854,7 @@ function invForm(id) {
     }
   });
 }
-const VIEWFN = { bugun: viewBugun, dokonlar: viewDokonlar, firma: viewFirma, sklad: viewSklad, xomashyo: viewXomashyo, nazorat: viewNazorat, ishchilar: viewIshchilar, xarajatlar: viewXarajatlar, hisobot: viewHisobot, tarix: viewTarix, sozlama: viewSozlama };
+const VIEWFN = { yonalish: viewYonalish, bugun: viewBugun, dokonlar: viewDokonlar, firma: viewFirma, sklad: viewSklad, xomashyo: viewXomashyo, nazorat: viewNazorat, ishchilar: viewIshchilar, xarajatlar: viewXarajatlar, hisobot: viewHisobot, tarix: viewTarix, sozlama: viewSozlama };
 
 function render() {
   applySkin();
@@ -1744,7 +1929,7 @@ async function start() {
   S.db = db;
   S.timer = setTimeout(() => { if (S.ready) S.stale = true; else S.slow = true; render(); }, 10000);
   db.collection("ref").onSnapshot(snap => {
-    const ref = { shops: {}, fshops: {}, products: {}, materials: {}, workers: {} };
+    const ref = { shops: {}, fshops: {}, products: {}, materials: {}, workers: {}, routes: {} };
     for (const doc of snap.docs) { S.known.add("ref/" + doc.id); if (ref[doc.id]) for (const [id, x] of Object.entries((doc.data() || {}).e || {})) if (x) ref[doc.id][id] = x; }
     S.ref = ref; got("ref", snap.metadata);
   }, onDead);
@@ -1955,7 +2140,9 @@ function refForm(cat, id) {
   if (shopLike) b += photoField(id, x.name) + `<div class="two">${inp("r-owner", "Egasi yoki sotuvchi", x.owner || "")}${inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel" placeholder="+998 90 123 45 67"')}</div>` + inp("r-addr", "Manzil", x.addr || "")
     + `<div class="field"><label for="r-loc">Lokatsiya (koordinata yoki xarita havolasi)</label><input id="r-loc" value="${esc(x.loc || "")}" placeholder="41.311081, 69.240562">
       ${window.DAFTAR_PWA ? `<div><button type="button" class="btn small" data-geo>Hozir turgan joyimni saqlash</button></div>` : ""}
-      <span class="hint">${window.DAFTAR_PWA ? "Do'kon oldida turib tugmani bosing yoki " : ""}Google yoki Yandex xaritadan koordinata yoki havolani nusxalab qo'ying.</span></div>` + openEditor(x, "Boshlang'ich qarz (daftardagi eski qarzi): sana va summa") + inp("r-note", "Izoh", x.note || "");
+      <span class="hint">${window.DAFTAR_PWA ? "Do'kon oldida turib tugmani bosing yoki " : ""}Google yoki Yandex xaritadan koordinata yoki havolani nusxalab qo'ying.</span></div>`
+    + (cat === "shops" && canRoute() && RCFG().areas.length ? (() => { const ar = areaOf({ loc: x.loc }); return sel("r-hudud", "Hudud (yo'nalish uchun)", [["", "Avtomatik" + (ar ? " — " + areaName(ar.id) : " — lokatsiyaga qarab")]].concat(RCFG().areas.map(a => [a.id, a.name])), x.hudud || ""); })() : "")
+    + openEditor(x, "Boshlang'ich qarz (daftardagi eski qarzi): sana va summa") + inp("r-note", "Izoh", x.note || "");
   if (cat === "products") b += `<div class="two">${sel("r-unit", "O'lchov birligi", ["kg", "dona", "pachka", "quti"].map(u => [u, u]), x.unit || "kg")}${inp("r-price", "Sotuv narxi, so'm", x.price ?? "", 'inputmode="decimal" placeholder="0"')}</div>`;
   if (cat === "materials") b += sel("r-unit", "O'lchov birligi", ["kg", "dona", "litr", "qop", "pachka"].map(u => [u, u]), x.unit || "kg");
   if (cat === "workers") b += inp("r-phone", "Telefon", x.phone || "", 'inputmode="tel"') + inp("r-note", "Izoh (lavozimi, kunlik stavkasi)", x.note || "");
@@ -1970,6 +2157,7 @@ function refForm(cat, id) {
       if ($("#o-rows")) Object.assign(o, readOpen());
       if ($("#r-price")) o.price = num($("#r-price").value);
       if (x.br) o.br = x.br;
+      if ($("#r-hudud")) { if ($("#r-hudud").value) o.hudud = $("#r-hudud").value; } else if (x.hudud) o.hudud = x.hudud;
       const rid = id || newId();
       await put("ref", cat, rid, o);
       if (shopLike) await savePhoto(rid);
@@ -2006,13 +2194,15 @@ function userForm(uid) {
   b += uid ? `<p class="hint">Login: <b>${esc(u.login)}</b>. Login va PIN o'zgarmaydi. PIN unutilsa, ruxsatni olib qo'yib, xodimni boshqa login bilan qayta qo'shing.</p>`
     : `<div class="two">${inp("u-login", "Login (lotin harflarida)", "", 'autocapitalize="none" autocomplete="off" placeholder="sardor"')}${inp("u-pin", "PIN-kod (6 ta raqam)", "", 'inputmode="numeric" autocomplete="off" maxlength="12" placeholder="482913"')}</div>`;
   b += `<div class="field"><span class="flabel">Qaysi bo'limlar ochiq</span>${PERMS.map(([k, t]) => `<label class="check"><input type="checkbox" class="u-perm" id="u-perm-${k}" value="${k}" ${(u.perms || []).includes(k) ? "checked" : ""}> ${t}</label>`).join("")}</div>
+    <label class="check"><input type="checkbox" id="u-route" ${u.route ? "checked" : ""}> Yo'nalish bo'limi (Do'konlar ruxsati ham kerak)</label>
     <label class="check"><input type="checkbox" id="u-ui" ${u.ui ? "checked" : ""}> Yangi dizayn (rangini Sozlamalarda «Xodimlar uchun dizayn» dan tanlaysiz)</label>
     <p class="hint">Belgilanmagan bo'limlar xodimga ko'rinmaydi. «To'liq huquq» berilsa, u hamma bo'limni, hisobotni va narxlarni ko'radi, yozuvni o'chira oladi. Xodimlar ro'yxati va Tarix faqat sizda.</p>`;
   openForm({
     title: uid ? "Xodim ruxsatlari" : "Yangi xodim", body: b, delText: "Ruxsatni olib qo'yish",
     onDelete: uid ? () => P.removeUser(uid) : null,
     submit: async () => {
-      const o = { uid, name: $("#u-name").value.trim(), perms: $$(".u-perm").filter(c => c.checked).map(c => c.value), ui: $("#u-ui").checked ? (u.ui || staffUi()) : "" };
+      const o = { uid, name: $("#u-name").value.trim(), perms: $$(".u-perm").filter(c => c.checked).map(c => c.value), ui: $("#u-ui").checked ? (u.ui || staffUi()) : "", route: $("#u-route").checked };
+      if (o.route && !o.perms.includes("sales") && !o.perms.includes("all")) throw "Yo'nalish uchun «Do'konlar» ruxsatini ham belgilang.";
       if (o.perms.includes("all")) o.perms = ["all"];
       if (!o.name) throw "Ismni kiriting.";
       if (!uid) {
@@ -2035,6 +2225,7 @@ $("#frm").addEventListener("submit", async ev => {
 const updateOTotal = () => { const t = $("#o-total"); if (t) t.textContent = fmt($$("#o-rows .o-a").reduce((a, i) => a + num(i.value), 0)); };
 $("#frm").addEventListener("input", ev => { updateOTotal(); if (ev.target.classList.contains("i-pr")) delete ev.target.dataset.auto; updateTotal(); });
 $("#frm").addEventListener("change", async ev => {
+  if (ev.target.classList.contains("a-from") && ev.target.value) { $(".a-loc", ev.target.closest(".arow")).value = ev.target.value; ev.target.value = ""; return; }
   if (ev.target.id === "r-img" && ev.target.files && ev.target.files[0]) {
     try { const url = await shrinkImg(ev.target.files[0]); F.photo = url; const pv = $("#r-pv"); pv.style.backgroundImage = `url('${url}')`; pv.textContent = ""; }
     catch (err) { const e = $("#frmErr"); e.textContent = String(err); e.hidden = false; }
@@ -2060,7 +2251,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-flt],[data-dflt],[data-staff-skin],[data-mat-open],[data-prod-open],[data-more],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-route],[data-rcfg],[data-rmove],[data-add-arow],[data-rm-arow],[data-add-rrow],[data-rm-rrow],[data-flt],[data-dflt],[data-staff-skin],[data-mat-open],[data-prod-open],[data-more],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
   if (!el) return;
   const ds = el.dataset;
   if (el.classList.contains("skin") && "skin" in ds) { SKIN = ds.skin; try { localStorage.setItem("daftar-skin", SKIN); } catch (e) {} applySkin(); render(); toast(SKIN ? "Dizayn almashtirildi" : "Oddiy dizaynga qaytildi"); return; }
@@ -2077,6 +2268,13 @@ document.addEventListener("click", async ev => {
   else if ("close" in ds) dlg.close();
   else if ("addRow" in ds) { $("#f-rows").insertAdjacentHTML("beforeend", itemRow(catOf(F.t), F.hasPrice, {})); refreshPrices(); updateTotal(); }
   else if ("flt" in ds) { S.flt = ds.flt; render(); }
+  else if ("route" in ds) { S.route = +ds.route; render(); }
+  else if ("rcfg" in ds) routeCfgForm();
+  else if ("rmove" in ds) { const [a, b, c] = ds.rmove.split(":").map(Number); moveStop(a, b, c); }
+  else if ("addArow" in ds) $("#a-rows").insertAdjacentHTML("beforeend", F_RC.aRow({}));
+  else if ("rmArow" in ds) el.closest(".arow").remove();
+  else if ("addRrow" in ds) $("#r-rows").insertAdjacentHTML("beforeend", F_RC.rRow({}));
+  else if ("rmRrow" in ds) el.closest(".rrow").remove();
   else if ("dflt" in ds) { S.dflt = ds.dflt; render(); }
   else if ("staffSkin" in ds) { const P = PW(), on = (P.users || []).filter(u => u.ui); if (!on.length) { toast("Avval xodimga «Yangi dizayn» ni belgilang"); return; } P.setUi(on.map(u => u.uid), ds.staffSkin).then(() => toast("Xodimlar dizayni o'zgardi")).catch(() => toast("Saqlanmadi, internetni tekshiring")); }
   else if ("matOpen" in ds) { S.matId = ds.matOpen; render(); window.scrollTo(0, 0); }
