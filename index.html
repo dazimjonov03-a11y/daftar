@@ -343,6 +343,27 @@ body.jon .tab:not([aria-current]):hover{background:var(--accent-soft);color:var(
 }
 @keyframes up{from{transform:translateY(100%)}to{transform:none}} @keyframes fadein{from{opacity:0}to{opacity:1}}
 
+
+/* ---------- xomashyo oborotka ---------- */
+.obor th.gh{text-align:center;border-left:1px solid var(--line)}
+.obor td.sm{color:var(--muted);font-size:12.5px} .obor td.b{font-weight:800}
+.obor tbody tr[data-mat-open]{cursor:pointer} .obor tbody tr[data-mat-open]:hover td{background:var(--accent-soft)}
+.obor tr.idle td{opacity:.5} .obor tr.neg td{background:color-mix(in srgb,var(--bad) 7%,transparent)}
+.obor tr.total td{background:var(--accent-soft);font-weight:800}
+.tann{border:2px dashed color-mix(in srgb,var(--accent) 35%,var(--line))}
+.tn-top{display:flex;gap:16px;flex-wrap:wrap}
+.tn-top div{display:flex;flex-direction:column}
+.tn-top small{font-size:12px;color:var(--muted);font-weight:600}
+.tn-top b{font-family:var(--display);font-size:34px;line-height:1.1;color:var(--accent)} .tn-top b em{font-style:normal;font-size:15px;color:var(--muted)}
+.tn-top span{font-size:12px;color:var(--muted)}
+.shares{display:flex;flex-direction:column;gap:7px}
+.sh{display:grid;grid-template-columns:minmax(80px,130px) 1fr 40px 74px;gap:10px;align-items:center;font-size:13px}
+.sh .sn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh .sb{height:10px;border-radius:9px;background:var(--line);overflow:hidden} .sh .sb i{display:block;height:100%;width:0;border-radius:9px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.sh b{text-align:right} .sh em{font-style:normal;color:var(--muted);text-align:right;font-size:12px}
+.obor td:first-child{min-width:130px}
+@media (max-width:600px){.sh{grid-template-columns:1fr auto auto;row-gap:4px}.sh .sb{grid-column:1/-1;grid-row:2}.tn-top b{font-size:30px}}
+
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -1252,7 +1273,7 @@ function viewMatJ(id) {
   const buyRows = buys.slice().reverse().map(e => { const r = row(e); return `<${S.canWrite ? `button type="button" data-edit="${e.id}"` : "div"} class="dr k-d">${avHTML("sup_" + supKey(e.sup || "-"), e.sup || "?", "")}<span class="dm"><b>${esc(e.sup || "Kimdan olingani yozilmagan")}</b><small>${dm(e.d)} · ${fq(r.q)} ${esc(u)} × ${fmt(r.pr)}${e.pd != null ? " · " + (+e.pd > 0 ? "qisman to'langan" : "qarzga") : ""}</small></span><span class="dv">${fmt(r.v)}</span></${S.canWrite ? "button" : "div"}>`; }).join("");
   const useRows = uses.slice().reverse().slice(0, 40).map(e => { const r = row(e); return `<${S.canWrite ? `button type="button" data-edit="${e.id}"` : "div"} class="dr k-r"><span class="av ic-av k-u">${ic("down")}</span><span class="dm"><b>Sarf</b><small>${dm(e.d)}${e.by && PW() && isOwner() ? " · kiritdi: " + esc(e.by) : ""}</small></span><span class="dv">−${fq(r.q)} ${esc(u)}</span></${S.canWrite ? "button" : "div"}>`; }).join("");
   const st = x.q < -0.001 ? "bad" : days != null && days < 3 ? "mid" : "ok";
-  return `<div><button type="button" class="btn small" data-back>‹ Sklad</button></div>
+  return `<div><button type="button" class="btn small" data-back>‹ ${S.view === "xomashyo" ? "Xomashyo" : "Sklad"}</button></div>
   <div class="sgrid"><div class="scol">
     <div class="hero2 mhero ${st}"><div class="who"><span class="av lg ic-av2">${ic("box")}</span><div class="wt"><h1>${esc(m.name)}</h1><small>o'lchov: ${esc(u || "—")} · ${buys.length} ta xarid · ${uses.length} ta sarf</small></div>${W(`<button type="button" class="camb" data-ref="materials" data-id="${id}" title="Tahrir">${ic("edit")}</button>`)}</div>
       <div class="mbig"><span data-countq="${x.q}">${fq(x.q)}</span> <em>${esc(u)}</em><small>${x.q < -0.001 ? "minus: sarf ko'p yozilgan yoki xarid kiritilmagan" : days != null ? "≈ " + days + " kunga yetadi" : "skladda qoldi"}</small></div>
@@ -1280,6 +1301,52 @@ function viewProdJ(id) {
     ${W(`<div class="qa qa2">${canT("m") ? `<button type="button" class="btn q-p" data-add="m"><i>${ic("check")}</i>Mahsulot chiqdi</button>` : ""}${canT("d") ? `<button type="button" class="btn q-d" data-add="d"><i>${ic("plus")}</i>Yuk berdim</button>` : ""}</div>`)}
     <div class="panel"><div class="ph"><h2>Oxirgi 14 kun</h2>${legend(["chiqdi", "var(--ok)"], ["ketdi", "var(--accent)"])}</div>${pairBars(days.map(d => d.slice(8)), made, gone, "var(--ok)", "var(--accent)", false)}</div>
   </div><div class="scol feedcol"><div class="sec"><h2>Kunlar bo'yicha</h2><div class="dlist2">${rows || `<div class="empty">Oxirgi 14 kunda yozuv yo'q.</div>`}</div></div></div></div>`;
+}
+
+/* ---------- Xomashyo: oylik oborotka (miqdor va summa), tannarx ---------- */
+function xomAgg(month) {
+  const start = month + "-01", end = month + "-31", agg = {};
+  const g = id => agg[id] || (agg[id] = { open: 0, in: 0, out: 0, sum: 0 });
+  for (const e of S.entries) if ("bu".includes(e.t) && !isPay(e) && e.d <= end) for (const r of e.i || []) {
+    const x = g(r.p), q = +r.q || 0;
+    if (e.d < start) x.open += e.t === "b" ? q : -q;
+    else if (e.t === "b") { x.in += q; x.sum += q * (+r.pr || 0); }
+    else x.out += q;
+  }
+  const avC = aveco(month), avP = aveco(shiftMonth(month, -1));
+  for (const [id, x] of Object.entries(agg)) {
+    const pc = (avC[id] || {}).avg, pp = (avP[id] || {}).avg ?? pc;
+    x.ov = x.open * (pp || 0); x.iv = x.sum; x.uv = x.out * (pc || 0); x.ev = x.ov + x.iv - x.uv; x.avg = pc;
+  }
+  return agg;
+}
+function viewXomashyoJ() {
+  if (S.matId && S.ref.materials[S.matId]) return viewMatJ(S.matId);
+  const agg = xomAgg(S.month), boss = canSkin();
+  const rows = Object.entries(S.ref.materials).filter(([id, m]) => m && (!m.del || agg[id])).sort((a, b) => String(a[1].name).localeCompare(String(b[1].name)));
+  const T = rows.reduce((t, [id]) => { const x = agg[id] || {}; for (const k of ["ov", "iv", "uv", "ev"]) t[k] += x[k] || 0; return t; }, { ov: 0, iv: 0, uv: 0, ev: 0 });
+  const mL = S.entries.filter(e => e.t === "b" && !isPay(e) && e.d.startsWith(S.month));
+  const credit = mL.filter(e => e.pd != null).reduce((a, e) => a + sumItems(e) - Math.max(0, +e.pd || 0), 0);
+  const packs = S.entries.filter(e => e.t === "m" && e.d.startsWith(S.month)).reduce((a, e) => a + (e.i || []).reduce((s, r) => s + (+r.q || 0), 0), 0);
+  const pu = (active("products")[0] || [, {}])[1].unit || "pachka";
+  const share = rows.map(([id, m]) => [m.name, (agg[id] || {}).uv || 0]).filter(x => x[1] > 0.5).sort((a, b) => b[1] - a[1]);
+  const cell = (q, cls = "") => `<td class="n ${q < -0.001 ? "debt" : cls}">${fq(q)}</td>`, mc = v => `<td class="n sm">${v ? fmt(v) : "—"}</td>`;
+  return `<div class="head"><h1>Xomashyo</h1>${monthStepper()}</div>
+  <div class="kpis">${kt("a", "box", "Oy xaridi", fmt(T.iv), mL.length + " ta xarid")}${kt("c", "down", "Ishlatilgan xomashyo", fmt(T.uv), "AVECO narx bo'yicha")}${kt("e", "wallet", "Skladdagi qoldiq qiymati", fmt(T.ev), "oy oxiriga")}${kt("b", "truck", "Qarzga olingan", fmt(credit), "shu oy xaridlaridan")}</div>
+  ${boss ? `<div class="panel tann"><div class="ph"><h2>Xomashyo tannarxi · faqat sizga ko'rinadi</h2></div>
+    ${packs && T.uv ? `<div class="tn-top"><div><small>1 ${esc(pu)}ga ketgan xomashyo</small><b>${fmt(T.uv / packs)} <em>so'm</em></b><span>${fmt(T.uv)} so'm ÷ ${fq(packs)} ${esc(pu)}</span></div></div>
+      <div class="shares">${share.map(([n, v], i) => `<div class="sh"><span class="sn">${esc(n)}</span><span class="sb"><i data-w="${(v / T.uv * 100).toFixed(1)}%" style="background:${CATCOL[i % CATCOL.length]}"></i></span><b>${Math.round(v / T.uv * 100)}%</b><em>${fmt(v / packs)}</em></div>`).join("")}</div>
+      <p class="hint">Ustunlar: har bir xomashyoning tannarxdagi ulushi va 1 ${esc(pu)}ga qancha so'mi to'g'ri kelishi. Normaga solishtirish Nazorat bo'limida.</p>`
+      : `<p class="hint">Hisoblash uchun shu oyda ishlab chiqarish («Mahsulot chiqdi») va xomashyo sarfi yozilgan bo'lishi kerak.</p>`}</div>` : ""}
+  ${W(`<div class="qgrid">${canT("b") ? `<button type="button" class="qb q-b" data-add="b"><i>${ic("box")}</i><span>Xomashyo oldim</span></button>` : ""}${canT("u") ? `<button type="button" class="qb q-u" data-add="u"><i>${ic("down")}</i><span>Xomashyo sarfi</span></button>` : ""}</div>`)}
+  ${rows.length ? `<div class="sec"><h2>${monthName(S.month)} — oborotka</h2><div class="tblwrap"><table class="tight obor"><thead>
+    <tr><th rowspan="2">Nomi</th><th class="n gh" colspan="2">Boshida</th><th class="n gh" colspan="2">Olindi</th><th class="n gh" colspan="2">Ishlatildi</th><th class="n gh" colspan="2">Qoldiq</th></tr>
+    <tr><th class="n">miqdor</th><th class="n">summa</th><th class="n">miqdor</th><th class="n">summa</th><th class="n">miqdor</th><th class="n">summa</th><th class="n">miqdor</th><th class="n">summa</th></tr></thead><tbody>
+    ${rows.map(([id, m]) => { const x = agg[id] || { open: 0, in: 0, out: 0, ov: 0, iv: 0, uv: 0, ev: 0 }, q = x.open + x.in - x.out, idle = !x.out && !x.in;
+      return `<tr class="${idle ? "idle" : ""} ${q < -0.001 ? "neg" : ""}" data-mat-open="${id}"><td><b>${esc(m.name)}</b> <span class="muted">${esc(m.unit || "")}</span>${q < -0.001 ? `<br><small class="debt">minus: sarf ko'p yoki xarid yozilmagan</small>` : ""}</td>${cell(x.open)}${mc(x.ov)}${cell(x.in)}${mc(x.iv)}${cell(x.out)}${mc(x.uv)}${cell(q, "b")}${mc(x.ev)}</tr>`; }).join("")}
+    <tr class="total"><td>Jami</td><td></td><td class="n">${fmt(T.ov)}</td><td></td><td class="n">${fmt(T.iv)}</td><td></td><td class="n">${fmt(T.uv)}</td><td></td><td class="n">${fmt(T.ev)}</td></tr></tbody></table></div>
+    <p class="hint">Summalar o'rtacha tortilgan narx (AVECO) bo'yicha. Qatorni bossangiz, o'sha xomashyo sahifasi ochiladi. Xira qatorlar — shu oy harakat bo'lmagan.</p></div>`
+    : `<div class="list"><div class="empty">Xomashyo turlari hali kiritilmagan. Sklad bo'limida qo'shing.</div></div>`}`;
 }
 
 /* Filiallari bor firma: filiallar ro'yxati, har birining qarzi bilan. */
@@ -1453,6 +1520,7 @@ function viewTarix() {
   <p class="hint">Oxirgi 200 ta amal ko'rsatiladi. Tarix shu bo'lim qo'shilgan kundan boshlab yoziladi.</p>`;
 }
 function viewXomashyo() {
+  if (JON()) return viewXomashyoJ();
   const start = S.month + "-01", end = S.month + "-31", agg = {};
   const g = id => agg[id] || (agg[id] = { open: 0, in: 0, out: 0, sum: 0 });
   for (const e of S.entries) if ("bu".includes(e.t) && e.d <= end) for (const r of e.i || []) {
