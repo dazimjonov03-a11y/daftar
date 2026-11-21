@@ -37,8 +37,9 @@
         const ok = await new Promise(done => fs.collection("users").doc(u.uid).onSnapshot(d => {
           if (!d.exists) { if (first) { first = false; done(false); } else denied(); return; }
           const x = d.data(), s = JSON.stringify(x.perms || []);
-          if (first) { first = false; sig = s; PWA.perms = x.perms || []; PWA.name = x.name || x.login || ""; done(true); }
+          if (first) { first = false; sig = s; PWA.perms = x.perms || []; PWA.name = x.name || x.login || ""; PWA.ui = x.ui || ""; done(true); }
           else if (s !== sig) location.reload();
+          else if ((x.ui || "") !== PWA.ui) { PWA.ui = x.ui || ""; rerender(); }
         }, () => { if (first) { first = false; done(false); } }));
         if (!ok) return denied();
       }
@@ -71,9 +72,12 @@
       }
       const data = { name: o.name, perms: o.perms };
       if (o.login) data.login = o.login;
+      if ("ui" in o) data.ui = o.ui || "";
       await fs.collection("users").doc(uid).set(data, { merge: true });
     };
     PWA.removeUser = uid => fs.collection("users").doc(uid).delete();
+    /* Rahbar xodimlar uchun dizayn rangini tanlaydi: ruxsati bor xodimlarning hammasiga yoziladi. */
+    PWA.setUi = (uids, ui) => Promise.all(uids.map(uid => fs.collection("users").doc(uid).set({ ui }, { merge: true })));
     /* Kim nima qilgani: har bir amal alohida yozuv, uni faqat rahbar o'qiydi. */
     PWA.log = ev => { fs.collection("log").add(Object.assign({ ts: Date.now(), uid: PWA.uid, by: PWA.name }, ev)).catch(() => {}); };
     PWA.loadLog = n => fs.collection("log").orderBy("ts", "desc").limit(n).get().then(s => s.docs.map(d => d.data()));
@@ -105,7 +109,7 @@
       if (PWA.full) return fs.collection(c).onSnapshot({ includeMetadataChanges: true }, s => {
         if (c === "j") for (const d of s.docs) if (!d.data().t && !fixed.has(d.id)) { fixed.add(d.id); fs.doc("j/" + d.id).set({ t: d.id.split("_")[1] }, { merge: true }).catch(() => {}); }
         next(s);
-      }, e => { if (e && e.code === "permission-denied") { if (c !== "ctl") denied(); } else if (err) err({ code: code(e), message: String(e && e.message) }); });
+      }, e => { if (e && e.code === "permission-denied") { if (c === "img") next({ docs: [], metadata: { fromCache: false } }); else if (c !== "ctl") denied(); } else if (err) err({ code: code(e), message: String(e && e.message) }); });
       if (c === "img") return has("sales") || has("firma") ? partial([fs.collection("img")], next) : next({ docs: [], metadata: { fromCache: false } });
       if (c === "ref") return partial([fs.doc("ref/products")].concat(Object.keys(REFS).filter(k => has(REFS[k])).map(k => fs.doc("ref/" + k))), next);
       const types = [].concat(...Object.keys(TYPES).filter(has).map(k => TYPES[k]));

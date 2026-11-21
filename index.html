@@ -617,8 +617,10 @@ const SKINS = [["", "Oddiy (hozirgi)", "#1f3fbf"], ["kok", "Ko'k", "linear-gradi
 const canSkin = () => !PW() || isBoss();
 let SKIN = "";
 try { SKIN = localStorage.getItem("daftar-skin") || ""; } catch (e) {}
+const staffUi = () => { const us = (PW() && PW().users || []).filter(u => u.ui); const c = {}; for (const u of us) c[u.ui] = (c[u.ui] || 0) + 1; return Object.keys(c).sort((a, b) => c[b] - c[a])[0] || "kok"; };
 function applySkin() {
-  const k = canSkin() && SKINS.some(x => x[0] === SKIN) ? SKIN : "";
+  const want = canSkin() ? SKIN : (PW() && PW().ui) || "";
+  const k = want && SKINS.some(x => x[0] === want) ? want : "";
   if (k) document.documentElement.dataset.skin = k; else delete document.documentElement.dataset.skin;
   const mc = document.querySelector('meta[name="theme-color"]');
   if (mc) { if (!mc.dataset.orig) mc.dataset.orig = mc.content || ""; mc.content = k === "ilyos" ? "#b3261e" : k === "tungi" ? "#151c19" : k === "kok" ? "#ffffff" : mc.dataset.orig; }
@@ -1498,10 +1500,13 @@ function viewSozlama() {
   ${isOwner() ? block("products", "Mahsulotlar va narxi", x => x.price ? fmt(x.price) + " so'm" : "narx yo'q", "Ishlab chiqaradigan mahsulotlaringizni qo'shing: masalan, chuchvara turlari va har birining sotuv narxi.") : ""}
   ${isOwner() ? block("materials", "Xomashyo turlari", () => "", "Sotib oladigan narsalaringiz: un, go'sht, piyoz, qadoq va boshqalar.") : ""}
   ${us ? `<div class="sec"><div class="head"><h2>Xodimlar va ruxsatlar</h2><button type="button" class="btn small" data-user="">Xodim qo'shish</button></div>
-    <div class="list">${us.length ? us.map(u => `<button type="button" class="row" data-user="${esc(u.uid)}"><span class="row-main"><b>${esc(u.name)}</b><small>login: ${esc(u.login)} · ${esc(PERMS.filter(x => (u.perms || []).includes(x[0])).map(x => x[1].split(":")[0]).join(", ") || "ruxsat yo'q")}</small></span><span class="row-val muted">o'zgartirish</span></button>`).join("")
+    <div class="list">${us.length ? us.map(u => `<button type="button" class="row" data-user="${esc(u.uid)}"><span class="row-main"><b>${esc(u.name)}</b><small>login: ${esc(u.login)} · ${esc(PERMS.filter(x => (u.perms || []).includes(x[0])).map(x => x[1].split(":")[0]).join(", ") || "ruxsat yo'q")}${u.ui ? " · yangi dizayn" : ""}</small></span><span class="row-val muted">o'zgartirish</span></button>`).join("")
       : `<div class="empty">Hali xodim qo'shilmagan. Xodim qo'shsangiz, u o'z logini va PIN-kodi bilan kirib, faqat siz ruxsat bergan bo'limlarni ko'radi.</div>`}</div></div>` : ""}
-  ${canSkin() ? `<div class="sec"><h2>Dizayn (sinov) — faqat sizga ko'rinadi</h2><div class="skins">${SKINS.map(([k, t, sw]) => `<button type="button" class="skin" data-skin="${k}" aria-pressed="${(document.documentElement.dataset.skin || "") === k}"><i style="--sw:${sw}"></i>${t}</button>`).join("")}</div>
-    <p class="hint">Tanlov faqat shu telefonda saqlanadi. Xodimlar oddiy ko'rinishni ko'radi. Yangi uslub hozircha Do'konlar va do'kon sahifasida, boshqa bo'limlarda faqat rang o'zgaradi.</p></div>` : ""}
+  ${canSkin() ? `<div class="sec"><h2>Dizayn — o'zingiz uchun</h2><div class="skins">${SKINS.map(([k, t, sw]) => `<button type="button" class="skin" data-skin="${k}" aria-pressed="${(document.documentElement.dataset.skin || "") === k}"><i style="--sw:${sw}"></i>${t}</button>`).join("")}</div>
+    <p class="hint">Bu tanlov faqat sizga, shu telefonda saqlanadi.</p></div>
+    ${PW() && PW().users ? (() => { const on = PW().users.filter(u => u.ui), cur = staffUi();
+      return `<div class="sec"><h2>Xodimlar uchun dizayn</h2><div class="skins">${SKINS.filter(x => x[0]).map(([k, t, sw]) => `<button type="button" class="skin" data-staff-skin="${k}" aria-pressed="${on.length && cur === k}"><i style="--sw:${sw}"></i>${t}</button>`).join("")}</div>
+      <p class="hint">${on.length ? `Yangi dizayn ${on.length} ta xodimda yoqilgan: ${esc(on.map(u => u.name).join(", "))}. Rangni bossangiz, hammasida o'zgaradi.` : "Hali hech bir xodimga yangi dizayn yoqilmagan."} Xodimga yoqish uchun pastdagi Xodimlar ro'yxatidan uni ochib, «Yangi dizayn» ni belgilang. Tannarx va Nazorat baribir faqat sizga ko'rinadi.</p></div>`; })() : ""}` : (PW() && PW().ui ? `<div class="sec"><h2>Dizayn</h2><p class="hint">Sizga yangi dizayn yoqilgan. Rangini rahbar tanlaydi.</p></div>` : "")}
   ${window.DAFTAR_PWA ? `<div class="sec"><h2>Hisob</h2><div class="card"><div>${esc(window.DAFTAR_PWA.name || window.DAFTAR_PWA.email || "")}</div><div><button type="button" class="btn small" data-logout>Hisobdan chiqish</button></div></div></div>` : ""}
   <p class="hint" ${isOwner() ? "" : "hidden"}>Do'konlar va ishchilar o'z bo'limida qo'shiladi. Biror do'konga boshqa narxda bersangiz, yuk yozishda narxni o'zgartiring: dastur shu do'konning oxirgi narxini eslab qoladi.</p>`;
 }
@@ -2001,12 +2006,13 @@ function userForm(uid) {
   b += uid ? `<p class="hint">Login: <b>${esc(u.login)}</b>. Login va PIN o'zgarmaydi. PIN unutilsa, ruxsatni olib qo'yib, xodimni boshqa login bilan qayta qo'shing.</p>`
     : `<div class="two">${inp("u-login", "Login (lotin harflarida)", "", 'autocapitalize="none" autocomplete="off" placeholder="sardor"')}${inp("u-pin", "PIN-kod (6 ta raqam)", "", 'inputmode="numeric" autocomplete="off" maxlength="12" placeholder="482913"')}</div>`;
   b += `<div class="field"><span class="flabel">Qaysi bo'limlar ochiq</span>${PERMS.map(([k, t]) => `<label class="check"><input type="checkbox" class="u-perm" id="u-perm-${k}" value="${k}" ${(u.perms || []).includes(k) ? "checked" : ""}> ${t}</label>`).join("")}</div>
+    <label class="check"><input type="checkbox" id="u-ui" ${u.ui ? "checked" : ""}> Yangi dizayn (rangini Sozlamalarda «Xodimlar uchun dizayn» dan tanlaysiz)</label>
     <p class="hint">Belgilanmagan bo'limlar xodimga ko'rinmaydi. «To'liq huquq» berilsa, u hamma bo'limni, hisobotni va narxlarni ko'radi, yozuvni o'chira oladi. Xodimlar ro'yxati va Tarix faqat sizda.</p>`;
   openForm({
     title: uid ? "Xodim ruxsatlari" : "Yangi xodim", body: b, delText: "Ruxsatni olib qo'yish",
     onDelete: uid ? () => P.removeUser(uid) : null,
     submit: async () => {
-      const o = { uid, name: $("#u-name").value.trim(), perms: $$(".u-perm").filter(c => c.checked).map(c => c.value) };
+      const o = { uid, name: $("#u-name").value.trim(), perms: $$(".u-perm").filter(c => c.checked).map(c => c.value), ui: $("#u-ui").checked ? (u.ui || staffUi()) : "" };
       if (o.perms.includes("all")) o.perms = ["all"];
       if (!o.name) throw "Ismni kiriting.";
       if (!uid) {
@@ -2054,7 +2060,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-flt],[data-dflt],[data-mat-open],[data-prod-open],[data-more],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-flt],[data-dflt],[data-staff-skin],[data-mat-open],[data-prod-open],[data-more],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
   if (!el) return;
   const ds = el.dataset;
   if (el.classList.contains("skin") && "skin" in ds) { SKIN = ds.skin; try { localStorage.setItem("daftar-skin", SKIN); } catch (e) {} applySkin(); render(); toast(SKIN ? "Dizayn almashtirildi" : "Oddiy dizaynga qaytildi"); return; }
@@ -2072,6 +2078,7 @@ document.addEventListener("click", async ev => {
   else if ("addRow" in ds) { $("#f-rows").insertAdjacentHTML("beforeend", itemRow(catOf(F.t), F.hasPrice, {})); refreshPrices(); updateTotal(); }
   else if ("flt" in ds) { S.flt = ds.flt; render(); }
   else if ("dflt" in ds) { S.dflt = ds.dflt; render(); }
+  else if ("staffSkin" in ds) { const P = PW(), on = (P.users || []).filter(u => u.ui); if (!on.length) { toast("Avval xodimga «Yangi dizayn» ni belgilang"); return; } P.setUi(on.map(u => u.uid), ds.staffSkin).then(() => toast("Xodimlar dizayni o'zgardi")).catch(() => toast("Saqlanmadi, internetni tekshiring")); }
   else if ("matOpen" in ds) { S.matId = ds.matOpen; render(); window.scrollTo(0, 0); }
   else if ("prodOpen" in ds) { S.prodId = ds.prodOpen; render(); window.scrollTo(0, 0); }
   else if ("more" in ds) { const sh = document.getElementById("bsheet"); if (sh) sh.hidden = !sh.hidden; }
