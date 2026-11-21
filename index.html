@@ -240,6 +240,61 @@ body{margin:0} img{max-width:100%} [hidden]{display:none!important}
 .chip .ic{width:13px;height:13px}
 .chip.warn{background:color-mix(in srgb,var(--mid) 18%,transparent);color:color-mix(in srgb,var(--mid) 70%,#000)}
 :root[data-skin="tungi"] .stp.mid,:root[data-skin="tungi"] .chip.warn{color:var(--mid)}
+/* ---------- Bugun, Sklad, Ishchilar, Xarajatlar v2 ---------- */
+.kt.e{background:linear-gradient(135deg,#10b981,#059669)}
+.dayhero{position:relative;overflow:hidden;border-radius:24px;padding:20px 22px;color:#fff;background:var(--hero);display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;box-shadow:0 16px 34px color-mix(in srgb,var(--accent) 28%,transparent);animation:rise .4s both;isolation:isolate}
+.dayhero::before{content:"";position:absolute;z-index:-1;width:240px;height:240px;border-radius:50%;right:-80px;top:-120px;background:rgba(255,255,255,.13)}
+.dayhero small{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;font-weight:700}
+.dayhero .big{font-family:var(--display);font-size:38px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.dh-sub{display:inline-flex;align-items:center;gap:5px;font-size:13px;opacity:.92;margin-top:4px;flex-wrap:wrap}
+.dh-sub .ic{width:14px;height:14px}
+.dh-r{text-align:right;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:10px 14px}
+.dh-r small{display:block;font-size:11px} .dh-r b{font-family:var(--display);font-size:20px}
+.dayhero.xh{background:linear-gradient(135deg,#e11d48,#9f1239);box-shadow:0 16px 34px rgba(225,29,72,.25)}
+.btn.light{background:#fff;color:#be123c;border:0}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.qb{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 6px;border-radius:18px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);cursor:pointer;font-weight:600;font-size:12.5px;text-align:center;transition:transform .15s}
+.qb:active{transform:scale(.95)} .qb:hover{border-color:var(--accent)}
+.qb i{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-style:normal}
+.qb.q-d i{background:var(--accent-soft);color:var(--accent)} .qb.q-p i{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.qb.q-r i,.qb.q-x i{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)} .qb.q-m i{background:#e0f2fe;color:#0284c7}
+.qb.q-b i,.qb.q-u i{background:#fef3c7;color:#b45309} .qb.q-v i{background:#ede9fe;color:#7c3aed}
+:root[data-skin="tungi"] .qb.q-m i,:root[data-skin="tungi"] .qb.q-b i,:root[data-skin="tungi"] .qb.q-u i,:root[data-skin="tungi"] .qb.q-v i{background:var(--accent-soft)}
+.alerts{gap:6px}
+.alr{display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:center;width:100%;text-align:left;border:0;border-radius:14px;padding:10px 12px;cursor:pointer;background:var(--bg)}
+.alr .ai{width:38px;height:38px;border-radius:12px;display:grid;place-items:center}
+.alr.bad .ai{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)} .alr.mid .ai{background:color-mix(in srgb,var(--mid) 20%,transparent);color:color-mix(in srgb,var(--mid) 75%,#000)}
+:root[data-skin="tungi"] .alr.mid .ai{color:var(--mid)}
+.alr b{display:block;font-size:14px} .alr small{color:var(--muted);font-size:12.5px} .alr .go{font-size:22px;color:var(--muted)}
+.dlist2{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.dr{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:11px 14px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;width:100%;cursor:pointer}
+.dr:last-child{border-bottom:0} button.dr:hover{background:var(--accent-soft)}
+.dr .av{width:40px;height:40px;font-size:14px}
+.ic-av{background:var(--bg)!important;color:var(--muted)} .ic-av .ic{width:19px;height:19px}
+.ic-av.k-x{color:var(--bad)} .ic-av.k-m{color:#0284c7} .ic-av.k-b,.ic-av.k-u{color:#b45309}
+.dm{min-width:0} .dm b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm small{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm .pill{min-width:0;padding:1px 6px;font-size:10px;margin-right:4px}
+.dv{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dr.k-p .dv{color:var(--ok)} .dr.k-r .dv{color:var(--bad)}
+.mgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.mc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);animation:rise .4s both;position:relative}
+.mc.bad{border-color:color-mix(in srgb,var(--bad) 45%,var(--line))} .mc.mid{border-color:color-mix(in srgb,var(--mid) 50%,var(--line))}
+.mt{display:flex;justify-content:space-between;gap:6px;align-items:center} .mt b{font-size:15px}
+.mq span{font-family:var(--display);font-size:28px;font-weight:800;font-variant-numeric:tabular-nums} .mq em{font-style:normal;color:var(--muted);font-weight:600}
+.mc.bad .pbar i{background:var(--bad)} .mc.mid .pbar i{background:var(--mid)}
+.mf{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--muted);flex-wrap:wrap} .mf .dd{font-weight:700;color:var(--ink)}
+.mw{display:flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--bad)} .mc.mid .mw{color:color-mix(in srgb,var(--mid) 75%,#000)}
+:root[data-skin="tungi"] .mc.mid .mw{color:var(--mid)}
+.mw .ic{width:15px;height:15px}
+.qa2{grid-template-columns:repeat(2,1fr)}
+.xdon{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.xleg{flex:1;min-width:220px;display:flex;flex-direction:column;gap:8px}
+.xleg div{display:grid;grid-template-columns:34px 1fr auto 42px;gap:10px;align-items:center}
+.xi{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 15%,transparent)}
+.xi .ic{width:17px;height:17px}
+.xn{font-weight:600;font-size:13.5px} .xleg b{font-variant-numeric:tabular-nums} .xleg em{font-style:normal;color:var(--muted);font-size:12px;text-align:right}
+
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -645,6 +700,7 @@ const addBtn = (t, text, extra = "", cls = "") => W(`<button type="button" class
 
 /* ---------- views ---------- */
 function viewBugun() {
+  if (JON()) return viewBugunJ();
   const day = S.entries.filter(e => e.d === S.day);
   const debts = Object.entries(D.shop).filter(([id, s]) => S.ref.shops[id] && !S.ref.shops[id].del);
   const total = debts.reduce((a, [, s]) => a + Math.max(0, s.bal), 0);
@@ -699,7 +755,7 @@ function sparkSVG(id, T) {
 function countUp(root) {
   for (const el of root.querySelectorAll("[data-count]")) {
     const to = +el.dataset.count, t0 = performance.now(), dur = 900;
-    const step = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(Math.round(to * e)) + " so'm"; if (k < 1) requestAnimationFrame(step); };
+    const step = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (el.dataset.sign && to ? el.dataset.sign : "") + fmt(Math.round(to * e)) + " so'm"; if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
   requestAnimationFrame(() => requestAnimationFrame(() => { for (const el of root.querySelectorAll("[data-w]")) el.style.width = el.dataset.w; for (const el of root.querySelectorAll("[data-arc]")) el.setAttribute("stroke-dasharray", el.dataset.arc); }));
@@ -772,6 +828,8 @@ function viewDokonlar() {
   <p class="hint">${J ? "Halqa: yashil — qarzi yo'q, sariq — qarzi bor, qizil — 30 kundan eski qarz. «Oxirgi yuk» 14 kundan oshsa sariq bo'ladi." : "Qizil raqam — do'konning qarzi. Ostida oxirgi yuk berilgan va oxirgi pul olingan sana."}</p>`;
 }
 function ledger(openItems, list, plusT, label, A) {
+  if (!Array.isArray(openItems)) openItems = [];
+  const noAl = !A; A = A || { byKey: {}, cr: {} };
   let bal = 0; const rows = [];
   for (const it of openItems.slice().sort((a, b) => (a.d || "") < (b.d || "") ? -1 : 1)) {
     const x = A.byKey[oKey(it)]; bal += +it.a || 0;
@@ -782,7 +840,7 @@ function ledger(openItems, list, plusT, label, A) {
     const det = e.i ? itemsText(e, true) : (e.m || "");
     let st = "";
     if (plus) { const x = A.byKey[e.id]; if (x) st = debtStatus(x); }
-    else { const parts = A.cr[e.id] || []; st = parts.map(p => p.x ? `→ ${debtName(p.x)} uchun ${fmt(p.a)}` : `→ avans ${fmt(p.a)}`).join("<br>"); if (parts.length && !e.to) st += ` <span class="muted">(avtomatik)</span>`; }
+    else if (!noAl) { const parts = A.cr[e.id] || []; st = parts.map(p => p.x ? `→ ${debtName(p.x)} uchun ${fmt(p.a)}` : `→ avans ${fmt(p.a)}`).join("<br>"); if (parts.length && !e.to) st += ` <span class="muted">(avtomatik)</span>`; }
     rows.push(`<tr><td class="num">${dm(e.d)}</td><td><b>${TYPES[bt(e.t)].label}</b>${det || e.n ? `<br><span class="muted">${esc([det, e.n].filter(Boolean).join(" · "))}</span>` : ""}${st ? `<br><small>${st}</small>` : ""}</td>
       <td class="n">${plus ? fmt(a) : ""}</td><td class="n">${plus ? "" : fmt(a)}</td><td class="n">${fmt(bal)}</td>
       <td>${W(`<button type="button" class="btn small" data-edit="${e.id}">Tuzatish</button>`)}</td></tr>`);
@@ -833,13 +891,19 @@ function shopStats(A, list, oItems) {
   const closed = A.debts.filter(x => x.d && x.a - x.paid <= 0.5 && x.pays.length);
   let w = 0, wd = 0; for (const x of closed) { const last = x.pays[x.pays.length - 1].d, dd = Math.max(0, (new Date(last + "T12:00:00") - new Date(x.d + "T12:00:00")) / 864e5); w += x.a; wd += dd * x.a; }
   const avgPay = w ? Math.round(wd / w) : null;
-  const open = A.debts.filter(x => x.a - x.paid > 0.5), oldest = open.length && open[0].d ? daysAgo(open[0].d) : 0;
-  const ref = avgPay != null ? avgPay : oldest;
-  let stars = ref <= 7 ? 5 : ref <= 14 ? 4 : ref <= 21 ? 3 : ref <= 30 ? 2 : 1;
-  if (oldest > 30) stars = Math.max(1, stars - 1);
+  const open = A.debts.filter(x => x.a - x.paid > 0.5);
+  const ages = open.filter(x => x.d).map(x => daysAgo(x.d)), oldest = ages.length ? Math.max(...ages) : 0;
+  const everPaid = A.debts.some(x => x.paid > 0.5);
+  let stars = 0;
+  if (avgPay != null || oldest > 7) {
+    const ref = Math.max(avgPay || 0, oldest);
+    stars = ref <= 7 ? 5 : ref <= 14 ? 4 : ref <= 21 ? 3 : ref <= 30 ? 2 : 1;
+    if (oldest > 30) stars = Math.max(1, stars - 1);
+    if (!everPaid) stars = Math.min(stars, oldest > 14 ? 2 : 3);
+  }
   const pq = {}; for (const e of yuk) for (const r of e.i || []) pq[r.p] = (pq[r.p] || 0) + (+r.q || 0);
   const topP = Object.entries(pq).sort((a, b) => b[1] - a[1])[0];
-  return { since, yukSum, yukN: yuk.length, avgYuk: yuk.length ? yukSum / yuk.length : 0, avgPay, stars: dates.length ? stars : 0, topP };
+  return { since, yukSum, yukN: yuk.length, avgYuk: yuk.length ? yukSum / yuk.length : 0, avgPay, stars, topP };
 }
 function monthsChart(list) {
   const ms = []; for (let i = 5; i >= 0; i--) ms.push(shiftMonth(today().slice(0, 7), -i));
@@ -874,7 +938,7 @@ function viewShopJ({ cat, id, bid, fm, T, f, br, s, d, list, bAttr, oItems, A })
     else al = (A.cr[e.id] || []).map(p => p.x ? `→ ${debtName(p.x)} uchun ${fmt(p.a)}` : `→ avans ${fmt(p.a)}`).join("<br>") + (e.to ? "" : ` <span class="muted">(avtomatik)</span>`);
     feed.push(`<button type="button" class="fi k-${k}" ${S.canWrite ? `data-edit="${e.id}"` : ""}><span class="t">${TYPES[k].label}</span><span class="v">${plus ? "+" : "−"}${fmt(a)}</span><span class="dt">${dm(e.d)}</span><span class="bal">qoldiq ${fmt(run)}</span>${det ? `<span class="d">${esc(det)}</span>` : ""}${al ? `<span class="${plus ? "d" : "al"}">${al}</span>` : ""}</button>`);
   });
-  const starH = st.stars ? `<span class="stars" title="To'lov intizomi">${"★".repeat(st.stars)}<i>${"★".repeat(5 - st.stars)}</i></span>` : `<span class="stars new">yangi mijoz</span>`;
+  const starH = st.stars ? `<span class="stars" title="To'lov intizomi">${"★".repeat(st.stars)}<i>${"★".repeat(5 - st.stars)}</i></span>` : `<span class="stars new" title="Baho uchun to'lov tarixi yetarli emas">baho yo'q</span>`;
   const left = `
   <div class="hero2 ${im ? "has-img" : ""}">${im ? `<div class="hbg" style="background-image:url('${esc(im)}')"></div>` : ""}
     <div class="who">${avHTML(imgKey, s.name, h.ring, true)}
@@ -906,6 +970,181 @@ function viewShopJ({ cat, id, bid, fm, T, f, br, s, d, list, bAttr, oItems, A })
   return `<div><button type="button" class="btn small" data-back>‹ ${bid ? esc(f.name) : fm ? "Firma" : "Do'konlar"}</button></div>
   <div class="sgrid"><div class="scol">${left}</div><div class="scol feedcol">${right}</div></div>`;
 }
+/* ---------- jonli dizayn: Bugun, Sklad, Ishchilar, Xarajatlar ---------- */
+Object.assign(IC, {
+  home: '<path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+  zap: '<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>', truck: '<path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
+  tool: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+  dots: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
+  alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>', down: '<path d="M12 5v14M19 12l-7 7-7-7"/>', up: '<path d="M12 19V5M5 12l7-7 7 7"/>',
+  wallet: '<path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>'
+});
+const CATIC = { "Ijara": "home", "Kommunal (gaz, svet, suv)": "zap", "Transport, benzin": "truck", "Qadoq, paket": "box", "Soliq": "file", "Ta'mirlash": "tool", "Boshqa": "dots" };
+const CATCOL = ["#2563eb", "#f59e0b", "#10b981", "#e11d48", "#8b5cf6", "#0ea5e9", "#64748b"];
+const kt = (cls, icon, label, val, sub) => `<div class="kt ${cls}"><span class="ki">${ic(icon)}</span><small>${label}</small><b>${val}</b>${sub ? `<em>${sub}</em>` : ""}</div>`;
+const DSH = ["Ya", "Du", "Se", "Ch", "Pa", "Ju", "Sh"];
+function pairBars(labels, a, b, colA, colB, fmtTop) {
+  const n = labels.length, mx = Math.max(...a, ...b, 1), H = 110, W = 320, gw = W / n, bw = Math.min(13, gw / 2 - 3);
+  const short = v => v >= 1e6 ? (v / 1e6).toFixed(v >= 1e7 ? 0 : 1).replace(".0", "") + "m" : v >= 1e3 ? Math.round(v / 1e3) + "k" : v ? String(Math.round(v)) : "";
+  let g = "";
+  labels.forEach((l, i) => {
+    const x = i * gw + gw / 2, ha = a[i] / mx * (H - 22), hb = b[i] / mx * (H - 22);
+    g += `<rect class="cb" x="${x - bw - 1.5}" y="${H - ha}" width="${bw}" height="${Math.max(ha, 1.5)}" rx="3" fill="${colA}" style="--d:${i * 50}ms"/>`
+      + `<rect class="cb" x="${x + 1.5}" y="${H - hb}" width="${bw}" height="${Math.max(hb, 1.5)}" rx="3" fill="${colB}" style="--d:${i * 50 + 25}ms"/>`
+      + (fmtTop && a[i] ? `<text x="${x - bw / 2 - 1.5}" y="${H - ha - 4}" text-anchor="middle" class="cv">${short(a[i])}</text>` : "")
+      + `<text x="${x}" y="${H + 15}" text-anchor="middle" class="cl">${l}</text>`;
+  });
+  return `<svg class="mchart" viewBox="0 -6 ${W} ${H + 22}" role="img">${g}</svg>`;
+}
+const legend = (a, b) => `<span class="lg"><i style="background:${a[1]}"></i>${a[0]} <i style="background:${b[1]}"></i>${b[0]}</span>`;
+function feedRow(e) {
+  const k = bt(e.t), a = isPay(e) ? paidB(e) : amt(e);
+  let who = "", av = "", det = "", sign = "", cls = "k-o";
+  if (e.s) { who = shopName(e); av = avHTML(isF(e.t) && e.b ? e.s + "_" + e.b : e.s, rname(shopCat(e.t), e.s), ""); }
+  else if (e.w) { who = rname("workers", e.w); av = avHTML("w_" + e.w, who, ""); }
+  else { who = e.t === "x" ? (e.c || "Xarajat") : e.t === "b" ? (e.sup || "Xomashyo") : TYPES[e.t].title; av = `<span class="av ic-av k-${e.t}">${ic(e.t === "x" ? CATIC[e.c] || "dots" : e.t === "m" ? "check" : e.t === "b" || e.t === "u" ? "box" : "wallet")}</span>`; }
+  if (k === "d") { det = itemsText(e, true); sign = "+"; cls = "k-d"; }
+  else if (k === "p") { det = e.m || ""; sign = "−"; cls = "k-p"; }
+  else if (k === "r") { det = itemsText(e, true); sign = "−"; cls = "k-r"; }
+  else if (e.t === "m") { det = itemsText(e, false); }
+  else if (e.t === "b") { det = isPay(e) ? "ta'minotchiga pul" : [itemsText(e, true), payNote(e)].filter(Boolean).join(" · "); cls = "k-r"; sign = isPay(e) ? "−" : ""; }
+  else if (e.t === "u") det = itemsText(e, false);
+  else if (e.t === "x") { det = e.n || ""; cls = "k-r"; sign = "−"; }
+  else if (e.t === "w") { det = "ish haqi hisoblandi"; sign = "+"; }
+  else if (e.t === "v") { det = "pul berildi"; sign = "−"; cls = "k-r"; }
+  const val = e.t === "m" ? qtyByUnit([e]) : e.t === "u" ? "" : sign + fmt(a);
+  return `<${S.canWrite ? `button type="button" data-edit="${e.id}"` : "div"} class="dr ${cls}">${av}<span class="dm"><b>${esc(who)}</b><small><span class="pill t-${isPay(e) ? "v" : e.t}">${isPay(e) ? "To'lov" : TYPES[e.t].label}</span> ${esc([det, e.by && PW() && isOwner() ? "kiritdi: " + e.by : ""].filter(Boolean).join(" · "))}</small></span><span class="dv">${esc(val)}</span></${S.canWrite ? "button" : "div"}>`;
+}
+
+function viewBugunJ() {
+  const day = S.entries.filter(e => e.d === S.day), isToday = S.day === today();
+  const inn = sumOf(day, "p"), out = sumOf(day, "x") + paidOut(day) + sumOf(day, "v"), net = inn - out;
+  const made = day.filter(e => e.t === "m");
+  // diqqat
+  const al = [];
+  if (can("sales")) {
+    const old = active("shops").map(([id]) => ({ id, h: shopHealth("shops", id), b: (D.shop[id] || {}).bal || 0 })).filter(o => o.b > 0.5 && o.h.old > 30);
+    if (old.length) al.push(["bad", "clock", `${old.length} ta do'konda 30 kundan eski qarz`, fmt(old.reduce((a, o) => a + o.b, 0)) + " so'm", "dokonlar"]);
+  }
+  if (can("stock")) { const neg = active("materials").filter(([id]) => (D.mat[id] || {}).q < -0.001); if (neg.length) al.push(["bad", "alert", "Xomashyo minusda: " + neg.map(([, m]) => m.name).join(", "), "sarf yoki xarid noto'g'ri yozilgan", "sklad"]); }
+  if (can("prod") && can("sales")) { const np = active("products").filter(([id]) => (D.prod[id] || 0) < -0.001); if (np.length) al.push(["mid", "box", "Tayyor mahsulot minusda: " + np.map(([, p]) => p.name).join(", "), "ishlab chiqarish yozilmay qolgan", "sklad"]); }
+  if (can("wages")) { const w = active("workers").reduce((a, [id]) => a + Math.max(0, D.wrk[id] || 0), 0); if (w > 0.5) al.push(["mid", "users", "Ishchilarga berilishi kerak", fmt(w) + " so'm", "ishchilar"]); }
+  if (can("stock")) { const sd = Object.values(D.sup).reduce((a, x) => a + Math.max(0, x.bal), 0); if (sd > 0.5) al.push(["mid", "truck", "Ta'minotchilarga qarzingiz", fmt(sd) + " so'm", "sklad"]); }
+  // 7 kun
+  const days = []; for (let i = 6; i >= 0; i--) days.push(shiftDay(S.day, -i));
+  const yv = days.map(d => S.entries.filter(e => e.d === d && e.t === "d").reduce((a, e) => a + amt(e), 0));
+  const pv = days.map(d => S.entries.filter(e => e.d === d && e.t === "p").reduce((a, e) => a + amt(e), 0));
+  const flt = S.dflt || "all", FL = [["all", "Hammasi"], ["sales", "Savdo"], ["wages", "Ish haqi"], ["stock", "Sklad"], ["x", "Xarajat"]];
+  const fl = e => flt === "all" || (flt === "sales" ? "dprfgh".includes(e.t) : flt === "wages" ? "wv".includes(e.t) : flt === "stock" ? "mbu".includes(e.t) : e.t === "x");
+  const qbtn = (t, icon, label, cls) => canT(t) ? `<button type="button" class="qb ${cls}" data-add="${t}"><i>${ic(icon)}</i><span>${label}</span></button>` : "";
+  return `<div class="head"><h1>${isToday ? "Bugun" : dm(S.day)}</h1>
+    <div class="stepper"><button type="button" class="icon-btn" data-day="-1" aria-label="Oldingi kun">‹</button><input type="date" id="dayPick" value="${S.day}" aria-label="Sana"><button type="button" class="icon-btn" data-day="1" aria-label="Keyingi kun">›</button></div></div>
+  ${can("sales") && can("exp") ? `<div class="dayhero"><div><small>${isToday ? "Bugungi" : dm(S.day) + " kungi"} kassa</small><div class="big" data-count="${Math.abs(Math.round(net))}" data-sign="${net < 0 ? "−" : "+"}">0 so'm</div>
+      <span class="dh-sub">${ic("down")} tushdi ${fmt(inn)} · ${ic("up")} chiqdi ${fmt(out)}</span></div>
+      <div class="dh-r"><small>Do'konlar qarzi</small><b>${fmt(Object.entries(D.shop).filter(([id]) => S.ref.shops[id] && !S.ref.shops[id].del).reduce((a, [, s]) => a + Math.max(0, s.bal), 0))}</b></div></div>` : ""}
+  <div class="kpis">
+    ${can("prod") ? kt("a", "check", "Ishlab chiqarildi", made.length ? esc(qtyByUnit(made)) : "0", "") : ""}
+    ${can("sales") ? kt("b", "box", "Yuk berildi", fmt(sumOf(day, "d")), day.filter(e => e.t === "d").length + " ta do'kon") + kt("e", "cash", "Pul tushdi", fmt(inn), day.filter(e => e.t === "p").length + " ta to'lov") : ""}
+    ${can("exp") && can("stock") && can("wages") ? kt("c", "wallet", "Pul chiqdi", fmt(out), "xarajat, xomashyo, ish haqi") : ""}
+  </div>
+  ${W(`<div class="qgrid">${qbtn("d", "plus", "Yuk berdim", "q-d")}${qbtn("p", "cash", "Pul oldim", "q-p")}${qbtn("r", "back", "Vozvrat", "q-r")}${qbtn("m", "check", "Mahsulot chiqdi", "q-m")}${qbtn("b", "box", "Xomashyo oldim", "q-b")}${qbtn("x", "wallet", "Xarajat", "q-x")}${qbtn("v", "users", "Ishchiga pul", "q-v")}</div>`)}
+  ${al.length ? `<div class="panel alerts"><div class="ph"><h2>Diqqat</h2></div>${al.map(([c, i, t, s, v]) => `<button type="button" class="alr ${c}" data-nav="${v}"><span class="ai">${ic(i)}</span><span><b>${esc(t)}</b><small>${esc(s)}</small></span><span class="go">›</span></button>`).join("")}</div>` : ""}
+  ${can("sales") ? `<div class="panel"><div class="ph"><h2>Oxirgi 7 kun</h2>${legend(["yuk", "var(--accent)"], ["pul tushdi", "var(--ok)"])}</div>${pairBars(days.map(d => DSH[new Date(d + "T12:00:00").getDay()] + " " + d.slice(8)), yv, pv, "var(--accent)", "var(--ok)", true)}</div>` : ""}
+  <div class="sec"><div class="head"><h2>${dm(S.day)} kungi yozuvlar · ${day.length} ta</h2></div>
+    <div class="chips">${FL.map(([k, t]) => `<button type="button" class="fchip" data-dflt="${k}" aria-pressed="${flt === k}">${t}</button>`).join("")}</div>
+    <div class="dlist2">${day.filter(fl).reverse().map(feedRow).join("") || `<div class="empty">Bu kunga yozuv yo'q.</div>`}</div></div>`;
+}
+
+function viewSkladJ() {
+  const prods = active("products"), mats = active("materials");
+  const sups = Object.values(D.sup).filter(x => Math.abs(x.bal) > 0.5).sort((a, b) => b.bal - a.bal);
+  const from = shiftDay(today(), -13);
+  const use = id => S.entries.filter(e => e.t === "u" && e.d >= from).reduce((a, e) => a + (e.i || []).filter(r => r.p === id).reduce((s, r) => s + (+r.q || 0), 0), 0) / 14;
+  const recent = S.entries.filter(e => "mbu".includes(e.t)).slice(-30).reverse();
+  const matCards = mats.map(([id, m], i) => {
+    const x = D.mat[id] || { q: 0, pr: null, in: 0, out: 0 }, u = use(id), days = u > 0 && x.q > 0 ? Math.floor(x.q / u) : null;
+    const st = x.q < -0.001 ? ["bad", "Minus: sarf ko'p yozilgan yoki xarid kiritilmagan"] : days != null && days < 3 ? ["mid", "Tez orada tugaydi"] : x.q <= 0.001 ? ["mid", "Qolmagan"] : ["ok", ""];
+    const pct = x.in > 0 ? Math.max(0, Math.min(100, x.q / x.in * 100)) : 0;
+    return `<div class="mc ${st[0]}" style="animation-delay:${Math.min(i, 12) * 30}ms"><div class="mt"><b>${esc(m.name)}</b>${x.pr != null ? `<span class="chip">${fmt(x.pr)} so'm</span>` : ""}</div>
+      <div class="mq"><span class="${x.q < -0.001 ? "debt" : ""}">${fq(x.q)}</span> <em>${esc(m.unit || "")}</em></div>
+      <span class="pbar"><i data-w="${pct}%"></i></span>
+      <div class="mf"><span>olindi ${fq(x.in)} · ishlatildi ${fq(x.out)}</span><span class="dd">${days != null ? "≈ " + days + " kunga yetadi" : u > 0 ? "" : "sarf yozilmagan"}</span></div>
+      ${st[1] ? `<div class="mw">${ic("alert")} ${st[1]}</div>` : ""}</div>`;
+  }).join("");
+  return `<div class="head"><h1>Sklad</h1></div>
+  ${can("sales") && can("prod") && can("firma") && prods.length ? `<div class="kpis">${prods.map(([id, p], i) => kt(["a", "e", "b", "d"][i % 4], "box", esc(p.name) + " — tayyor", `${fq(D.prod[id] || 0)} ${esc(p.unit || "")}`, (D.prod[id] || 0) < -0.001 ? "minus: ishlab chiqarish yozilmagan" : "skladda")).join("")}
+    ${can("stock") ? kt("c", "truck", "Ta'minotchilarga qarz", fmt(sups.reduce((a, x) => a + Math.max(0, x.bal), 0)), sups.length + " ta ta'minotchi") : ""}</div>` : ""}
+  ${W(`<div class="qgrid">${["m", "b", "B", "u"].filter(canT).map(t => `<button type="button" class="qb q-${t === "B" ? "p" : t}" data-add="${t}"><i>${ic(t === "m" ? "check" : t === "B" ? "cash" : t === "u" ? "down" : "box")}</i><span>${{ m: "Mahsulot chiqdi", b: "Xomashyo oldim", B: "Ta'minotchiga pul", u: "Xomashyo sarfi" }[t]}</span></button>`).join("")}</div>`)}
+  ${can("stock") ? `<div class="sec"><div class="head"><h2>Xomashyo qoldig'i</h2>${W(`<button type="button" class="btn small" data-ref="materials">Xomashyo turini qo'shish</button>`)}</div>
+    ${mats.length ? `<div class="mgrid">${matCards}</div><p class="hint">«Necha kunga yetadi» — oxirgi 14 kundagi o'rtacha sarfga qarab hisoblanadi.</p>` : `<div class="list"><div class="empty">Xomashyo turlari hali qo'shilmagan.</div></div>`}</div>` : ""}
+  ${can("stock") && sups.length ? `<div class="sec"><h2>Ta'minotchilar</h2><div class="dlist2">${sups.map(x => `<${S.canWrite ? `button type="button" data-add="B" data-sup="${esc(x.name)}"` : "div"} class="dr k-r">${avHTML("sup_" + supKey(x.name), x.name, "")}<span class="dm"><b>${esc(x.name)}</b><small>${x.bal > 0 ? (S.canWrite ? "pul berganda shu yerni bosing" : "qarzim") : "ortiqcha to'langan"}</small></span><span class="dv ${x.bal > 0 ? "debt" : "paid"}">${fmt(Math.abs(x.bal))}</span></${S.canWrite ? "button" : "div"}>`).join("")}</div></div>` : ""}
+  <div class="sec"><h2>Oxirgi sklad yozuvlari</h2><div class="dlist2">${recent.map(e => feedRow(e)).join("") || `<div class="empty">Hali sklad yozuvi yo'q.</div>`}</div></div>`;
+}
+
+function workerMonth(id, m) {
+  const L = S.entries.filter(e => e.w === id && e.d.startsWith(m));
+  return { earn: L.filter(e => e.t === "w").reduce((a, e) => a + amt(e), 0), paid: L.filter(e => e.t === "v").reduce((a, e) => a + amt(e), 0) };
+}
+function viewIshchilarJ() {
+  const m = today().slice(0, 7);
+  if (S.workerId && S.ref.workers[S.workerId]) {
+    const id = S.workerId, w = S.ref.workers[id], bal = D.wrk[id] || 0, tel = w.phone ? String(w.phone).replace(/[^\d+]/g, "") : "";
+    const list = S.entries.filter(e => e.w === id && "wv".includes(e.t));
+    const ms = []; for (let i = 5; i >= 0; i--) ms.push(shiftMonth(m, -i));
+    const mm = ms.map(x => workerMonth(id, x)), cur = mm[5];
+    const lastV = list.filter(e => e.t === "v").slice(-1)[0];
+    let run = 0; const feed = list.map(e => { const a = amt(e); run += e.t === "w" ? a : -a; return `<button type="button" class="fi ${e.t === "w" ? "k-d" : "k-p"}" ${S.canWrite ? `data-edit="${e.id}"` : ""}><span class="t">${e.t === "w" ? "Ish haqi hisoblandi" : "Pul berildi"}</span><span class="v">${e.t === "w" ? "+" : "−"}${fmt(a)}</span><span class="dt">${dm(e.d)}</span><span class="bal">qoldiq ${fmt(run)}</span>${e.n ? `<span class="d">${esc(e.n)}</span>` : ""}</button>`; }).reverse();
+    return `<div><button type="button" class="btn small" data-back>‹ Ishchilar</button></div>
+    <div class="sgrid"><div class="scol">
+      <div class="hero2"><div class="who">${avHTML("w_" + id, w.name, bal > 0.5 ? "r-mid" : "r-ok", true)}<div class="wt"><h1>${esc(w.name)}</h1><small>${esc([w.phone, w.note].filter(Boolean).join(" · ") || "ma'lumot kiritilmagan")}</small></div></div>
+        <div class="hstats"><div><b>${fmt(cur.earn)}</b><small>shu oy topdi</small></div><div><b>${fmt(cur.paid)}</b><small>shu oy oldi</small></div><div><b>${lastV ? dshort(lastV.d) : "—"}</b><small>oxirgi pul</small></div></div>
+        <div class="acts2">${tel ? `<a class="act2" href="tel:${esc(tel)}">${ic("phone")}<span>Qo'ng'iroq</span></a><button type="button" class="act2" data-copy="${esc(w.phone)}">${ic("copy")}<span>Nusxa</span></button>` : ""}${W(`<button type="button" class="act2" data-ref="workers" data-id="${id}">${ic("edit")}<span>Tahrir</span></button>`)}</div></div>
+      <div class="debtcard"><div><small>${bal < -0.5 ? "Ortiqcha berilgan (avans)" : "Berilishi kerak"}</small><div class="big ${bal <= 0.5 ? "zero" : ""}" data-count="${Math.round(Math.abs(bal))}">0 so'm</div>
+        <div class="meta">Jami hisoblangan ${fmt(list.filter(e => e.t === "w").reduce((a, e) => a + amt(e), 0))} · berilgan ${fmt(list.filter(e => e.t === "v").reduce((a, e) => a + amt(e), 0))}</div></div></div>
+      ${W(`<div class="qa qa2"><button type="button" class="btn q-d" data-add="w" data-w="${id}"><i>${ic("plus")}</i>Ish haqi yozish</button><button type="button" class="btn q-p" data-add="v" data-w="${id}"><i>${ic("cash")}</i>Pul berdim</button></div>`)}
+      <div class="panel"><div class="ph"><h2>Oxirgi 6 oy</h2>${legend(["topdi", "var(--accent)"], ["oldi", "var(--ok)"])}</div>${pairBars(ms.map(x => ["Yan", "Fev", "Mar", "Apr", "May", "Iyn", "Iyl", "Avg", "Sen", "Okt", "Noy", "Dek"][+x.slice(5) - 1]), mm.map(x => x.earn), mm.map(x => x.paid), "var(--accent)", "var(--ok)", true)}</div>
+    </div><div class="scol feedcol"><div class="sec"><h2>Tarix</h2>${feed.length ? `<div class="feed">${feed.join("")}</div>` : `<div class="list"><div class="empty">Hali yozuv yo'q.</div></div>`}</div></div></div>`;
+  }
+  const ws = active("workers");
+  const owed = ws.reduce((a, [id]) => a + Math.max(0, D.wrk[id] || 0), 0);
+  const mt = ws.map(([id]) => workerMonth(id, m)), earn = mt.reduce((a, x) => a + x.earn, 0), paid = mt.reduce((a, x) => a + x.paid, 0);
+  return `<div class="head"><h1>Ishchilar</h1>${W(`<button type="button" class="btn primary" data-ref="workers">Ishchi qo'shish</button>`)}</div>
+  <div class="kpis">${kt("c", "wallet", "Berilishi kerak", fmt(owed), "jami qoldiq")}${kt("a", "users", "Ishchilar", ws.length, ws.filter(([id]) => (D.wrk[id] || 0) > 0.5).length + " tasiga berilishi kerak")}${kt("b", "plus", monthName(m) + " hisoblandi", fmt(earn), "")}${kt("e", "cash", monthName(m) + " berildi", fmt(paid), "")}</div>
+  ${W(`<div class="qgrid">${canT("w") ? `<button type="button" class="qb q-d" data-add="w"><i>${ic("plus")}</i><span>Ish haqi yozish</span></button><button type="button" class="qb q-p" data-add="v"><i>${ic("cash")}</i><span>Pul berdim</span></button>` : ""}</div>`)}
+  <div class="shopgrid">${ws.map(([id, w], i) => { const b = D.wrk[id] || 0, x = mt[i], lv = S.entries.filter(e => e.w === id && e.t === "v").slice(-1)[0], pct = x.earn ? Math.min(100, Math.round(x.paid / x.earn * 100)) : 0;
+    return `<button type="button" class="sc2" data-open="workers:${id}" style="animation-delay:${Math.min(i, 12) * 30}ms">
+      <span class="top">${avHTML("w_" + id, w.name, b > 0.5 ? "r-mid" : "r-ok")}<span class="tt"><span class="nm">${esc(w.name)}</span><span class="sub">${esc(w.phone || w.note || "")}</span></span>
+        <span class="stp ${b > 0.5 ? "mid" : b < -0.5 ? "bad" : "ok"}">${b > 0.5 ? "Berilishi kerak" : b < -0.5 ? "Avans" : "Hisob teng"}</span></span>
+      <span class="mid"><span><small>${b < -0.5 ? "Ortiqcha berilgan" : "Qoldiq"}</small><b class="${b > 0.5 ? "debt" : "paid"}">${fmt(Math.abs(b))}</b></span><span class="r"><small>Shu oy topdi</small><b>${fmt(x.earn)}</b></span></span>
+      <span class="pbar"><i data-w="${pct}%"></i></span>
+      <span class="foot"><span class="chip">${ic("cash")}shu oy oldi ${fmt(x.paid)}</span><span class="chip">${ic("cal")}${lv ? "oxirgi pul " + dshort(lv.d) : "pul berilmagan"}</span></span></button>`; }).join("") || `<div class="list"><div class="empty">Hali ishchi yo'q.</div></div>`}</div>
+  <p class="hint">«Ish haqi yozish» — ishchi ishlab topgan pul. «Pul berdim» — avans yoki oylik. Chiziq — shu oy topganining qanchasi berilgani.</p>`;
+}
+
+function viewXarajatlarJ() {
+  const list = S.entries.filter(e => e.t === "x" && e.d.startsWith(S.month)), prev = S.entries.filter(e => e.t === "x" && e.d.startsWith(shiftMonth(S.month, -1)));
+  const total = list.reduce((a, e) => a + amt(e), 0), ptot = prev.reduce((a, e) => a + amt(e), 0);
+  const by = {}; for (const e of list) by[e.c || "Boshqa"] = (by[e.c || "Boshqa"] || 0) + amt(e);
+  const cats = Object.entries(by).sort((a, b) => b[1] - a[1]);
+  const diff = ptot ? Math.round((total - ptot) / ptot * 100) : null;
+  const R = 52, C = 2 * Math.PI * R; let off = 0;
+  const arcs = cats.map(([c, v], i) => { const len = v / total * C, s = `<circle cx="70" cy="70" r="${R}" fill="none" stroke="${CATCOL[i % CATCOL.length]}" stroke-width="18" stroke-dasharray="${len.toFixed(1)} ${C}" stroke-dashoffset="${(-off).toFixed(1)}"/>`; off += len; return s; }).join("");
+  const ms = []; for (let i = 5; i >= 0; i--) ms.push(shiftMonth(S.month, -i));
+  const mv = ms.map(x => S.entries.filter(e => e.t === "x" && e.d.startsWith(x)).reduce((a, e) => a + amt(e), 0));
+  return `<div class="head"><h1>Xarajatlar</h1>${monthStepper()}</div>
+  <div class="dayhero xh"><div><small>${monthName(S.month)} xarajati</small><div class="big" data-count="${Math.round(total)}">0 so'm</div>
+    <span class="dh-sub">${diff == null ? "o'tgan oyda xarajat yo'q" : `${diff > 0 ? ic("up") : ic("down")} o'tgan oyga nisbatan ${diff > 0 ? "+" : ""}${diff}% (${fmt(ptot)})`}</span></div>
+    ${addBtn("x", "Xarajat yozish", "", "light")}</div>
+  ${cats.length ? `<div class="panel"><div class="ph"><h2>Turlari bo'yicha</h2></div><div class="xdon"><svg width="140" height="140" viewBox="0 0 140 140" style="transform:rotate(-90deg)"><circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--line)" stroke-width="18"/>${arcs}</svg>
+    <div class="xleg">${cats.map(([c, v], i) => `<div><span class="xi" style="--c:${CATCOL[i % CATCOL.length]}">${ic(CATIC[c] || "dots")}</span><span class="xn">${esc(c)}</span><b>${fmt(v)}</b><em>${Math.round(v / total * 100)}%</em></div>`).join("")}</div></div></div>` : ""}
+  <div class="panel"><div class="ph"><h2>Oxirgi 6 oy</h2></div>${pairBars(ms.map(x => ["Yan", "Fev", "Mar", "Apr", "May", "Iyn", "Iyl", "Avg", "Sen", "Okt", "Noy", "Dek"][+x.slice(5) - 1]), mv, mv.map(() => 0), "var(--bad)", "transparent", true)}</div>
+  <div class="sec"><h2>Yozuvlar · ${list.length} ta</h2><div class="dlist2">${list.slice().reverse().map(feedRow).join("") || `<div class="empty">Bu oyda xarajat yozilmagan.</div>`}</div></div>
+  <p class="hint">Xomashyo xaridi Sklad bo'limida, ish haqi Ishchilar bo'limida yoziladi. Hammasi Hisobot bo'limida jamlanadi.</p>`;
+}
+
 /* Filiallari bor firma: filiallar ro'yxati, har birining qarzi bilan. */
 function viewFirmBranches(id) {
   const f = S.ref.fshops[id], d = D.shop[id] || { bal: 0, lastD: "", lastP: "" }, brs = brList(id);
@@ -945,6 +1184,7 @@ function viewFirma() {
 }
 
 function viewSklad() {
+  if (JON()) return viewSkladJ();
   const prods = active("products"), mats = active("materials");
   const recent = S.entries.filter(e => "mbu".includes(e.t)).slice(-40).reverse();
   const sups = Object.values(D.sup).filter(x => Math.abs(x.bal) > 0.5).sort((a, b) => b.bal - a.bal);
@@ -965,6 +1205,7 @@ function viewSklad() {
 }
 
 function viewIshchilar() {
+  if (JON()) return viewIshchilarJ();
   if (S.workerId && S.ref.workers[S.workerId]) {
     const id = S.workerId, w = S.ref.workers[id], bal = D.wrk[id] || 0;
     const list = S.entries.filter(e => e.w === id && "wv".includes(e.t));
@@ -988,6 +1229,7 @@ function viewIshchilar() {
 
 const monthStepper = () => `<div class="stepper"><button type="button" class="icon-btn" data-month="-1" aria-label="Oldingi oy">‹</button><b>${monthName(S.month)}</b><button type="button" class="icon-btn" data-month="1" aria-label="Keyingi oy">›</button></div>`;
 function viewXarajatlar() {
+  if (JON()) return viewXarajatlarJ();
   const list = S.entries.filter(e => e.t === "x" && e.d.startsWith(S.month));
   const total = list.reduce((a, e) => a + amt(e), 0);
   const by = {}; for (const e of list) by[e.c || "Boshqa"] = (by[e.c || "Boshqa"] || 0) + amt(e);
@@ -1603,7 +1845,7 @@ async function exportCsv() {
 
 /* ---------- events ---------- */
 document.addEventListener("click", async ev => {
-  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-flt],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
+  const el = ev.target.closest("[data-nav],[data-add],[data-edit],[data-open],[data-back],[data-ref],[data-day],[data-month],[data-copy],[data-close],[data-add-row],[data-rm-row],[data-add-orow],[data-rm-orow],[data-img-del],[data-flt],[data-dflt],[data-del],[data-export],[data-geo],[data-logout],[data-user],[data-reload-log],[data-norm],[data-inv],[data-invsel],[data-openbr],[data-br],button[data-skin]");
   if (!el) return;
   const ds = el.dataset;
   if (el.classList.contains("skin") && "skin" in ds) { SKIN = ds.skin; try { localStorage.setItem("daftar-skin", SKIN); } catch (e) {} applySkin(); render(); toast(SKIN ? "Dizayn almashtirildi" : "Oddiy dizaynga qaytildi"); return; }
@@ -1620,6 +1862,7 @@ document.addEventListener("click", async ev => {
   else if ("close" in ds) dlg.close();
   else if ("addRow" in ds) { $("#f-rows").insertAdjacentHTML("beforeend", itemRow(catOf(F.t), F.hasPrice, {})); refreshPrices(); updateTotal(); }
   else if ("flt" in ds) { S.flt = ds.flt; render(); }
+  else if ("dflt" in ds) { S.dflt = ds.dflt; render(); }
   else if ("imgDel" in ds) { F.photo = "del"; const pv = $("#r-pv"); pv.style.backgroundImage = ""; pv.textContent = "—"; el.remove(); }
   else if ("addOrow" in ds) { $("#o-rows").insertAdjacentHTML("beforeend", oRow({})); }
   else if ("rmOrow" in ds) { if ($$("#o-rows .orow").length > 1) el.closest(".orow").remove(); else { $(".o-a", el.closest(".orow")).value = ""; $(".o-d", el.closest(".orow")).value = ""; } updateOTotal(); }
